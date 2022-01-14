@@ -15,7 +15,7 @@ repositories {
     }
 }
 
-group = 'org.example'
+group = 'fr.ferret'
 version = '1.0-SNAPSHOT'
 description = 'NewFerret'
 
@@ -37,6 +37,23 @@ java {
   targetCompatibility = JavaVersion.VERSION_17
 }
 
+
+dependencies {
+    // Use JUnit Jupiter for testing.
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+
+    // This dependency is used by the application.
+    implementation 'com.google.guava:guava:30.1.1-jre'
+    // https://mvnrepository.com/artifact/com.github.samtools/htsjdk
+    implementation 'com.github.samtools:htsjdk:2.21.2'
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
+
 application {
     mainClassName = javaMainClass
 }
+
