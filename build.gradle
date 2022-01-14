@@ -5,6 +5,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id 'application'
 }
 
 repositories {
@@ -25,4 +26,13 @@ publishing {
             from(components.java)
         }
     }
+}
+
+apply plugin : "java" 
+ext {
+   javaMainClass = "fr.ferret.FerretMain"
+}
+
+application {
+    mainClassName = javaMainClass
 }
