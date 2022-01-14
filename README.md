@@ -32,5 +32,7 @@ With the latest JDK installed, just execute:
 
 ## References
 
-frontend: <https://github.com/PAPPL-Ferret/NewFerret>
-backend: <https://github.com/JorgeStone/Ferret-Model>
+This project is based on previous PAPPL assignments of our classmates:
+
+- Frontend: <https://github.com/PAPPL-Ferret/NewFerret>
+- Backend: <https://github.com/JorgeStone/Ferret-Model>
