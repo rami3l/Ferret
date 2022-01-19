@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -20,6 +21,9 @@ import fr.ferret.view.panel.VariantPanel;
  * The {@link VariantPanel} controller
  */
 public class VariantPanelController extends InputPanelController {
+
+    private static final Logger LOG = Logger.getLogger(VariantPanelController.class.getName());
+
     private final VariantPanel variantPanel;
 
     public VariantPanelController(FerretFrame frame, VariantPanel variantPanel) {
@@ -141,7 +145,7 @@ public class VariantPanelController extends InputPanelController {
         if ((snpListInputted || (snpFileImported && !snpFileError && !snpFileExtensionError))
                 && !invalidCharacter && validWindowSizeEntered && popSelected) {
 
-            FerretMain.getLog().log(Level.INFO, "Starting gene research...");
+            LOG.log(Level.INFO, "Starting gene research...");
             // TODO LINK WITH MODEL
 
             // this should be combined with the one single call to Ferret later

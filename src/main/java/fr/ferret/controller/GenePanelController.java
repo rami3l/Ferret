@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
@@ -20,6 +21,9 @@ import fr.ferret.view.panel.GenePanel;
  * The {@link GenePanel} controller
  */
 public class GenePanelController extends InputPanelController {
+
+    private static final Logger LOG = Logger.getLogger(GenePanelController.class.getName());
+
     private final GenePanel genePanel;
 
     public GenePanelController(FerretFrame frame, GenePanel genePanel) {
@@ -127,7 +131,7 @@ public class GenePanelController extends InputPanelController {
         if ((geneListInputted || (geneFileImported && !geneFileError && !geneFileExtensionError))
                 && !invalidCharacter && popSelected) {
 
-            FerretMain.getLog().log(Level.INFO, "Starting gene research...");
+            LOG.log(Level.INFO, "Starting gene research...");
             // TODO LINK WITH MODEL
 
             // this should be combined with the one single call to Ferret later

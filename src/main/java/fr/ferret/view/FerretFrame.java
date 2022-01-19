@@ -1,27 +1,30 @@
 package fr.ferret.view;
 
+import java.awt.image.BufferedImage;
+import java.util.Optional;
 import java.util.logging.Level;
-
-import javax.imageio.ImageIO;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-
-import fr.ferret.FerretMain;
 import fr.ferret.view.panel.GenePanel;
 import fr.ferret.view.panel.LocusPanel;
 import fr.ferret.view.panel.RegionPanel;
 import fr.ferret.view.panel.RunPanel;
 import fr.ferret.view.panel.VariantPanel;
 import fr.ferret.view.panel.header.MenuPanel;
+import fr.ferret.view.utils.Resource;
 
 /**
  * Main Ferret frame
  */
 public class FerretFrame extends JFrame {
+
+    private static final Logger LOG = Logger.getLogger(FerretFrame.class.getName());
+
     private final MenuPanel headerPanel;
     private final JTabbedPane inputTabs;
     private final LocusPanel locusPanel;
@@ -36,13 +39,12 @@ public class FerretFrame extends JFrame {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
-            FerretMain.getLog().log(Level.WARNING, "Failed to set ferret look and feel !", e);
+            LOG.log(Level.WARNING, "Failed to set ferret look and feel !", e);
         }
         // Set icon
-        try {
-            setIconImage(ImageIO.read(getClass().getResourceAsStream("/img/ferret.jpg")));
-        } catch (Exception e) {
-            FerretMain.getLog().log(Level.WARNING, "Failed to set ferret icon !", e);
+        Optional<BufferedImage> icon = Resource.getImage("/img/ferret.jpg");
+        if (icon.isPresent()) {
+            setIconImage(icon.get());
         }
 
         headerPanel = new MenuPanel(this);

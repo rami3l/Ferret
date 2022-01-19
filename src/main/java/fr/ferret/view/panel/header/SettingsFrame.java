@@ -2,10 +2,9 @@ package fr.ferret.view.panel.header;
 
 import java.awt.Dimension;
 import java.awt.Font;
-import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Hashtable;
-import java.util.logging.Level;
+import java.util.Optional;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -24,6 +23,7 @@ import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.controller.settings.SettingsFrameController;
 import fr.ferret.view.FerretFrame;
+import fr.ferret.view.utils.Resource;
 
 /**
  * The ferret settings frame
@@ -35,14 +35,9 @@ public class SettingsFrame extends JFrame {
         super(FerretMain.getLocale().getString("settings.title"));
         this.config = config;
 
-        ImageIcon questionMark = null;
-        try {
-            URL questionMarkURL = getClass().getResource("/img/questionMark25.png");
-            questionMark = new ImageIcon(questionMarkURL);
-        } catch (Exception e) {
-            FerretMain.getLog().log(Level.WARNING, "Failed to get question mark icon !", e);
-        }
-        JLabel questionMarkMAFThreshold = questionMark == null ? null : new JLabel(questionMark);
+        Optional<ImageIcon> questionMark = Resource.getIcon("/img/questionMark25.png");
+        JLabel questionMarkMAFThreshold =
+                questionMark.isPresent() ? new JLabel(questionMark.get()) : null;
 
         JPanel settingsPanel = new JPanel();
         this.getContentPane().add(settingsPanel);

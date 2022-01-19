@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import fr.ferret.FerretMain;
@@ -16,6 +17,9 @@ import fr.ferret.view.panel.LocusPanel;
  * The {@link LocusPanel} controller
  */
 public class LocusPanelController extends InputPanelController {
+
+    private static final Logger LOG = Logger.getLogger(LocusPanelController.class.getName());
+
     private final LocusPanel locusPanel;
 
     public LocusPanelController(FerretFrame frame, LocusPanel locusPanel) {
@@ -131,7 +135,7 @@ public class LocusPanelController extends InputPanelController {
         // Valid input
         if (isChrSelected && populationSelected && startSelected && endSelected && startEndValid
                 && withinRange) {
-            FerretMain.getLog().log(Level.INFO, "Starting gene research...");
+            LOG.log(Level.INFO, "Starting gene research...");
             // TODO LINK WITH MODEL
 
             /*
