@@ -15,7 +15,7 @@ import fr.ferret.controller.UpdateChecker;
 
 public class UpdateFrame extends JFrame {
 
-    private final Boolean[] checkedForUpdate = {false};
+    private boolean checkedForUpdate = false;
     private final JPanel updatePanel = new JPanel();
     private final JPanel updateBarHolder = new JPanel();
     private final JProgressBar updateProgressBar = new JProgressBar();
@@ -37,7 +37,7 @@ public class UpdateFrame extends JFrame {
         updateProgressBar.setIndeterminate(true);
         // updateBarHolder.add(updateDetailLabel);
         JLabel updateDetailLabel = new JLabel("");
-        updateDetailLabel.setAlignmentX(CENTER_ALIGNMENT);
+        updateDetailLabel.setAlignmentX(CENTER_ALIGNMENT); // TODO: what is the use of this label ?
         updateBarHolder.add(updateProgressBar);
         updatePanel.add(updateBarHolder);
         JPanel updateButtonHolder = new JPanel();
@@ -49,12 +49,12 @@ public class UpdateFrame extends JFrame {
         this.pack();
     }
 
-    public void showFrame(JFrame SNPFerret) {
-        this.setLocationRelativeTo(SNPFerret);
+    public void showFrame(JFrame snpFerret) {
+        this.setLocationRelativeTo(snpFerret);
         this.setVisible(true);
 
-        if (!checkedForUpdate[0]) {
-            checkedForUpdate[0] = true;
+        if (!checkedForUpdate) {
+            checkedForUpdate = true;
             final UpdateChecker updateWorker = new UpdateChecker();
             updateWorker.addPropertyChangeListener(arg01 -> {
                 if (arg01.getPropertyName().equals("state")) {

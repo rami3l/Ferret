@@ -46,7 +46,7 @@ public class LocusPanel extends JPanel {
         GridBagLayout inputPanelLayout = new GridBagLayout();
         inputPanel.setLayout(inputPanelLayout);
 
-        JLabel lab_chromosome = new JLabel(FerretMain.getLocale().getString("locus.chromosome"));
+        JLabel labChromosome = new JLabel(FerretMain.getLocale().getString("locus.chromosome"));
         String[] chromosomes = {" ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
                 "13", "14", "15", "16", "17", "18", "19", "20", "21", "22"};
 
@@ -55,8 +55,8 @@ public class LocusPanel extends JPanel {
         chromosomeList = new JComboBox<>(chromosomes);
         chromosomeList.setSelectedIndex(0);
 
-        JLabel lab_start = new JLabel(FerretMain.getLocale().getString("locus.start"));
-        JLabel lab_end = new JLabel(FerretMain.getLocale().getString("locus.end"));
+        JLabel labStart = new JLabel(FerretMain.getLocale().getString("locus.start"));
+        JLabel labEnd = new JLabel(FerretMain.getLocale().getString("locus.end"));
 
         inputStart = new JTextField();
         inputEnd = new JTextField();
@@ -68,9 +68,9 @@ public class LocusPanel extends JPanel {
         c.weightx = 0.3;
         c.gridx = 1;
         c.gridy = 2;
-        lab_chromosome.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
-        lab_chromosome.setFont(new Font(lab_chromosome.getFont().getFontName(), Font.PLAIN, 16));
-        inputPanel.add(lab_chromosome, c);
+        labChromosome.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
+        labChromosome.setFont(new Font(labChromosome.getFont().getFontName(), Font.PLAIN, 16));
+        inputPanel.add(labChromosome, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.8;
@@ -82,9 +82,9 @@ public class LocusPanel extends JPanel {
         c.weightx = 0.3;
         c.gridx = 1;
         c.gridy = 3;
-        lab_start.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
-        lab_start.setFont(new Font(lab_start.getFont().getFontName(), Font.PLAIN, 16));
-        inputPanel.add(lab_start, c);
+        labStart.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
+        labStart.setFont(new Font(labStart.getFont().getFontName(), Font.PLAIN, 16));
+        inputPanel.add(labStart, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.8;
@@ -96,9 +96,9 @@ public class LocusPanel extends JPanel {
         c.weightx = 0.3;
         c.gridx = 1;
         c.gridy = 4;
-        lab_end.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
-        lab_end.setFont(new Font(lab_end.getFont().getFontName(), Font.PLAIN, 16));
-        inputPanel.add(lab_end, c);
+        labEnd.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
+        labEnd.setFont(new Font(labEnd.getFont().getFontName(), Font.PLAIN, 16));
+        inputPanel.add(labEnd, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.8;

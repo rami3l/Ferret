@@ -12,6 +12,7 @@ import fr.ferret.view.FerretFrame;
  * The panel with the run button of Ferret
  */
 public class RunPanel extends JPanel {
+
     private final RunButtonListener listener;
 
     public RunPanel(FerretFrame frame) {

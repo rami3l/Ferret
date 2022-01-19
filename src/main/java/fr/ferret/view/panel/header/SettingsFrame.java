@@ -31,6 +31,8 @@ import lombok.Getter;
  */
 public class SettingsFrame extends JFrame {
 
+    private static final String FONT = "SansSerif";
+
     @Getter
     private final FerretConfig config;
 
@@ -57,7 +59,7 @@ public class SettingsFrame extends JFrame {
         {
             JLabel vcfVersionLabel =
                     new JLabel(FerretMain.getLocale().getString("settings.genversion"));
-            vcfVersionLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+            vcfVersionLabel.setFont(new Font(FONT, Font.BOLD, 16));
             settingsPanel.add(vcfVersionLabel);
 
             ButtonGroup vcfRadioButtons = new ButtonGroup();
@@ -77,9 +79,9 @@ public class SettingsFrame extends JFrame {
         // TODO PGROU : une barre pour le min, une barre pour le max
 
         JSlider mafSlider = new JSlider(0, 5000, 0);
-        JLabel MAFThresholdLabel =
+        JLabel nafThresholdLabel =
                 new JLabel(FerretMain.getLocale().getString("settings.mafthresold"));
-        JLabel MAFOptionLabel = new JLabel(FerretMain.getLocale().getString("settings.maf"));
+        JLabel nafOptionLabel = new JLabel(FerretMain.getLocale().getString("settings.maf"));
 
         JPanel mafPanel = new JPanel();
         JPanel mafESPPanel = new JPanel();
@@ -93,21 +95,21 @@ public class SettingsFrame extends JFrame {
         {
             settingsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
             mafPanel.setAlignmentX(LEFT_ALIGNMENT);
-            settingsPanel.add(MAFOptionLabel);
-            MAFOptionLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+            settingsPanel.add(nafOptionLabel);
+            nafOptionLabel.setFont(new Font(FONT, Font.BOLD, 16));
             settingsPanel.add(mafPanel);
             mafPanel.setLayout(new BoxLayout(mafPanel, BoxLayout.X_AXIS));
-            mafPanel.add(MAFThresholdLabel);
+            mafPanel.add(nafThresholdLabel);
             mafText.setColumns(5);
             mafText.setMaximumSize(mafText.getPreferredSize());
             mafPanel.add(mafText);
 
             mafSlider.setMajorTickSpacing(1000);
             mafSlider.setPaintTicks(true);
-            Hashtable labelTable = new Hashtable();
-            labelTable.put(new Integer(0), new JLabel("0.0"));
-            labelTable.put(new Integer(5000), new JLabel("0.5"));
-            mafSlider.setLabelTable(labelTable);
+            Hashtable<Integer, JLabel> labels = new Hashtable<>();
+            labels.put(0, new JLabel("0.0"));
+            labels.put(5000, new JLabel("0.5"));
+            mafSlider.setLabelTable(labels);
             mafSlider.setValue(0);
             mafSlider.setPaintLabels(true);
             mafPanel.add(mafSlider);
@@ -134,7 +136,7 @@ public class SettingsFrame extends JFrame {
         settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         JLabel filesLabel = new JLabel(FerretMain.getLocale().getString("settings.outfiles"));
         settingsPanel.add(filesLabel);
-        filesLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+        filesLabel.setFont(new Font(FONT, Font.BOLD, 16));
 
         ButtonGroup fileOutputButtons = new ButtonGroup();
         JRadioButton allFilesButton =
@@ -169,7 +171,7 @@ public class SettingsFrame extends JFrame {
                     new JLabel(FerretMain.getLocale().getString("settings.hugversion"));
             settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
             settingsPanel.add(hgVersionLabel);
-            hgVersionLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
+            hgVersionLabel.setFont(new Font(FONT, Font.BOLD, 16));
 
             ButtonGroup hgVersionButtons = new ButtonGroup();
             for (int i = 0; i < humanVersionButtons.length; i++) {

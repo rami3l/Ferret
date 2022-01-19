@@ -36,9 +36,7 @@ public class MenuPanel extends JMenuBar {
         this.add(helpMenu);
 
         // update window
-        updateMenuItem.addActionListener(arg0 -> {
-            new UpdateFrame().showFrame(ferretFrame);
-        });
+        updateMenuItem.addActionListener(arg0 -> new UpdateFrame().showFrame(ferretFrame));
 
         // Settings pane:
         FerretConfig config = FerretMain.getConfig();

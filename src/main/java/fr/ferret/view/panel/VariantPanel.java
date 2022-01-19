@@ -15,12 +15,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import fr.ferret.FerretMain;
 import fr.ferret.controller.BrowseFileButtonListener;
+import lombok.Getter;
 
 /**
  * The variant panel of Ferret <br>
  * Selection of the gene variants parameters
  */
+@Getter
 public class VariantPanel extends JPanel {
+
     // private final JComboBox<String> chromosomeList;
     private final JTextField variantIdField;
     private final JCheckBox checkbox;
@@ -140,19 +143,4 @@ public class VariantPanel extends JPanel {
         helpLabel1.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
     }
 
-    public JTextField getVariantIdField() {
-        return variantIdField;
-    }
-
-    public BrowseFileButtonListener getFileSelector() {
-        return fileSelector;
-    }
-
-    public JCheckBox getCheckbox() {
-        return checkbox;
-    }
-
-    public JTextField getBpField() {
-        return bpField;
-    }
 }
