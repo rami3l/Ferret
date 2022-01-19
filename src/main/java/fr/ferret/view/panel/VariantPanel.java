@@ -9,6 +9,7 @@ import java.awt.GridBagLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -24,123 +25,133 @@ import lombok.Getter;
 @Getter
 public class VariantPanel extends JPanel {
 
-    // private final JComboBox<String> chromosomeList;
-    private final JTextField variantIdField;
-    private final JCheckBox checkbox;
-    private final JTextField bpField;
-    private final BrowseFileButtonListener fileSelector;
+    private JTextField variantIdField;
+    private JCheckBox checkbox;
+    private JTextField bpField;
+    private BrowseFileButtonListener fileSelector;
 
+    /**
+     * Creates the variant panel
+     */
     public VariantPanel() {
-        // Labels
+
+        /* --- Title --- */
+        JLabel titleLabel = generateTitle();
+
+        /* --- Input panel --- */
+        JPanel inputPanel = generateInputPanel();
+
+        /* --- Help section --- */
+        JLabel helpLabel =
+                new JLabel(Resource.getTextElement("variant.help"), SwingConstants.CENTER);
+
+        // Add the 3 parts defined above to the layout
+        this.setLayout(new BorderLayout());
+        add(titleLabel, BorderLayout.NORTH);
+        add(inputPanel, BorderLayout.CENTER);
+        add(helpLabel, BorderLayout.SOUTH);
+
+        // Set the borders
+        setBorder(BorderFactory.createLineBorder(new Color(131, 55, 192, 140), 4));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
+        helpLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+    }
+
+    /**
+     * Generates the title of the variant panel
+     * 
+     * @return the title label
+     */
+    private JLabel generateTitle() {
         JLabel titleLabel =
                 new JLabel(Resource.getTextElement("variant.input"), SwingConstants.LEFT);
         titleLabel.setFont(new Font("Calibri", Font.BOLD, 24));
         titleLabel.setForeground(new Color(18, 0, 127));
+        return titleLabel;
+    }
 
-        JLabel helpLabel1 =
-                new JLabel(Resource.getTextElement("variant.help"), SwingConstants.CENTER);
-
-        // Input panel
+    /**
+     * Generate the input part of the variant panel
+     * 
+     * @return the input panel
+     */
+    private JPanel generateInputPanel() {
 
         JPanel inputPanel = new JPanel();
         inputPanel.setLayout(new GridBagLayout());
 
-        // JLabel lab_inputnameorid = new JLabel(FerretTest.locale.getString("gene.inputnameorid"));
-        JLabel labOr = new JLabel(Resource.getTextElement("variant.or"));
-        labOr.setBorder(BorderFactory.createEmptyBorder(0, 130, 0, 10));
-        labOr.setFont(new Font(labOr.getFont().getFontName(), Font.PLAIN, 16));
-
+        // Variant Id
         variantIdField = new JTextField();
-        bpField = new JTextField();
 
-        JLabel selectedFile = new JLabel(Resource.getTextElement("variant.selectfile"));
+        // Including variants (placed in a subpanel)
+        JPanel includingVariantSubPanel = generateIncludingVariantPanel();
+
+        // Or Label
+        JLabel orLabel = new JLabel(Resource.getTextElement("variant.or"));
+        orLabel.setBorder(BorderFactory.createEmptyBorder(0, 130, 0, 10));
+        orLabel.setFont(new Font(orLabel.getFont().getFontName(), Font.PLAIN, 16));
+
+        // File selection
         JButton browseButton = new JButton(Resource.getTextElement("variant.browse"));
         browseButton.setPreferredSize(new Dimension(200, 30));
         browseButton.setBackground(new Color(201, 157, 240));
+
+        JLabel selectedFile = new JLabel(Resource.getTextElement("variant.selectfile"));
+        selectedFile.setFont(new Font(selectedFile.getFont().getFontName(), Font.PLAIN, 13));
+
         fileSelector = new BrowseFileButtonListener(this, browseButton, selectedFile);
-        // RunButtonListener listener = new RunButtonListener(frame, browseButton);
+
+        // Add the elements defined above to the input panel
+        addToPanel(inputPanel, variantIdField, 0.8, 1, 1);
+        addToPanel(inputPanel, orLabel, 0.2, 2, 1);
+        addToPanel(inputPanel, browseButton, 0.6, 3, 1);
+        addToPanel(inputPanel, selectedFile, 0.6, 3, 2);
+        addToPanel(inputPanel, includingVariantSubPanel, 0.7, 1, 2);
+
+        return inputPanel;
+    }
+
+    /**
+     * Generates the 'Including variants' part of the input panel
+     * 
+     * @return the 'Including variants' panel
+     */
+    private JPanel generateIncludingVariantPanel() {
+        JPanel includingVariantSubPanel = new JPanel();
+        includingVariantSubPanel.setLayout(new GridBagLayout());
 
         checkbox = new JCheckBox(Resource.getTextElement("variant.bpcheckbox"));
-
-        JLabel bp = new JLabel(Resource.getTextElement("variant.bp"));
-
-        GridBagConstraints c = new GridBagConstraints();
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.8;
-        c.gridx = 1;
-        c.gridy = 1;
-        inputPanel.add(variantIdField, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.2;
-        c.gridx = 2;
-        c.gridy = 1;
-        inputPanel.add(labOr, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.6;
-        c.gridx = 3;
-        c.gridy = 1;
-        inputPanel.add(browseButton, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.6;
-        c.gridx = 3;
-        c.gridy = 2;
-        selectedFile.setFont(new Font(selectedFile.getFont().getFontName(), Font.PLAIN, 13));
-        inputPanel.add(selectedFile, c);
-
-        /*
-         * c.fill = GridBagConstraints.HORIZONTAL; c.weightx = 0.3; c.gridx = 1; c.gridy = 2;
-         * lab_inputnameorid.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
-         * lab_inputnameorid.setFont(new Font(lab_inputnameorid.getFont().getFontName(), Font.PLAIN,
-         * 16)); inputPanel.add(lab_inputnameorid, c);
-         */
-
-        JPanel choice = new JPanel();
-        choice.setLayout(new GridBagLayout());
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.02;
-        c.gridx = 1;
-        c.gridy = 1;
         checkbox.setFont(new Font(checkbox.getFont().getFontName(), Font.PLAIN, 13));
-        choice.add(checkbox, c);
 
+        JLabel bpLabel = new JLabel(Resource.getTextElement("variant.bp"));
+        bpLabel.setFont(new Font(bpLabel.getFont().getFontName(), Font.PLAIN, 13));
+        bpField = new JTextField();
+
+        addToPanel(includingVariantSubPanel, checkbox, 0.002, 1, 1);
+        addToPanel(includingVariantSubPanel, bpField, 0.4, 2, 1);
+        addToPanel(includingVariantSubPanel, bpLabel, 0.3, 3, 1);
+
+        return includingVariantSubPanel;
+    }
+
+    /**
+     * Adds a component to a panel (which is a grid)
+     * 
+     * @param panel : the panel to add the component to
+     * @param componentToAdd : the component to add to the panel
+     * @param weightx : the width of the component in the panel
+     * @param gridx : the x position of the component in the panel
+     * @param gridy : the y position of the component in the panel
+     */
+    private void addToPanel(JPanel panel, JComponent componentToAdd, double weightx, int gridx,
+            int gridy) {
+        GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.4;
-        c.gridx = 2;
-        c.gridy = 1;
-        choice.add(bpField, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.3;
-        c.gridx = 3;
-        c.gridy = 1;
-        bp.setFont(new Font(bp.getFont().getFontName(), Font.PLAIN, 13));
-        choice.add(bp, c);
-
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 0.7;
-        c.gridx = 1;
-        c.gridy = 2;
-        inputPanel.add(choice, c);
-
-        // rdoGreen.addItemListener( this::radioButtons_itemStateChanged );
-
-        // Add elements
-
-        this.setLayout(new BorderLayout());
-        add(titleLabel, BorderLayout.NORTH);
-        add(inputPanel, BorderLayout.CENTER);
-        add(helpLabel1, BorderLayout.SOUTH);
-
-        // Borders
-        setBorder(BorderFactory.createLineBorder(new Color(131, 55, 192, 140), 4));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
-        inputPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
-        helpLabel1.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        c.weightx = weightx;
+        c.gridx = gridx;
+        c.gridy = gridy;
+        panel.add(componentToAdd, c);
     }
 
 }
