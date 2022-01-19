@@ -12,12 +12,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import fr.ferret.FerretMain;
+import lombok.Getter;
 
 /**
  * The locus panel of Ferret <br>
  * Selection of the chromosome and genes parameters
  */
+@Getter
 public class LocusPanel extends JPanel {
+
     private final JComboBox<String> chromosomeList;
     private final JTextField inputStart;
     private final JTextField inputEnd;
@@ -117,19 +120,4 @@ public class LocusPanel extends JPanel {
         helpLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
     }
 
-    public JLabel getTitleLabel() {
-        return titleLabel;
-    }
-
-    public JComboBox<String> getChromosomeList() {
-        return chromosomeList;
-    }
-
-    public JTextField getInputStart() {
-        return inputStart;
-    }
-
-    public JTextField getInputEnd() {
-        return inputEnd;
-    }
 }

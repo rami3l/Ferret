@@ -19,13 +19,14 @@ import javax.swing.border.MatteBorder;
  * A clickable JTextField containing a link
  */
 public class LinkLabel extends JTextField implements MouseListener, FocusListener, ActionListener {
+
     private URI target;
 
-    public Color standardColor = new Color(0, 0, 255);
-    public Color hoverColor = new Color(255, 0, 0);
-    public Color activeColor = new Color(128, 0, 128);
-    public Color transparent = new Color(0, 0, 0, 0);
-    public Color backgroundColor;
+    private Color standardColor = new Color(0, 0, 255);
+    private Color hoverColor = new Color(255, 0, 0);
+    private Color activeColor = new Color(128, 0, 128);
+    private Color transparent = new Color(0, 0, 0, 0);
+    private Color backgroundColor;
 
     private Border activeBorder;
     private Border hoverBorder;

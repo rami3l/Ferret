@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import fr.ferret.FerretMain;
 import fr.ferret.view.region.Region;
+import lombok.Getter;
 
 /**
  * Region panel <br>
@@ -23,6 +24,7 @@ public class RegionPanel extends JPanel {
     /**
      * Panels for each supported {@link Region}
      */
+    @Getter
     private final List<ZonesPanel> regions = new ArrayList<>();
 
     /**
@@ -69,17 +71,12 @@ public class RegionPanel extends JPanel {
         updateUI();
     }
 
-    /**
-     * @return Panels for each supported {@link Region}
-     */
-    public List<ZonesPanel> getRegions() {
-        return regions;
-    }
 
     /**
      * A JPanel containing a {@link Region} <br>
      * Contains all the selectable zones of the region
      */
+    @Getter
     public class ZonesPanel extends JPanel {
         /**
          * The region displayed on this panel
@@ -154,14 +151,6 @@ public class RegionPanel extends JPanel {
                 checkBoxes[i].setSelected(false);
                 checkBoxes[i].updateUI();
             }
-        }
-
-        public Region getRegion() {
-            return region;
-        }
-
-        public JCheckBox[] getCheckBoxes() {
-            return checkBoxes;
         }
     }
 }

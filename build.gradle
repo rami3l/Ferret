@@ -46,6 +46,10 @@ dependencies {
     implementation 'com.google.guava:guava:30.1.1-jre'
     // https://mvnrepository.com/artifact/com.github.samtools/htsjdk
     implementation 'com.github.samtools:htsjdk:2.21.2'
+
+    // lombok (generation of getters, setters, constructors, builders, etc.)
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+	annotationProcessor 'org.projectlombok:lombok:1.18.22'
 }
 
 tasks.named('test') {

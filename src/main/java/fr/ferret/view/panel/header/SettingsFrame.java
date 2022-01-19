@@ -24,11 +24,14 @@ import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.controller.settings.SettingsFrameController;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.utils.Resource;
+import lombok.Getter;
 
 /**
  * The ferret settings frame
  */
 public class SettingsFrame extends JFrame {
+
+    @Getter
     private final FerretConfig config;
 
     public SettingsFrame(FerretFrame ferretFrame, FerretConfig config) {
@@ -199,9 +202,5 @@ public class SettingsFrame extends JFrame {
         settingsButtonPanel.add(settingsOK);
 
         this.pack();
-    }
-
-    public FerretConfig getConfig() {
-        return config;
     }
 }

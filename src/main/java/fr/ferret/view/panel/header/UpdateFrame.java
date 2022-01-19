@@ -14,6 +14,7 @@ import fr.ferret.FerretMain;
 import fr.ferret.controller.UpdateChecker;
 
 public class UpdateFrame extends JFrame {
+
     private final Boolean[] checkedForUpdate = {false};
     private final JPanel updatePanel = new JPanel();
     private final JPanel updateBarHolder = new JPanel();

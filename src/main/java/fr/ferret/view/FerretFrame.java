@@ -17,10 +17,12 @@ import fr.ferret.view.panel.RunPanel;
 import fr.ferret.view.panel.VariantPanel;
 import fr.ferret.view.panel.header.MenuPanel;
 import fr.ferret.view.utils.Resource;
+import lombok.Getter;
 
 /**
  * Main Ferret frame
  */
+@Getter
 public class FerretFrame extends JFrame {
 
     private static final Logger LOG = Logger.getLogger(FerretFrame.class.getName());
@@ -81,31 +83,4 @@ public class FerretFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public MenuPanel getHeaderPanel() {
-        return headerPanel;
-    }
-
-    public JTabbedPane getInputTabs() {
-        return inputTabs;
-    }
-
-    public LocusPanel getLocusPanel() {
-        return locusPanel;
-    }
-
-    public GenePanel getGenePanel() {
-        return genePanel;
-    }
-
-    public VariantPanel getVariantPanel() {
-        return variantPanel;
-    }
-
-    public RegionPanel getRegionPanel() {
-        return regionPanel;
-    }
-
-    public RunPanel getRunPanel() {
-        return runPanel;
-    }
 }

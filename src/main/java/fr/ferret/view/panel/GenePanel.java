@@ -16,12 +16,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import fr.ferret.FerretMain;
 import fr.ferret.controller.BrowseFileButtonListener;
+import lombok.Getter;
 
 /**
  * The gene panel of Ferret <br>
  * Selection of the genes parameters
  */
+@Getter
 public class GenePanel extends JPanel {
+
     private final JTextField inputField;
     private final BrowseFileButtonListener fileSelector;
     private final JRadioButton rdoName;
@@ -136,19 +139,4 @@ public class GenePanel extends JPanel {
         helpLabel1.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
     }
 
-    public JTextField getInputField() {
-        return inputField;
-    }
-
-    public BrowseFileButtonListener getFileSelector() {
-        return fileSelector;
-    }
-
-    public JRadioButton getRdoName() {
-        return rdoName;
-    }
-
-    public JRadioButton getRdoID() {
-        return rdoID;
-    }
 }
