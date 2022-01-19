@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Hashtable;
+import java.util.logging.Level;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -34,9 +35,14 @@ public class SettingsFrame extends JFrame {
         super(FerretMain.getLocale().getString("settings.title"));
         this.config = config;
 
-        URL questionMarkURL = getClass().getResource("/questionMark25.png");
-        ImageIcon questionMark = new ImageIcon(questionMarkURL);
-        JLabel questionMarkMAFThreshold = new JLabel(questionMark);
+        ImageIcon questionMark = null;
+        try {
+            URL questionMarkURL = getClass().getResource("/img/questionMark25.png");
+            questionMark = new ImageIcon(questionMarkURL);
+        } catch (Exception e) {
+            FerretMain.getLog().log(Level.WARNING, "Failed to get question mark icon !", e);
+        }
+        JLabel questionMarkMAFThreshold = questionMark == null ? null : new JLabel(questionMark);
 
         JPanel settingsPanel = new JPanel();
         this.getContentPane().add(settingsPanel);
@@ -114,9 +120,11 @@ public class SettingsFrame extends JFrame {
             mafSlider.addChangeListener(mafController);
             mafText.setValue(config.getMafThreshold());
 
-            mafPanel.add(questionMarkMAFThreshold);
-            questionMarkMAFThreshold
-                    .setToolTipText(FerretMain.getLocale().getString("settings.maf.help"));
+            if (questionMarkMAFThreshold != null) {
+                mafPanel.add(questionMarkMAFThreshold);
+                questionMarkMAFThreshold
+                        .setToolTipText(FerretMain.getLocale().getString("settings.maf.help"));
+            }
             mafPanel.add(Box.createHorizontalGlue());
             mafESPPanel.setLayout(new BoxLayout(mafESPPanel, BoxLayout.X_AXIS));
             mafESPPanel.setAlignmentX(LEFT_ALIGNMENT);

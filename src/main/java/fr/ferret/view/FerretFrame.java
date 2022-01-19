@@ -1,7 +1,7 @@
 package fr.ferret.view;
 
-import java.io.IOException;
 import java.util.logging.Level;
+
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
 import fr.ferret.FerretMain;
 import fr.ferret.view.panel.GenePanel;
 import fr.ferret.view.panel.LocusPanel;
@@ -39,8 +40,8 @@ public class FerretFrame extends JFrame {
         }
         // Set icon
         try {
-            setIconImage(ImageIO.read(getClass().getResourceAsStream("/ferret.jpg")));
-        } catch (IOException e) {
+            setIconImage(ImageIO.read(getClass().getResourceAsStream("/img/ferret.jpg")));
+        } catch (Exception e) {
             FerretMain.getLog().log(Level.WARNING, "Failed to set ferret icon !", e);
         }
 
