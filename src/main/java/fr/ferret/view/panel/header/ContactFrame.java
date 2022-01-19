@@ -6,16 +6,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import fr.ferret.FerretMain;
+import fr.ferret.view.utils.Resource;
 
 public class ContactFrame extends JFrame {
     public ContactFrame() {
-        super(FerretMain.getLocale().getString("contact.title"));
+        super(Resource.getTextElement("contact.title"));
 
         JPanel contactPanel = new JPanel();
-        JLabel contactPeopleLabel = new JLabel(FerretMain.getLocale().getString("contact.text"));
-        JTextArea contactEmailLabel =
-                new JTextArea(FerretMain.getLocale().getString("contact.mail"));
+        JLabel contactPeopleLabel = new JLabel(Resource.getTextElement("contact.text"));
+        JTextArea contactEmailLabel = new JTextArea(Resource.getTextElement("contact.mail"));
 
         this.getContentPane().add(contactPanel);
         this.setResizable(true);

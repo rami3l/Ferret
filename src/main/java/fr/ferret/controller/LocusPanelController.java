@@ -12,6 +12,7 @@ import fr.ferret.FerretMain;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.LocusPanel;
+import fr.ferret.view.utils.Resource;
 
 /**
  * The {@link LocusPanel} controller
@@ -206,39 +207,38 @@ public class LocusPanelController extends InputPanelController {
              * } }); currFerretWorker.execute();
              */
         } else { // Invalid input
-            StringBuffer errorMessage =
-                    new StringBuffer(FerretMain.getLocale().getString("run.fixerrors"));
+            StringBuffer errorMessage = new StringBuffer(Resource.getTextElement("run.fixerrors"));
             if (!isChrSelected) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.selectchr"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectchr"));
                 locusPanel.getChromosomeList()
                         .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!populationSelected) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.selectpop"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectpop"));
                 getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!startSelected) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.startpos"));
+                errorMessage.append("\n " + Resource.getTextElement("run.startpos"));
                 locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!endSelected) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.endpos"));
+                errorMessage.append("\n " + Resource.getTextElement("run.endpos"));
                 locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!startEndValid) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.invalidstart"));
+                errorMessage.append("\n " + Resource.getTextElement("run.invalidstart"));
                 locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
                 locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!withinRange) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.invalidpos.1")
-                        + " " + chrSelected + " "
-                        + FerretMain.getLocale().getString("run.invalidpos.2") + " " + chrEndBound);
+                errorMessage.append("\n " + Resource.getTextElement("run.invalidpos.1") + " "
+                        + chrSelected + " " + Resource.getTextElement("run.invalidpos.2") + " "
+                        + chrEndBound);
                 locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
                 locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             JOptionPane.showMessageDialog(getFrame(), errorMessage,
-                    FerretMain.getLocale().getString("run.error"), JOptionPane.OK_OPTION);
+                    Resource.getTextElement("run.error"), JOptionPane.OK_OPTION);
         }
     }
 }

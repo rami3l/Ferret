@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
-import fr.ferret.FerretMain;
 import fr.ferret.controller.UpdateChecker;
+import fr.ferret.view.utils.Resource;
 
 public class UpdateFrame extends JFrame {
 
@@ -19,11 +19,10 @@ public class UpdateFrame extends JFrame {
     private final JPanel updatePanel = new JPanel();
     private final JPanel updateBarHolder = new JPanel();
     private final JProgressBar updateProgressBar = new JProgressBar();
-    private final JLabel updateLabel =
-            new JLabel(FerretMain.getLocale().getString("update.checking"));
+    private final JLabel updateLabel = new JLabel(Resource.getTextElement("update.checking"));
 
     public UpdateFrame() {
-        super(FerretMain.getLocale().getString("update.title"));
+        super(Resource.getTextElement("update.title"));
 
         this.setResizable(true);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -43,7 +42,7 @@ public class UpdateFrame extends JFrame {
         JPanel updateButtonHolder = new JPanel();
         updatePanel.add(updateButtonHolder);
         updateButtonHolder.setLayout(new BoxLayout(updateButtonHolder, BoxLayout.X_AXIS));
-        JButton updateOK = new JButton(FerretMain.getLocale().getString("settings.ok"));
+        JButton updateOK = new JButton(Resource.getTextElement("settings.ok"));
         updateButtonHolder.add(updateOK);
         updateOK.addActionListener(e -> UpdateFrame.this.dispose());
         this.pack();
@@ -66,10 +65,10 @@ public class UpdateFrame extends JFrame {
                         if (urgentUpdate || needUpdate) {
                             updateLabel.setText(updateReason);
                             updateBarHolder.remove(updateProgressBar);
-                            String link = FerretMain.getLocale().getString("update.link");
+                            String link = Resource.getTextElement("update.link");
                             LinkLabel ferretUpdate = new LinkLabel(link);
                             JLabel updateFerretLabel =
-                                    new JLabel(FerretMain.getLocale().getString("update.msg"));
+                                    new JLabel(Resource.getTextElement("update.msg"));
                             updateBarHolder.add(updateFerretLabel);
                             updateBarHolder.repaint();
                             // updateFerretLabel.setText("");

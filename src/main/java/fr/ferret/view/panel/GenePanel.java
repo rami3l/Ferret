@@ -14,8 +14,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import fr.ferret.FerretMain;
 import fr.ferret.controller.BrowseFileButtonListener;
+import fr.ferret.view.utils.Resource;
 import lombok.Getter;
 
 /**
@@ -32,13 +32,11 @@ public class GenePanel extends JPanel {
 
     public GenePanel() {
         // Labels
-        JLabel titleLabel =
-                new JLabel(FerretMain.getLocale().getString("gene.input"), SwingConstants.LEFT);
+        JLabel titleLabel = new JLabel(Resource.getTextElement("gene.input"), SwingConstants.LEFT);
         titleLabel.setFont(new Font("Calibri", Font.BOLD, 24));
         titleLabel.setForeground(new Color(18, 0, 127));
 
-        JLabel helpLabel1 =
-                new JLabel(FerretMain.getLocale().getString("gene.help"), SwingConstants.CENTER);
+        JLabel helpLabel1 = new JLabel(Resource.getTextElement("gene.help"), SwingConstants.CENTER);
 
         // Input panel
 
@@ -46,22 +44,22 @@ public class GenePanel extends JPanel {
         inputPanel.setLayout(new GridBagLayout());
 
         // JLabel lab_inputnameorid = new JLabel(FerretTest.locale.getString("gene.inputnameorid"));
-        JLabel labOr = new JLabel(FerretMain.getLocale().getString("gene.or"));
+        JLabel labOr = new JLabel(Resource.getTextElement("gene.or"));
         labOr.setBorder(BorderFactory.createEmptyBorder(0, 130, 0, 10));
         labOr.setFont(new Font(labOr.getFont().getFontName(), Font.PLAIN, 16));
 
         inputField = new JTextField();
 
-        JLabel selectedFile = new JLabel(FerretMain.getLocale().getString("gene.selectfile"));
-        JButton browseButton = new JButton(FerretMain.getLocale().getString("gene.browse"));
+        JLabel selectedFile = new JLabel(Resource.getTextElement("gene.selectfile"));
+        JButton browseButton = new JButton(Resource.getTextElement("gene.browse"));
         browseButton.setPreferredSize(new Dimension(200, 30));
         browseButton.setBackground(new Color(201, 157, 240));
         fileSelector = new BrowseFileButtonListener(this, browseButton, selectedFile);
         // RunButtonListener listener = new RunButtonListener(frame, browseButton);
 
         ButtonGroup buttonGroup = new ButtonGroup();
-        rdoName = new JRadioButton(FerretMain.getLocale().getString("gene.name"));
-        rdoID = new JRadioButton(FerretMain.getLocale().getString("gene.ID"));
+        rdoName = new JRadioButton(Resource.getTextElement("gene.name"));
+        rdoID = new JRadioButton(Resource.getTextElement("gene.ID"));
 
         GridBagConstraints c = new GridBagConstraints();
 

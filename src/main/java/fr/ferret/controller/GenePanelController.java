@@ -13,9 +13,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import fr.ferret.FerretMain;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.GenePanel;
+import fr.ferret.view.utils.Resource;
 
 /**
  * The {@link GenePanel} controller
@@ -204,26 +204,23 @@ public class GenePanelController extends InputPanelController {
         } else {
             StringBuffer errorMessage = new StringBuffer("Correct the following errors:");
             if (!geneListInputted && !geneFileImported) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.selectgene"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectgene"));
                 genePanel.getInputField().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
                 genePanel.getFileSelector().getRunButton()
                         .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (geneFileImported && geneFileError) {
-                errorMessage
-                        .append("\n " + FerretMain.getLocale().getString("run.selectgene.ferr"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectgene.ferr"));
                 genePanel.getFileSelector().getRunButton()
                         .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (geneFileImported && geneFileExtensionError) {
-                errorMessage
-                        .append("\n " + FerretMain.getLocale().getString("run.selectgene.fext"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectgene.fext"));
                 genePanel.getFileSelector().getRunButton()
                         .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if ((geneListInputted || geneFileImported) && invalidCharacter) {
-                errorMessage
-                        .append("\n " + FerretMain.getLocale().getString("run.selectgene.cerr"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectgene.cerr"));
                 if (geneListInputted) {
                     genePanel.getInputField()
                             .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
@@ -233,12 +230,11 @@ public class GenePanelController extends InputPanelController {
                 }
             }
             if (!popSelected) {
-                errorMessage.append("\n ")
-                        .append(FerretMain.getLocale().getString("run.selectpop"));
+                errorMessage.append("\n ").append(Resource.getTextElement("run.selectpop"));
                 getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             JOptionPane.showMessageDialog(getFrame(), errorMessage,
-                    FerretMain.getLocale().getString("run.error"), JOptionPane.OK_OPTION);
+                    Resource.getTextElement("run.error"), JOptionPane.OK_OPTION);
         }
     }
 }

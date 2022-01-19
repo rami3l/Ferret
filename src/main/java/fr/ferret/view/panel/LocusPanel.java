@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import fr.ferret.FerretMain;
+import fr.ferret.view.utils.Resource;
 import lombok.Getter;
 
 /**
@@ -29,16 +30,13 @@ public class LocusPanel extends JPanel {
     public LocusPanel() {
         // Labels
 
-        titleLabel =
-                new JLabel(
-                        FerretMain.getLocale()
-                                .getString("locus.input."
-                                        + FerretMain.getConfig().getSelectedHumanGenome().name()),
-                        SwingConstants.LEFT);
+        titleLabel = new JLabel(
+                Resource.getTextElement(
+                        "locus.input." + FerretMain.getConfig().getSelectedHumanGenome().name()),
+                SwingConstants.LEFT);
         titleLabel.setFont(new Font("Calibri", Font.BOLD, 24));
         titleLabel.setForeground(new Color(18, 0, 127));
-        JLabel helpLabel =
-                new JLabel(FerretMain.getLocale().getString("locus.help"), SwingConstants.CENTER);
+        JLabel helpLabel = new JLabel(Resource.getTextElement("locus.help"), SwingConstants.CENTER);
 
         // Input panel
 
@@ -46,7 +44,7 @@ public class LocusPanel extends JPanel {
         GridBagLayout inputPanelLayout = new GridBagLayout();
         inputPanel.setLayout(inputPanelLayout);
 
-        JLabel labChromosome = new JLabel(FerretMain.getLocale().getString("locus.chromosome"));
+        JLabel labChromosome = new JLabel(Resource.getTextElement("locus.chromosome"));
         String[] chromosomes = {" ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
                 "13", "14", "15", "16", "17", "18", "19", "20", "21", "22"};
 
@@ -55,8 +53,8 @@ public class LocusPanel extends JPanel {
         chromosomeList = new JComboBox<>(chromosomes);
         chromosomeList.setSelectedIndex(0);
 
-        JLabel labStart = new JLabel(FerretMain.getLocale().getString("locus.start"));
-        JLabel labEnd = new JLabel(FerretMain.getLocale().getString("locus.end"));
+        JLabel labStart = new JLabel(Resource.getTextElement("locus.start"));
+        JLabel labEnd = new JLabel(Resource.getTextElement("locus.end"));
 
         inputStart = new JTextField();
         inputEnd = new JTextField();

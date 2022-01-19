@@ -17,7 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
-import fr.ferret.FerretMain;
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.Phases1KG;
@@ -37,7 +36,7 @@ public class SettingsFrame extends JFrame {
     private final FerretConfig config;
 
     public SettingsFrame(FerretFrame ferretFrame, FerretConfig config) {
-        super(FerretMain.getLocale().getString("settings.title"));
+        super(Resource.getTextElement("settings.title"));
         this.config = config;
 
         Optional<ImageIcon> questionMark = Resource.getIcon("/img/questionMark25.png");
@@ -57,15 +56,14 @@ public class SettingsFrame extends JFrame {
 
         // Phases
         {
-            JLabel vcfVersionLabel =
-                    new JLabel(FerretMain.getLocale().getString("settings.genversion"));
+            JLabel vcfVersionLabel = new JLabel(Resource.getTextElement("settings.genversion"));
             vcfVersionLabel.setFont(new Font(FONT, Font.BOLD, 16));
             settingsPanel.add(vcfVersionLabel);
 
             ButtonGroup vcfRadioButtons = new ButtonGroup();
             for (int i = 0; i < phaseButtons.length; i++) {
-                phaseButtons[i] = new JRadioButton(FerretMain.getLocale()
-                        .getString("settings.phase." + Phases1KG.values()[i].name()));
+                phaseButtons[i] = new JRadioButton(
+                        Resource.getTextElement("settings.phase." + Phases1KG.values()[i].name()));
                 vcfRadioButtons.add(phaseButtons[i]);
                 settingsPanel.add(phaseButtons[i]);
             }
@@ -79,9 +77,8 @@ public class SettingsFrame extends JFrame {
         // TODO PGROU : une barre pour le min, une barre pour le max
 
         JSlider mafSlider = new JSlider(0, 5000, 0);
-        JLabel nafThresholdLabel =
-                new JLabel(FerretMain.getLocale().getString("settings.mafthresold"));
-        JLabel nafOptionLabel = new JLabel(FerretMain.getLocale().getString("settings.maf"));
+        JLabel nafThresholdLabel = new JLabel(Resource.getTextElement("settings.mafthresold"));
+        JLabel nafOptionLabel = new JLabel(Resource.getTextElement("settings.maf"));
 
         JPanel mafPanel = new JPanel();
         JPanel mafESPPanel = new JPanel();
@@ -123,7 +120,7 @@ public class SettingsFrame extends JFrame {
             if (questionMarkMAFThreshold != null) {
                 mafPanel.add(questionMarkMAFThreshold);
                 questionMarkMAFThreshold
-                        .setToolTipText(FerretMain.getLocale().getString("settings.maf.help"));
+                        .setToolTipText(Resource.getTextElement("settings.maf.help"));
             }
             mafPanel.add(Box.createHorizontalGlue());
             mafESPPanel.setLayout(new BoxLayout(mafESPPanel, BoxLayout.X_AXIS));
@@ -134,17 +131,15 @@ public class SettingsFrame extends JFrame {
 
         // File output type
         settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        JLabel filesLabel = new JLabel(FerretMain.getLocale().getString("settings.outfiles"));
+        JLabel filesLabel = new JLabel(Resource.getTextElement("settings.outfiles"));
         settingsPanel.add(filesLabel);
         filesLabel.setFont(new Font(FONT, Font.BOLD, 16));
 
         ButtonGroup fileOutputButtons = new ButtonGroup();
         JRadioButton allFilesButton =
-                new JRadioButton(FerretMain.getLocale().getString("settings.out.frqmap"));
-        JRadioButton freqFileButton =
-                new JRadioButton(FerretMain.getLocale().getString("settings.out.frq"));
-        JRadioButton vcfFileButton =
-                new JRadioButton(FerretMain.getLocale().getString("settings.out.vcf"));
+                new JRadioButton(Resource.getTextElement("settings.out.frqmap"));
+        JRadioButton freqFileButton = new JRadioButton(Resource.getTextElement("settings.out.frq"));
+        JRadioButton vcfFileButton = new JRadioButton(Resource.getTextElement("settings.out.vcf"));
         {
             fileOutputButtons.add(allFilesButton);
             fileOutputButtons.add(freqFileButton);
@@ -167,16 +162,15 @@ public class SettingsFrame extends JFrame {
 
         // Human genome versions
         {
-            JLabel hgVersionLabel =
-                    new JLabel(FerretMain.getLocale().getString("settings.hugversion"));
+            JLabel hgVersionLabel = new JLabel(Resource.getTextElement("settings.hugversion"));
             settingsPanel.add(Box.createRigidArea(new Dimension(0, 5)));
             settingsPanel.add(hgVersionLabel);
             hgVersionLabel.setFont(new Font(FONT, Font.BOLD, 16));
 
             ButtonGroup hgVersionButtons = new ButtonGroup();
             for (int i = 0; i < humanVersionButtons.length; i++) {
-                humanVersionButtons[i] = new JRadioButton(FerretMain.getLocale()
-                        .getString("settings.hugen." + HumanGenomeVersions.values()[i].name()));
+                humanVersionButtons[i] = new JRadioButton(Resource.getTextElement(
+                        "settings.hugen." + HumanGenomeVersions.values()[i].name()));
                 hgVersionButtons.add(humanVersionButtons[i]);
                 settingsPanel.add(humanVersionButtons[i]);
             }
@@ -187,8 +181,8 @@ public class SettingsFrame extends JFrame {
         // Ok/Cancel buttons
 
         JPanel settingsButtonPanel = new JPanel();
-        JButton settingsOK = new JButton(FerretMain.getLocale().getString("settings.ok"));
-        JButton settingsCancel = new JButton(FerretMain.getLocale().getString("settings.cancel"));
+        JButton settingsOK = new JButton(Resource.getTextElement("settings.ok"));
+        JButton settingsCancel = new JButton(Resource.getTextElement("settings.cancel"));
 
         settingsButtonPanel.setAlignmentX(LEFT_ALIGNMENT);
         settingsButtonPanel.setLayout(new BoxLayout(settingsButtonPanel, BoxLayout.X_AXIS));

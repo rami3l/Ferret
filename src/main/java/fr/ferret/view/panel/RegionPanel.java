@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import fr.ferret.FerretMain;
 import fr.ferret.view.region.Region;
+import fr.ferret.view.utils.Resource;
 import lombok.Getter;
 
 /**
@@ -41,8 +42,7 @@ public class RegionPanel extends JPanel {
      * Inits the panel : adds all components
      */
     private void initPanel() {
-        JLabel label =
-                new JLabel(FerretMain.getLocale().getString("region.input"), SwingConstants.LEFT);
+        JLabel label = new JLabel(Resource.getTextElement("region.input"), SwingConstants.LEFT);
         label.setFont(new Font("Calibri", Font.BOLD, 24));
         add(label, BorderLayout.NORTH);
         label.setForeground(new Color(18, 0, 127));
@@ -99,8 +99,8 @@ public class RegionPanel extends JPanel {
             this.setLayout(new GridLayout(lines, 1));
 
             // Title
-            JLabel label = new JLabel(FerretMain.getLocale()
-                    .getString("region." + region.getName().toLowerCase(Locale.ROOT)));
+            JLabel label = new JLabel(
+                    Resource.getTextElement("region." + region.getName().toLowerCase(Locale.ROOT)));
             label.setFont(new Font("Calibri", Font.BOLD, 20));
             label.setForeground(new Color(131, 55, 192));
             add(label);
@@ -109,8 +109,8 @@ public class RegionPanel extends JPanel {
             this.checkBoxes = new JCheckBox[region.getZones().length];
             for (int i = 0; i < checkBoxes.length; i++) {
                 checkBoxes[i] = new JCheckBox(region.getZones()[i] + " "
-                        + FerretMain.getLocale().getString("region." + region.getZones()[i])
-                        + " (n=" + region.getIndividualCount()[i] + ")");
+                        + Resource.getTextElement("region." + region.getZones()[i]) + " (n="
+                        + region.getIndividualCount()[i] + ")");
                 if (i == 0) {
                     checkBoxes[i].setFont(
                             new Font(checkBoxes[i].getFont().getFontName(), Font.BOLD, 14));

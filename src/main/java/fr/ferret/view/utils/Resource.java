@@ -1,7 +1,9 @@
 package fr.ferret.view.utils;
 
 import java.awt.image.BufferedImage;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -13,6 +15,8 @@ import javax.swing.ImageIcon;
 public class Resource {
 
     private static final Logger LOG = Logger.getLogger(Resource.class.getName());
+    private static final ResourceBundle locale =
+            ResourceBundle.getBundle("ferret", Locale.getDefault());
 
     // utils should not be instanciated
     private Resource() {}
@@ -51,6 +55,15 @@ public class Resource {
         }
         // we return an optional icon (with a null value if impossible to get the icon)
         return Optional.ofNullable(icon);
+    }
+
+    /**
+     * Program resources (languages and properties)
+     * 
+     * @param element to get in the property file
+     */
+    public static String getTextElement(String element) {
+        return locale.getString(element);
     }
 
 }

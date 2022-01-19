@@ -8,19 +8,17 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import fr.ferret.FerretMain;
+import fr.ferret.view.utils.Resource;
 
 public class AboutFrame extends JFrame {
     public AboutFrame() {
-        super(FerretMain.getLocale().getString("about.title"));
+        super(Resource.getTextElement("about.title"));
         JPanel aboutPanel = new JPanel();
-        JLabel ferretVersionLabel = new JLabel(FerretMain.getLocale().getString("about.version"));
-        JLabel ferretDateLabel = new JLabel(FerretMain.getLocale().getString("about.date"));
-        JTextArea ferretCitation =
-                new JTextArea(FerretMain.getLocale().getString("about.citation"), 4, 50);
+        JLabel ferretVersionLabel = new JLabel(Resource.getTextElement("about.version"));
+        JLabel ferretDateLabel = new JLabel(Resource.getTextElement("about.date"));
+        JTextArea ferretCitation = new JTextArea(Resource.getTextElement("about.citation"), 4, 50);
 
-        LinkLabel ferretWebLabelAbout =
-                new LinkLabel(FerretMain.getLocale().getString("about.link"));
+        LinkLabel ferretWebLabelAbout = new LinkLabel(Resource.getTextElement("about.link"));
 
         this.getContentPane().add(aboutPanel);
         this.setResizable(true);

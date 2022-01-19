@@ -13,9 +13,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import fr.ferret.FerretMain;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.VariantPanel;
+import fr.ferret.view.utils.Resource;
 
 /**
  * The {@link VariantPanel} controller
@@ -216,27 +216,24 @@ public class VariantPanelController extends InputPanelController {
         } else {
             StringBuffer errorMessage = new StringBuffer("Correct the following errors:");
             if (!snpListInputted && !snpFileImported) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.selectvari"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectvari"));
                 variantPanel.getVariantIdField()
                         .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
                 variantPanel.getFileSelector().getRunButton()
                         .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (snpFileImported && snpFileError) {
-                errorMessage
-                        .append("\n " + FerretMain.getLocale().getString("run.selectvari.ferr"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectvari.ferr"));
                 variantPanel.getFileSelector().getRunButton()
                         .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (snpFileImported && snpFileExtensionError) {
-                errorMessage
-                        .append("\n " + FerretMain.getLocale().getString("run.selectvari.fext"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectvari.fext"));
                 variantPanel.getFileSelector().getRunButton()
                         .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if ((snpListInputted || snpFileImported) && invalidCharacter) {
-                errorMessage
-                        .append("\n " + FerretMain.getLocale().getString("run.selectvari.cerr"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectvari.cerr"));
                 if (snpListInputted) {
                     variantPanel.getVariantIdField()
                             .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
@@ -246,17 +243,15 @@ public class VariantPanelController extends InputPanelController {
                 }
             }
             if (!popSelected) {
-                errorMessage.append("\n ")
-                        .append(FerretMain.getLocale().getString("run.selectpop"));
+                errorMessage.append("\n ").append(Resource.getTextElement("run.selectpop"));
                 getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!validWindowSizeEntered) {
-                errorMessage
-                        .append("\n " + FerretMain.getLocale().getString("run.selectvari.wsize"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectvari.wsize"));
                 variantPanel.getBpField().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             JOptionPane.showMessageDialog(getFrame(), errorMessage,
-                    FerretMain.getLocale().getString("run.error"), JOptionPane.OK_OPTION);
+                    Resource.getTextElement("run.error"), JOptionPane.OK_OPTION);
         }
     }
 }
