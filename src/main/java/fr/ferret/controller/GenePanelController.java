@@ -75,8 +75,7 @@ public class GenePanelController extends InputPanelController {
                     case ".csv":
                         delimiter = ",";
                         break;
-                    case ".tab":
-                    case ".tsv":
+                    case ".tab", ".tsv":
                         delimiter = "\\t";
                         break;
                     case ".txt":

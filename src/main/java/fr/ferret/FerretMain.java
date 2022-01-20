@@ -8,8 +8,6 @@ import lombok.Getter;
  * Main Ferret class displaying the FerretFrame
  */
 public class FerretMain {
-
-
     /**
      * Program settings
      */
@@ -20,7 +18,4 @@ public class FerretMain {
         FerretFrame frame = new FerretFrame(); // Show ferret frame
         frame.setVisible(true);
     }
-
-
-
 }

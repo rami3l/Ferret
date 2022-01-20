@@ -8,10 +8,12 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import fr.ferret.view.utils.Resource;
+import lombok.Getter;
 
 /**
  * Listens events of the run button and sends input data to the model
  */
+@Getter
 public class BrowseFileButtonListener implements ActionListener {
     /**
      * The panel containing the button
@@ -56,21 +58,5 @@ public class BrowseFileButtonListener implements ActionListener {
                     Resource.getTextElement("browse.selectedfile") + " " + fileNameAndPath);
             selectedFile = file;
         }
-    }
-
-    public File getSelectedFile() {
-        return selectedFile;
-    }
-
-    public JPanel getPanel() {
-        return panel;
-    }
-
-    public JLabel getSelectedFileLabel() {
-        return selectedFileLabel;
-    }
-
-    public JButton getRunButton() {
-        return runButton;
     }
 }
