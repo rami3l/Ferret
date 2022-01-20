@@ -7,7 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import fr.ferret.view.utils.Resource;
+import fr.ferret.utils.Resource;
 import lombok.Getter;
 
 /**

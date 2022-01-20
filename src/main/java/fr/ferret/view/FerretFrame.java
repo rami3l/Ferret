@@ -10,13 +10,13 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.panel.GenePanel;
 import fr.ferret.view.panel.LocusPanel;
 import fr.ferret.view.panel.RegionPanel;
 import fr.ferret.view.panel.RunPanel;
 import fr.ferret.view.panel.VariantPanel;
 import fr.ferret.view.panel.header.MenuPanel;
-import fr.ferret.view.utils.Resource;
 import lombok.Getter;
 
 /**

@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import fr.ferret.controller.UpdateChecker;
-import fr.ferret.view.utils.Resource;
+import fr.ferret.utils.Resource;
 
 public class UpdateFrame extends JFrame {
 

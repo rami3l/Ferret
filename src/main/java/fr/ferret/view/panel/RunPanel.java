@@ -5,8 +5,8 @@ import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import fr.ferret.controller.RunButtonListener;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.utils.Resource;
 
 /**
  * The panel with the run button of Ferret

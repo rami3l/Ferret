@@ -13,9 +13,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.VariantPanel;
-import fr.ferret.view.utils.Resource;
 
 /**
  * The {@link VariantPanel} controller

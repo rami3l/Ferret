@@ -15,7 +15,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import fr.ferret.controller.BrowseFileButtonListener;
-import fr.ferret.view.utils.Resource;
+import fr.ferret.utils.Resource;
 import lombok.Getter;
 
 /**

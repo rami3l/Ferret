@@ -8,11 +8,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
-import fr.ferret.FerretMain;
 import fr.ferret.controller.settings.HumanGenomeVersions;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.LocusPanel;
-import fr.ferret.view.utils.Resource;
 
 /**
  * The {@link LocusPanel} controller
@@ -66,8 +65,7 @@ public class LocusPanelController extends InputPanelController {
                 startEndValid = (tempEndPos >= tempStartPos);
                 if (startEndValid) {
                     Map<String, Integer> chrMap = new HashMap<>();
-                    if (FerretMain.getConfig()
-                            .getSelectedHumanGenome() == HumanGenomeVersions.hg19) {
+                    if (Resource.CONFIG.getSelectedHumanGenome() == HumanGenomeVersions.hg19) {
                         // Avoid too much if/else
                         chrMap.put("X", 155270560);
                         chrMap.put("1", 249250621);

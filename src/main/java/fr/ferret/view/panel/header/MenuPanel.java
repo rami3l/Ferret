@@ -5,10 +5,9 @@ import java.net.URI;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import fr.ferret.FerretMain;
 import fr.ferret.controller.settings.FerretConfig;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.utils.Resource;
 
 /**
  * Menu of the Ferret Frame
@@ -38,7 +37,7 @@ public class MenuPanel extends JMenuBar {
         updateMenuItem.addActionListener(arg0 -> new UpdateFrame().showFrame(ferretFrame));
 
         // Settings pane:
-        FerretConfig config = FerretMain.getConfig();
+        FerretConfig config = Resource.CONFIG;
         settingsMenuItem.addActionListener(arg0 -> {
             SettingsFrame settingsFrame = new SettingsFrame(ferretFrame, config);
             settingsFrame.setLocationRelativeTo(ferretFrame);

@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import fr.ferret.view.utils.Resource;
+import fr.ferret.utils.Resource;
 
 public class ContactFrame extends JFrame {
     public ContactFrame() {

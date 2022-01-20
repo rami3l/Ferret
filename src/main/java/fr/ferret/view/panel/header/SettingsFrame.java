@@ -21,8 +21,8 @@ import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.controller.settings.SettingsFrameController;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.utils.Resource;
 import lombok.Getter;
 
 /**

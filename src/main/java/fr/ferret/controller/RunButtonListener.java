@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.utils.Resource;
 
 /**
  * Listens events of the run button and sends input data to the model

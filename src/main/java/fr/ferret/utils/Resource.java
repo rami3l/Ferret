@@ -1,4 +1,4 @@
-package fr.ferret.view.utils;
+package fr.ferret.utils;
 
 import java.awt.image.BufferedImage;
 import java.util.Locale;
@@ -8,11 +8,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import fr.ferret.controller.settings.FerretConfig;
 
 /**
  * Util class to deal with resouce files
  */
 public class Resource {
+
+    /** program settings */
+    public static final FerretConfig CONFIG = new FerretConfig();
 
     private static final Logger LOG = Logger.getLogger(Resource.class.getName());
     private static final ResourceBundle locale =

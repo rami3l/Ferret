@@ -1,21 +1,20 @@
 package fr.ferret.view.panel;
 
+import static fr.ferret.view.utils.GuiUtils.addToPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import fr.ferret.controller.BrowseFileButtonListener;
-import fr.ferret.view.utils.Resource;
+import fr.ferret.utils.Resource;
 import lombok.Getter;
 
 /**
@@ -78,8 +77,7 @@ public class VariantPanel extends JPanel {
      */
     private JPanel generateInputPanel() {
 
-        JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new GridBagLayout());
+        JPanel inputPanel = new JPanel(new GridBagLayout());
 
         // Variant Id
         variantIdField = new JTextField();
@@ -133,25 +131,6 @@ public class VariantPanel extends JPanel {
         addToPanel(includingVariantSubPanel, bpLabel, 0.3, 3, 1);
 
         return includingVariantSubPanel;
-    }
-
-    /**
-     * Adds a component to a panel (which is a grid)
-     * 
-     * @param panel : the panel to add the component to
-     * @param componentToAdd : the component to add to the panel
-     * @param weightx : the width of the component in the panel
-     * @param gridx : the x position of the component in the panel
-     * @param gridy : the y position of the component in the panel
-     */
-    private void addToPanel(JPanel panel, JComponent componentToAdd, double weightx, int gridx,
-            int gridy) {
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = weightx;
-        c.gridx = gridx;
-        c.gridy = gridy;
-        panel.add(componentToAdd, c);
     }
 
 }

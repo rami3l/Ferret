@@ -12,9 +12,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import fr.ferret.FerretMain;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.region.Region;
-import fr.ferret.view.utils.Resource;
 import lombok.Getter;
 
 /**
@@ -50,9 +49,9 @@ public class RegionPanel extends JPanel {
         JPanel container = new JPanel();
         container.setLayout(new GridLayout(2, 3));
 
-        Region[] regions1 = FerretMain.getConfig().getSelectedVersion().getRegions();
-        for (int i = 0; i < regions1.length; i++) {
-            Region region = regions1[i];
+        Region[] ferretRegions = Resource.CONFIG.getSelectedVersion().getRegions();
+        for (int i = 0; i < ferretRegions.length; i++) {
+            Region region = ferretRegions[i];
             ZonesPanel panel = new ZonesPanel(region, i >= 3 ? 7 : 9);
             regions.add(panel);
             container.add(panel);
@@ -111,13 +110,8 @@ public class RegionPanel extends JPanel {
                 checkBoxes[i] = new JCheckBox(region.getZones()[i] + " "
                         + Resource.getTextElement("region." + region.getZones()[i]) + " (n="
                         + region.getIndividualCount()[i] + ")");
-                if (i == 0) {
-                    checkBoxes[i].setFont(
-                            new Font(checkBoxes[i].getFont().getFontName(), Font.BOLD, 14));
-                } else {
-                    checkBoxes[i].setFont(
-                            new Font(checkBoxes[i].getFont().getFontName(), Font.PLAIN, 14));
-                }
+                checkBoxes[i].setFont(new Font(checkBoxes[i].getFont().getFontName(),
+                        i == 0 ? Font.BOLD : Font.PLAIN, 14));
                 add(checkBoxes[i]);
                 if (region.getIndividualCount()[i] == 0) {
                     checkBoxes[i].setEnabled(false);
@@ -127,7 +121,7 @@ public class RegionPanel extends JPanel {
                 boolean state = !checkBoxes[0].isSelected();
                 setCheckBoxesState(1, state);
 
-                if (region == FerretMain.getConfig().getSelectedVersion().getRegions()[0]) {
+                if (region == Resource.CONFIG.getSelectedVersion().getRegions()[0]) {
                     for (ZonesPanel panel : RegionPanel.this.regions) {
                         if (panel != this) {
                             panel.setCheckBoxesState(0, state);

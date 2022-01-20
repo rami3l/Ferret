@@ -13,9 +13,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.GenePanel;
-import fr.ferret.view.utils.Resource;
 
 /**
  * The {@link GenePanel} controller
