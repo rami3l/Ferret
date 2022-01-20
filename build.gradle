@@ -66,3 +66,37 @@ jar {
     )
   }
 }
+
+// Tasks
+
+defaultTasks 'build'
+
+tasks.javadoc.doFirst {
+    println 'Exporting javadoc under `./build/docs/javadoc`...'
+}
+
+tasks.build.doFirst {
+    println 'Building...'
+}
+
+tasks.run.doFirst {
+    println 'Running...'
+}
+
+tasks.test.doFirst {
+    println 'Testing...'
+}
+
+tasks.jar.doFirst {
+    println 'Generating jar under `./build/libs`'
+}
+
+task javadocOpen(type:Exec) {
+    dependsOn 'javadoc'
+    description 'Opens javadoc.'
+
+    workingDir './build/docs/javadoc'
+    commandLine 'start', 'index.html'
+    commandLine 'xdg-open', 'index.html'
+    commandLine 'open', 'index.html'
+}
