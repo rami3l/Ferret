@@ -102,7 +102,8 @@ task javadocOpen(type:Exec) {
     // Let Linux be the default case.
     commandLine 'xdg-open', 'index.html'
     if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-        commandLine 'start', 'index.html'
+        workingDir System.getProperty("user.dir") + '/build/docs/javadoc'
+        commandLine 'pwsh', '-Command', 'Invoke-Item index.html'
     } else if (Os.isFamily(Os.FAMILY_MAC)) {
         commandLine 'open', 'index.html'
     }
