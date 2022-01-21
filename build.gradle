@@ -58,7 +58,7 @@ tasks.named('test') {
 }
 
 application {
-    mainClassName = javaMainClass
+    mainClass.set(javaMainClass)
 }
 
 jar {
