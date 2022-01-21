@@ -1,4 +1,4 @@
-package fr.ferret.view.panel.header;
+package fr.ferret.view.panel.header.ferret;
 
 import java.awt.Dimension;
 import javax.swing.BorderFactory;
@@ -12,6 +12,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 import fr.ferret.controller.UpdateChecker;
 import fr.ferret.utils.Resource;
+import fr.ferret.view.LinkLabel;
 
 public class UpdateFrame extends JFrame {
 

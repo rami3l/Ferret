@@ -1,4 +1,4 @@
-package fr.ferret.view.panel;
+package fr.ferret.view.panel.inputs;
 
 import static fr.ferret.view.utils.GuiUtils.addToPanel;
 import java.awt.BorderLayout;

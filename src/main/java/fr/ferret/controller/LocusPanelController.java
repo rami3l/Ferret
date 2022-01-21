@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.panel.LocusPanel;
+import fr.ferret.view.panel.inputs.LocusPanel;
 
 /**
  * The {@link LocusPanel} controller

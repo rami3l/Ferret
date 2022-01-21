@@ -12,8 +12,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import fr.ferret.model.Region;
 import fr.ferret.utils.Resource;
-import fr.ferret.view.region.Region;
 import lombok.Getter;
 
 /**

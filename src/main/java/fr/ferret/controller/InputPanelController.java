@@ -33,7 +33,7 @@ public abstract class InputPanelController {
      * Resets the RegionPanel borders and gets all selected populations by zone
      *
      * @return A list of the selected zones (using the zones codes of the
-     *         {@link fr.ferret.view.region.Region} class)
+     *         {@link fr.ferret.model.Region} class)
      */
     protected List<CharSequence> getSelectedPopulations() {
         frame.getRegionPanel().setBorder(null);

@@ -8,6 +8,10 @@ import javax.swing.JMenuItem;
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
+import fr.ferret.view.panel.header.ferret.SettingsFrame;
+import fr.ferret.view.panel.header.ferret.UpdateFrame;
+import fr.ferret.view.panel.header.help.AboutFrame;
+import fr.ferret.view.panel.header.help.ContactFrame;
 
 /**
  * Menu of the Ferret Frame

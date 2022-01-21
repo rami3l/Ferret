@@ -11,10 +11,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.panel.header.SettingsFrame;
+import fr.ferret.view.panel.header.ferret.SettingsFrame;
 
 /**
- * Groups all controllers for the {@link fr.ferret.view.panel.header.SettingsFrame}
+ * Groups all controllers for the {@link fr.ferret.view.panel.header.ferret.SettingsFrame}
  */
 public class SettingsFrameController {
     /**

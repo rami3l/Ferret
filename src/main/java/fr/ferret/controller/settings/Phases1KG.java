@@ -1,6 +1,6 @@
 package fr.ferret.controller.settings;
 
-import fr.ferret.view.region.Region;
+import fr.ferret.model.Region;
 
 /**
  * 1KG project supported versions

@@ -1,4 +1,4 @@
-package fr.ferret.view.panel.header;
+package fr.ferret.view;
 
 import java.awt.Color;
 import java.awt.Cursor;

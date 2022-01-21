@@ -1,4 +1,4 @@
-package fr.ferret.view.panel.header;
+package fr.ferret.view.panel.header.help;
 
 import java.awt.Dimension;
 import javax.swing.BorderFactory;
@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import fr.ferret.utils.Resource;
+import fr.ferret.view.LinkLabel;
 
 public class AboutFrame extends JFrame {
     public AboutFrame() {

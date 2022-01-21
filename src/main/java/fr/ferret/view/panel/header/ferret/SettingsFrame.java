@@ -1,4 +1,4 @@
-package fr.ferret.view.panel.header;
+package fr.ferret.view.panel.header.ferret;
 
 import java.awt.Dimension;
 import java.awt.Font;

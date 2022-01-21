@@ -1,4 +1,4 @@
-package fr.ferret.view.panel.header;
+package fr.ferret.view.panel.header.help;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
