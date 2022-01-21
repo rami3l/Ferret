@@ -71,7 +71,7 @@ public class VariantPanel extends JPanel {
     }
 
     /**
-     * Generate the input part of the variant panel
+     * Generates the input part of the variant panel
      * 
      * @return the input panel
      */
@@ -113,19 +113,24 @@ public class VariantPanel extends JPanel {
     /**
      * Generates the 'Including variants' part of the input panel
      * 
-     * @return the 'Including variants' panel
+     * @return the 'Including variants' subpanel
      */
     private JPanel generateIncludingVariantPanel() {
-        JPanel includingVariantSubPanel = new JPanel();
-        includingVariantSubPanel.setLayout(new GridBagLayout());
 
+        JPanel includingVariantSubPanel = new JPanel(new GridBagLayout());
+
+        // Including variants checbox
         checkbox = new JCheckBox(Resource.getTextElement("variant.bpcheckbox"));
         checkbox.setFont(new Font(checkbox.getFont().getFontName(), Font.PLAIN, 13));
 
-        JLabel bpLabel = new JLabel(Resource.getTextElement("variant.bp"));
-        bpLabel.setFont(new Font(bpLabel.getFont().getFontName(), Font.PLAIN, 13));
+        // bp Field
         bpField = new JTextField();
 
+        // bp Label
+        JLabel bpLabel = new JLabel(Resource.getTextElement("variant.bp"));
+        bpLabel.setFont(new Font(bpLabel.getFont().getFontName(), Font.PLAIN, 13));
+
+        // Add the elements defined above to the input panel
         addToPanel(includingVariantSubPanel, checkbox, 0.002, 1, 1);
         addToPanel(includingVariantSubPanel, bpField, 0.4, 2, 1);
         addToPanel(includingVariantSubPanel, bpLabel, 0.3, 3, 1);

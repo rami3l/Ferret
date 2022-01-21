@@ -26,6 +26,9 @@ public class LocusPanel extends JPanel {
     private JTextField inputEnd;
     private final JLabel titleLabel;
 
+    /**
+     * Creates the locus panel
+     */
     public LocusPanel() {
 
         /* --- Title --- */
@@ -50,6 +53,11 @@ public class LocusPanel extends JPanel {
         helpLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
     }
 
+    /**
+     * Generates the title of the locus panel
+     * 
+     * @return the title label
+     */
     private JLabel generateTitle() {
         String text = Resource
                 .getTextElement("locus.input." + Resource.CONFIG.getSelectedHumanGenome().name());
@@ -59,10 +67,16 @@ public class LocusPanel extends JPanel {
         return title;
     }
 
+    /**
+     * Generates the input panel of the locus panel
+     * 
+     * @return the input panel
+     */
     private JPanel generateInputPanel() {
 
         JPanel inputPanel = new JPanel(new GridBagLayout());
 
+        // Chromosome selection
         JLabel labChromosome = new JLabel(Resource.getTextElement("locus.chromosome"));
         labChromosome.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
         labChromosome.setFont(new Font(labChromosome.getFont().getFontName(), Font.PLAIN, 16));
@@ -75,17 +89,21 @@ public class LocusPanel extends JPanel {
         chromosomeList = new JComboBox<>(chromosomes);
         chromosomeList.setSelectedIndex(0);
 
+        // Start position selection
         JLabel labStart = new JLabel(Resource.getTextElement("locus.start"));
         labStart.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
         labStart.setFont(new Font(labStart.getFont().getFontName(), Font.PLAIN, 16));
 
+        inputStart = new JTextField();
+
+        // End position selection
         JLabel labEnd = new JLabel(Resource.getTextElement("locus.end"));
         labEnd.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
         labEnd.setFont(new Font(labEnd.getFont().getFontName(), Font.PLAIN, 16));
 
-        inputStart = new JTextField();
         inputEnd = new JTextField();
 
+        // Add the elements defined above to the input panel
         addToPanel(inputPanel, labChromosome, 0.3, 1, 2);
         addToPanel(inputPanel, chromosomeList, 0.8, 2, 2);
         addToPanel(inputPanel, labStart, 0.3, 1, 3);
