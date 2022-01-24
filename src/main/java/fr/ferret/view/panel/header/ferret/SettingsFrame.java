@@ -43,7 +43,7 @@ public class SettingsFrame extends JFrame {
     private JRadioButton vcfFileButton;
     private JRadioButton[] phaseButtons;
 
-    private JFormattedTextField mafText;
+    private JFormattedTextField mafValueField;
 
     private JRadioButton[] humanVersionButtons;
 
@@ -83,7 +83,7 @@ public class SettingsFrame extends JFrame {
         /* --- Ok/Cancel button --- */
         generateOkCancelButtons();
 
-        // Sets the settings windows
+        // Sets the settings window
         this.getContentPane().add(settingsPanel);
         this.setResizable(true);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -92,8 +92,8 @@ public class SettingsFrame extends JFrame {
         // TODO: should these addActionListener be in the view part ?
         settingsCancel.addActionListener(new SettingsFrameController.CancelButtonListener(this));
         settingsOK.addActionListener(new SettingsFrameController.SaveButtonListener(ferretFrame,
-                this, phaseButtons, humanVersionButtons, mafText, allFilesButton, freqFileButton,
-                vcfFileButton));
+                this, phaseButtons, humanVersionButtons, mafValueField, allFilesButton,
+                freqFileButton, vcfFileButton));
     }
 
     /**
@@ -132,58 +132,79 @@ public class SettingsFrame extends JFrame {
      */
     private void generateMAF() {
 
-        Optional<ImageIcon> questionMark = Resource.getIcon("/img/questionMark25.png");
-        JLabel questionMarkMAFThreshold =
-                questionMark.isPresent() ? new JLabel(questionMark.get()) : null;
-
-        JSlider mafSlider = new JSlider(0, 5000, 0);
-        JLabel mafThresholdLabel = new JLabel(Resource.getTextElement("settings.mafthresold"));
+        /* --- Section title --- */
         JLabel mafOptionLabel = new JLabel(Resource.getTextElement("settings.maf"));
         mafOptionLabel.setFont(new Font(FONT, Font.BOLD, 16));
 
+
+        /* --- Value selection panel: divided in two parts --- */
         JPanel mafPanel = new JPanel();
         mafPanel.setLayout(new BoxLayout(mafPanel, BoxLayout.X_AXIS));
+        mafPanel.setAlignmentX(LEFT_ALIGNMENT);
 
-        JPanel mafESPPanel = new JPanel();
+        // -- First part: value selection field --
+        // Label
+        JLabel mafThresholdLabel = new JLabel(Resource.getTextElement("settings.mafthresold"));
 
-        // TODO bonus : GnomAD si le temps
-
+        // Field
         NumberFormat mafFormat = NumberFormat.getNumberInstance();
         mafFormat.setMaximumFractionDigits(4);
-        mafText = new JFormattedTextField(mafFormat);
+        mafValueField = new JFormattedTextField(mafFormat);
+        mafValueField.setColumns(5);
+        mafValueField.setMaximumSize(mafValueField.getPreferredSize());
 
-        mafPanel.setAlignmentX(LEFT_ALIGNMENT);
+        // we set the value to the actual setting
+        mafValueField.setValue(config.getMafThreshold());
+
+        // Label and field added to the panel
         mafPanel.add(mafThresholdLabel);
-        mafText.setColumns(5);
-        mafText.setMaximumSize(mafText.getPreferredSize());
-        mafPanel.add(mafText);
+        mafPanel.add(mafValueField);
 
+        // -- Second part: value selection slider --
+        JSlider mafSlider = new JSlider(0, 5000, 0);
+
+        // Slider labels
         Hashtable<Integer, JLabel> labels = new Hashtable<>();
         labels.put(0, new JLabel("0.0"));
         labels.put(5000, new JLabel("0.5"));
         mafSlider.setLabelTable(labels);
-        mafSlider.setValue(0);
         mafSlider.setPaintLabels(true);
+
+        // Value initialized to 0
+        mafSlider.setValue(0);
+
+        // slide added to the panel
         mafPanel.add(mafSlider);
 
-        SettingsFrameController.MafInputListener mafController =
-                new SettingsFrameController.MafInputListener(mafText, mafSlider);
-        mafText.addPropertyChangeListener(mafController);
-        mafSlider.addChangeListener(mafController);
-        mafText.setValue(config.getMafThreshold());
 
-        if (questionMarkMAFThreshold != null) {
-            mafPanel.add(questionMarkMAFThreshold);
+        /* --- Help section --- */
+        JPanel mafHelpPanel = new JPanel();
+        mafHelpPanel.setLayout(new BoxLayout(mafHelpPanel, BoxLayout.X_AXIS));
+        mafHelpPanel.setAlignmentX(LEFT_ALIGNMENT);
+
+        // We try to get the question mark icon
+        Optional<ImageIcon> questionMark = Resource.getIcon("/img/questionMark25.png");
+        if (questionMark.isPresent()) {
+            // if icon got sucessfully we add an help tooltip
+            JLabel questionMarkMAFThreshold = new JLabel(questionMark.get());
             questionMarkMAFThreshold.setToolTipText(Resource.getTextElement("settings.maf.help"));
+            // and we add it to the panel
+            mafPanel.add(questionMarkMAFThreshold);
         }
-        mafPanel.add(Box.createHorizontalGlue());
-        mafESPPanel.setLayout(new BoxLayout(mafESPPanel, BoxLayout.X_AXIS));
-        mafESPPanel.setAlignmentX(LEFT_ALIGNMENT);
 
+        mafPanel.add(Box.createHorizontalGlue());
+        // TODO bonus : GnomAD si le temps
+
+        // We add the three parts to the settings panel
         settingsPanel.add(mafOptionLabel);
         settingsPanel.add(mafPanel);
-        settingsPanel.add(mafESPPanel);
+        settingsPanel.add(mafHelpPanel);
 
+        // We link together field and slider values
+        SettingsFrameController.MafInputListener mafController =
+                new SettingsFrameController.MafInputListener(mafValueField, mafSlider);
+        mafValueField.addPropertyChangeListener(mafController);
+        mafSlider.addChangeListener(mafController);
     }
 
     /**
