@@ -23,70 +23,95 @@ public class UpdateFrame extends JFrame {
     private final JLabel updateLabel = new JLabel(Resource.getTextElement("update.checking"));
 
     public UpdateFrame() {
+
         super(Resource.getTextElement("update.title"));
 
+        // Label
+        updateLabel.setAlignmentX(CENTER_ALIGNMENT);
+        updatePanel.add(updateLabel);
+
+        updatePanel.add(Box.createRigidArea(new Dimension(500, 0)));
+
+        // Progress bar
+        updateProgressBar.setIndeterminate(true);
+        updateBarHolder.add(updateProgressBar);
+        updatePanel.add(updateBarHolder);
+
+        // Ok button
+        // Button holder
+        JPanel updateButtonHolder = new JPanel();
+        updateButtonHolder.setLayout(new BoxLayout(updateButtonHolder, BoxLayout.X_AXIS));
+        updatePanel.add(updateButtonHolder);
+        // Button
+        JButton updateOK = new JButton(Resource.getTextElement("settings.ok"));
+        updateButtonHolder.add(updateOK);
+        updateOK.addActionListener(event -> UpdateFrame.this.dispose());
+
+
+        // Panel settings
+        updatePanel.setLayout(new BoxLayout(updatePanel, BoxLayout.Y_AXIS));
+        updatePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        // frame settings
         this.setResizable(true);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.getContentPane().add(updatePanel);
-        updatePanel.setLayout(new BoxLayout(updatePanel, BoxLayout.Y_AXIS));
-        updatePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        updatePanel.add(updateLabel);
-        // updatePanel.add(updateDetailLabel);
-        updatePanel.add(Box.createRigidArea(new Dimension(500, 0)));
-        updateLabel.setAlignmentX(CENTER_ALIGNMENT);
-        updateProgressBar.setIndeterminate(true);
-        // updateBarHolder.add(updateDetailLabel);
-        JLabel updateDetailLabel = new JLabel("");
-        updateDetailLabel.setAlignmentX(CENTER_ALIGNMENT); // TODO: what is the use of this label ?
-        updateBarHolder.add(updateProgressBar);
-        updatePanel.add(updateBarHolder);
-        JPanel updateButtonHolder = new JPanel();
-        updatePanel.add(updateButtonHolder);
-        updateButtonHolder.setLayout(new BoxLayout(updateButtonHolder, BoxLayout.X_AXIS));
-        JButton updateOK = new JButton(Resource.getTextElement("settings.ok"));
-        updateButtonHolder.add(updateOK);
-        updateOK.addActionListener(e -> UpdateFrame.this.dispose());
         this.pack();
     }
 
     public void showFrame(JFrame snpFerret) {
+
         this.setLocationRelativeTo(snpFerret);
         this.setVisible(true);
 
         if (!checkedForUpdate) {
+            // We don't need to check again for updates
             checkedForUpdate = true;
-            final UpdateChecker updateWorker = new UpdateChecker();
-            updateWorker.addPropertyChangeListener(arg01 -> {
-                if (arg01.getPropertyName().equals("state")) {
-                    if (arg01.getNewValue() == SwingWorker.StateValue.DONE) {
-                        String updateReason = updateWorker.updateStatus();
-                        Boolean urgentUpdate = updateWorker.urgentUpdate();
-                        Boolean needUpdate = updateWorker.needUpdate();
 
-                        if (urgentUpdate || needUpdate) {
-                            updateLabel.setText(updateReason);
-                            updateBarHolder.remove(updateProgressBar);
-                            String link = Resource.getTextElement("update.link");
-                            LinkLabel ferretUpdate = new LinkLabel(link);
-                            JLabel updateFerretLabel =
-                                    new JLabel(Resource.getTextElement("update.msg"));
-                            updateBarHolder.add(updateFerretLabel);
-                            updateBarHolder.repaint();
-                            // updateFerretLabel.setText("");
-                            // updateFerretLabel.setText("Please update Ferret at:");
-                            ferretUpdate.setBackgroundColor(updatePanel.getBackground());
-                            ferretUpdate.init();
-                            ferretUpdate.setAlignmentX(LEFT_ALIGNMENT);
-                            ferretUpdate.setMaximumSize(ferretUpdate.getPreferredSize());
-                            updateBarHolder.add(ferretUpdate);
-                        } else {
-                            updateLabel.setText("");
-                            updateBarHolder.remove(updateProgressBar);
-                            updateBarHolder.add(new JLabel(updateReason));
-                        }
+            // We set the update checker
+            final UpdateChecker updateWorker = new UpdateChecker();
+            updateWorker.addPropertyChangeListener(propertyChangeEvent -> {
+                // When check is done
+                if (propertyChangeEvent.getPropertyName().equals("state")
+                        && propertyChangeEvent.getNewValue() == SwingWorker.StateValue.DONE) {
+
+                    String updateReason = updateWorker.updateStatus();
+                    Boolean urgentUpdate = updateWorker.urgentUpdate();
+                    Boolean needUpdate = updateWorker.needUpdate();
+
+                    // If the update is important
+                    if (urgentUpdate || needUpdate) {
+                        // We print update reason
+                        updateLabel.setText(updateReason);
+
+                        // And we replace the progress bar by a label and an update link
+                        // - Removes the progress bar
+                        updateBarHolder.remove(updateProgressBar);
+                        // - Adds the label
+                        JLabel updateFerretLabel =
+                                new JLabel(Resource.getTextElement("update.msg"));
+                        updateBarHolder.add(updateFerretLabel);
+                        // - Adds the link
+                        String linkText = Resource.getTextElement("update.link");
+                        LinkLabel ferretUpdateLink = new LinkLabel(linkText);
+                        ferretUpdateLink.setBackgroundColor(updatePanel.getBackground());
+                        ferretUpdateLink.init();
+                        ferretUpdateLink.setAlignmentX(LEFT_ALIGNMENT);
+                        ferretUpdateLink.setMaximumSize(ferretUpdateLink.getPreferredSize());
+                        updateBarHolder.add(ferretUpdateLink);
+                        // - Refresh the display
+                        updateBarHolder.repaint();
+                    } else {
+                        // We remove the update label
+                        updateLabel.setText("");
+                        // And we replace the progress bar by the update reason
+                        updateBarHolder.remove(updateProgressBar);
+                        updateBarHolder.add(new JLabel(updateReason));
                     }
                 }
             });
+
+            // We launch the update check
             updateWorker.execute();
         }
     }
