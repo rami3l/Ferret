@@ -21,6 +21,9 @@ import lombok.Getter;
  * Selection of the regions of the 1KG project
  */
 public class RegionPanel extends JPanel {
+
+    private static final String FONT = "Calibri";
+
     /**
      * Panels for each supported {@link Region}
      */
@@ -31,33 +34,12 @@ public class RegionPanel extends JPanel {
      * Inits a new RegionPanel
      */
     public RegionPanel() {
+
+        // Panel settings
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20));
 
         initPanel();
-    }
-
-    /**
-     * Inits the panel : adds all components
-     */
-    private void initPanel() {
-        JLabel label = new JLabel(Resource.getTextElement("region.input"), SwingConstants.LEFT);
-        label.setFont(new Font("Calibri", Font.BOLD, 24));
-        add(label, BorderLayout.NORTH);
-        label.setForeground(new Color(18, 0, 127));
-
-        JPanel container = new JPanel();
-        container.setLayout(new GridLayout(2, 3));
-
-        Region[] ferretRegions = Resource.CONFIG.getSelectedVersion().getRegions();
-        for (int i = 0; i < ferretRegions.length; i++) {
-            Region region = ferretRegions[i];
-            ZonesPanel panel = new ZonesPanel(region, i >= 3 ? 7 : 9);
-            regions.add(panel);
-            container.add(panel);
-        }
-
-        add(container, BorderLayout.CENTER);
     }
 
     /**
@@ -69,6 +51,30 @@ public class RegionPanel extends JPanel {
         initPanel();
         updateUI();
     }
+
+    /**
+     * Inits the panel : adds all components
+     */
+    private void initPanel() {
+        // Panel title
+        JLabel label = new JLabel(Resource.getTextElement("region.input"), SwingConstants.LEFT);
+        label.setFont(new Font(FONT, Font.BOLD, 24));
+        label.setForeground(new Color(18, 0, 127));
+        add(label, BorderLayout.NORTH);
+
+        // Container for zone selection panels
+        JPanel container = new JPanel(new GridLayout(2, 3));
+
+        Region[] ferretRegions = Resource.CONFIG.getSelectedVersion().getRegions();
+        for (int i = 0; i < ferretRegions.length; i++) {
+            ZonesPanel panel = new ZonesPanel(ferretRegions[i], i >= 3 ? 7 : 9);
+            regions.add(panel);
+            container.add(panel);
+        }
+
+        add(container, BorderLayout.CENTER);
+    }
+
 
 
     /**
@@ -94,33 +100,48 @@ public class RegionPanel extends JPanel {
          *        SubPanels
          */
         public ZonesPanel(Region region, int lines) {
+
             this.region = region;
             this.setLayout(new GridLayout(lines, 1));
 
-            // Title
+            // Zone panel title
             JLabel label = new JLabel(
                     Resource.getTextElement("region." + region.getName().toLowerCase(Locale.ROOT)));
-            label.setFont(new Font("Calibri", Font.BOLD, 20));
+            label.setFont(new Font(FONT, Font.BOLD, 20));
             label.setForeground(new Color(131, 55, 192));
             add(label);
 
             // Zones selection
             this.checkBoxes = new JCheckBox[region.getZones().length];
+
             for (int i = 0; i < checkBoxes.length; i++) {
+
+                int nbIndividuals = region.getIndividualCount()[i];
+
+                // Checkbox created with its label
                 checkBoxes[i] = new JCheckBox(region.getZones()[i] + " "
                         + Resource.getTextElement("region." + region.getZones()[i]) + " (n="
-                        + region.getIndividualCount()[i] + ")");
+                        + nbIndividuals + ")");
+
+                // Checkbox font (bold for the first checkbox)
                 checkBoxes[i].setFont(new Font(checkBoxes[i].getFont().getFontName(),
                         i == 0 ? Font.BOLD : Font.PLAIN, 14));
+
+                // Checkbox is added to the panel
                 add(checkBoxes[i]);
-                if (region.getIndividualCount()[i] == 0) {
+
+                // If there is no individual for this zone, the checkbox is disabled.
+                if (nbIndividuals == 0) {
                     checkBoxes[i].setEnabled(false);
                 }
             }
+
+            // When we select the first checkbox (the All zone population one) others are disabled.
             checkBoxes[0].addActionListener(action -> {
                 boolean state = !checkBoxes[0].isSelected();
                 setCheckBoxesState(1, state);
 
+                // If we selected the All population checbkox, all others checkboxes are disabled
                 if (region == Resource.CONFIG.getSelectedVersion().getRegions()[0]) {
                     for (ZonesPanel panel : RegionPanel.this.regions) {
                         if (panel != this) {
@@ -139,6 +160,8 @@ public class RegionPanel extends JPanel {
          */
         private void setCheckBoxesState(int start, boolean state) {
             for (int i = start; i < checkBoxes.length; i++) {
+                // We change the state of the checkbox only if there is individuals for the
+                // corresponding zone (else we leave it disabled)
                 if (region.getIndividualCount()[i] != 0) {
                     checkBoxes[i].setEnabled(state);
                 }
