@@ -36,51 +36,56 @@ public class FerretFrame extends JFrame {
     private final VariantPanel variantPanel;
 
     public FerretFrame() {
-        // Set look
+        // Set look (for example dark/white mode)
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
             LOG.log(Level.WARNING, "Failed to set ferret look and feel !", e);
         }
+
         // Set icon
         Optional<BufferedImage> icon = Resource.getImage("/img/ferret.jpg");
         if (icon.isPresent()) {
             setIconImage(icon.get());
         }
 
+        // Set the window title
+        setTitle("Ferret v3");
+
+        // Creates the menu panel
         headerPanel = new MenuPanel(this);
+        setJMenuBar(headerPanel);
+
+        // Creates the content panel
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        setContentPane(panel);
+
+        // Creates the 3 input panels
         locusPanel = new LocusPanel();
         genePanel = new GenePanel();
         variantPanel = new VariantPanel();
-        regionPanel = new RegionPanel();
-        runPanel = new RunPanel(this);
 
-        // Créer le conteneur des onglets
+        // Creates 3 tabs in a tab container for these 3 input panels
         inputTabs = new JTabbedPane();
-        // Définir la position de conteneur d'onglets
         inputTabs.setBounds(40, 20, 300, 300);
-        // Associer chaque panneau à l'onglet correspondant
         inputTabs.add("Locus", locusPanel);
         inputTabs.add("Gene", genePanel);
         inputTabs.add("Variant", variantPanel);
-
-        setTitle("Ferret v3");
-        setJMenuBar(headerPanel);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(inputTabs);
+
+        // Creates the region panel
+        regionPanel = new RegionPanel();
         panel.add(regionPanel);
+
+        // Creates the run panel
+        runPanel = new RunPanel(this);
         panel.add(runPanel);
 
-        // affecte le panneau a la fenetre
-        setContentPane(panel);
+        // Window settings
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         pack();
-
-        // maFrame.add(new JButton("Button 1")); //SwingConstants.CENTER
-        // setSize(800,790);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
 }
