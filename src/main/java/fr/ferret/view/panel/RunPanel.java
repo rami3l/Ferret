@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import fr.ferret.controller.RunButtonListener;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 
@@ -18,5 +19,6 @@ public class RunPanel extends JPanel {
         runButton.setPreferredSize(new Dimension(300, 60));
         runButton.setBackground(new Color(201, 157, 240));
         this.add(runButton);
+        new RunButtonListener(frame, runButton);
     }
 }
