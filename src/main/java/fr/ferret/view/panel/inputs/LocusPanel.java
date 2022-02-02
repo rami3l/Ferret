@@ -2,7 +2,6 @@ package fr.ferret.view.panel.inputs;
 
 import static fr.ferret.view.utils.GuiUtils.addToPanel;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import javax.swing.BorderFactory;
@@ -47,7 +46,7 @@ public class LocusPanel extends JPanel {
         add(helpLabel, BorderLayout.SOUTH);
 
         // Set the borders
-        setBorder(BorderFactory.createLineBorder(new Color(131, 55, 192, 140), 4));
+        setBorder(BorderFactory.createLineBorder(Resource.PANEL_BORDER_COLOR, 4));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
         inputPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
         helpLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
@@ -63,7 +62,7 @@ public class LocusPanel extends JPanel {
                 .getTextElement("locus.input." + Resource.CONFIG.getSelectedHumanGenome().name());
         JLabel title = new JLabel(text, SwingConstants.LEFT);
         title.setFont(new Font("Calibri", Font.BOLD, 24));
-        title.setForeground(new Color(18, 0, 127));
+        title.setForeground(Resource.TITLE_COLOR);
         return title;
     }
 

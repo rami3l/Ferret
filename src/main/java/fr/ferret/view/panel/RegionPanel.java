@@ -1,7 +1,6 @@
 package fr.ferret.view.panel;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public class RegionPanel extends JPanel {
         // Panel title
         JLabel label = new JLabel(Resource.getTextElement("region.input"), SwingConstants.LEFT);
         label.setFont(new Font(FONT, Font.BOLD, 24));
-        label.setForeground(new Color(18, 0, 127));
+        label.setForeground(Resource.TITLE_COLOR);
         add(label, BorderLayout.NORTH);
 
         // Container for zone selection panels
@@ -108,7 +107,7 @@ public class RegionPanel extends JPanel {
             JLabel label = new JLabel(
                     Resource.getTextElement("region." + region.getName().toLowerCase(Locale.ROOT)));
             label.setFont(new Font(FONT, Font.BOLD, 20));
-            label.setForeground(new Color(131, 55, 192));
+            label.setForeground(Resource.ZONE_LABEL_COLOR);
             add(label);
 
             // Zones selection

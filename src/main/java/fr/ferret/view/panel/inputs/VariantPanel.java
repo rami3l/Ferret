@@ -2,7 +2,6 @@ package fr.ferret.view.panel.inputs;
 
 import static fr.ferret.view.utils.GuiUtils.addToPanel;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
@@ -51,7 +50,7 @@ public class VariantPanel extends JPanel {
         add(helpLabel, BorderLayout.SOUTH);
 
         // Set the borders
-        setBorder(BorderFactory.createLineBorder(new Color(131, 55, 192, 140), 4));
+        setBorder(BorderFactory.createLineBorder(Resource.PANEL_BORDER_COLOR, 4));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
         inputPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
         helpLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
@@ -66,7 +65,7 @@ public class VariantPanel extends JPanel {
         JLabel titleLabel =
                 new JLabel(Resource.getTextElement("variant.input"), SwingConstants.LEFT);
         titleLabel.setFont(new Font("Calibri", Font.BOLD, 24));
-        titleLabel.setForeground(new Color(18, 0, 127));
+        titleLabel.setForeground(Resource.TITLE_COLOR);
         return titleLabel;
     }
 
@@ -93,7 +92,7 @@ public class VariantPanel extends JPanel {
         // File selection
         JButton browseButton = new JButton(Resource.getTextElement("variant.browse"));
         browseButton.setPreferredSize(new Dimension(200, 30));
-        browseButton.setBackground(new Color(201, 157, 240));
+        browseButton.setBackground(Resource.BUTTON_COLOR);
 
         JLabel selectedFile = new JLabel(Resource.getTextElement("variant.selectfile"));
         selectedFile.setFont(new Font(selectedFile.getFont().getFontName(), Font.PLAIN, 13));

@@ -1,5 +1,6 @@
 package fr.ferret.utils;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Locale;
 import java.util.Optional;
@@ -24,6 +25,14 @@ public class Resource {
     /** text elements for the interface */
     private static final ResourceBundle textElements =
             ResourceBundle.getBundle("ferret", Locale.getDefault());
+
+    public static final Color TITLE_COLOR = new Color(18, 0, 150);
+    public static final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
+    public static final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
+    public static final Color BUTTON_COLOR = new Color(201, 157, 240);
+    public static final Color LINK_STANDARD_COLOR = new Color(40, 100, 255);
+    public static final Color LINK_HOVER_COLOR = new Color(255, 0, 0);
+    public static final Color LINK_ACTIVE_COLOR = new Color(128, 0, 128);
 
     // utils should not be instanciated
     private Resource() {}
@@ -65,9 +74,9 @@ public class Resource {
     }
 
     /**
-     * Program resources (languages and properties)
+     * Gets an element of text from the resources according to system langage
      * 
-     * @param element to get in the property file
+     * @param element of text to get in the resources
      */
     public static String getTextElement(String element) {
         return textElements.getString(element);

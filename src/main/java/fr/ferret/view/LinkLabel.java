@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
+import fr.ferret.utils.Resource;
 import lombok.Setter;
 
 /**
@@ -24,9 +25,9 @@ public class LinkLabel extends JTextField implements MouseListener, FocusListene
     private URI target;
 
     // Colors need to be seen in dark and white mode
-    private Color standardColor = new Color(40, 100, 255);
-    private Color hoverColor = new Color(255, 0, 0);
-    private Color activeColor = new Color(128, 0, 128);
+    private Color standardColor = Resource.LINK_STANDARD_COLOR;
+    private Color hoverColor = Resource.LINK_HOVER_COLOR;
+    private Color activeColor = Resource.LINK_ACTIVE_COLOR;
     private Color transparent = new Color(0, 0, 0, 0);
     @Setter
     private Color backgroundColor;
