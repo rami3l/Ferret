@@ -15,11 +15,14 @@ import fr.ferret.controller.settings.FerretConfig;
  */
 public class Resource {
 
+
     /** program settings */
     public static final FerretConfig CONFIG = new FerretConfig();
 
-    private static final Logger LOG = Logger.getLogger(Resource.class.getName());
-    private static final ResourceBundle locale =
+    private static final Logger logger = Logger.getLogger(Resource.class.getName());
+
+    /** text elements for the interface */
+    private static final ResourceBundle textElements =
             ResourceBundle.getBundle("ferret", Locale.getDefault());
 
     // utils should not be instanciated
@@ -36,7 +39,7 @@ public class Resource {
             // we try to read the image from the resource file
             img = ImageIO.read(Resource.class.getResource(resourceFileName));
         } catch (Exception e) {
-            LOG.log(Level.WARNING,
+            logger.log(Level.WARNING,
                     String.format("Failed to get resource image %s", resourceFileName), e);
         }
         // we return an optional image (with a null value if impossible to get the image)
@@ -54,7 +57,7 @@ public class Resource {
             // we try to read the icon from the resource file
             icon = new ImageIcon(Resource.class.getResource(resourceFileName));
         } catch (Exception e) {
-            LOG.log(Level.WARNING,
+            logger.log(Level.WARNING,
                     String.format("Failed to get resource image %s", resourceFileName), e);
         }
         // we return an optional icon (with a null value if impossible to get the icon)
@@ -67,7 +70,7 @@ public class Resource {
      * @param element to get in the property file
      */
     public static String getTextElement(String element) {
-        return locale.getString(element);
+        return textElements.getString(element);
     }
 
 }

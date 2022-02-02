@@ -22,7 +22,7 @@ import fr.ferret.view.panel.inputs.GenePanel;
  */
 public class GenePanelController extends InputPanelController {
 
-    private static final Logger LOG = Logger.getLogger(GenePanelController.class.getName());
+    private static final Logger logger = Logger.getLogger(GenePanelController.class.getName());
 
     private final GenePanel genePanel;
 
@@ -130,7 +130,7 @@ public class GenePanelController extends InputPanelController {
         if ((geneListInputted || (geneFileImported && !geneFileError && !geneFileExtensionError))
                 && !invalidCharacter && popSelected) {
 
-            LOG.log(Level.INFO, "Starting gene research...");
+            logger.log(Level.INFO, "Starting gene research...");
             // TODO LINK WITH MODEL
 
         } else {

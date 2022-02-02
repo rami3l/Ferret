@@ -25,7 +25,7 @@ import lombok.Getter;
 @Getter
 public class FerretFrame extends JFrame {
 
-    private static final Logger LOG = Logger.getLogger(FerretFrame.class.getName());
+    private static final Logger logger = Logger.getLogger(FerretFrame.class.getName());
 
     private final MenuPanel headerPanel;
     private final JTabbedPane inputTabs;
@@ -41,7 +41,7 @@ public class FerretFrame extends JFrame {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException e) {
-            LOG.log(Level.WARNING, "Failed to set ferret look and feel !", e);
+            logger.log(Level.WARNING, "Failed to set ferret look and feel !", e);
         }
 
         // Set icon

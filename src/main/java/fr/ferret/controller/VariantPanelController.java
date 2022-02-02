@@ -22,7 +22,7 @@ import fr.ferret.view.panel.inputs.VariantPanel;
  */
 public class VariantPanelController extends InputPanelController {
 
-    private static final Logger LOG = Logger.getLogger(VariantPanelController.class.getName());
+    private static final Logger logger = Logger.getLogger(VariantPanelController.class.getName());
 
     private final VariantPanel variantPanel;
 
@@ -145,7 +145,7 @@ public class VariantPanelController extends InputPanelController {
         if ((snpListInputted || (snpFileImported && !snpFileError && !snpFileExtensionError))
                 && !invalidCharacter && validWindowSizeEntered && popSelected) {
 
-            LOG.log(Level.INFO, "Starting gene research...");
+            logger.log(Level.INFO, "Starting gene research...");
             // TODO LINK WITH MODEL
 
             // this should be combined with the one single call to Ferret later

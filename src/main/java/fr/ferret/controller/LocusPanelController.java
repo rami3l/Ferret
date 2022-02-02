@@ -18,7 +18,7 @@ import fr.ferret.view.panel.inputs.LocusPanel;
  */
 public class LocusPanelController extends InputPanelController {
 
-    private static final Logger LOG = Logger.getLogger(LocusPanelController.class.getName());
+    private static final Logger logger = Logger.getLogger(LocusPanelController.class.getName());
 
     private final LocusPanel locusPanel;
 
@@ -134,7 +134,7 @@ public class LocusPanelController extends InputPanelController {
         // Valid input
         if (isChrSelected && populationSelected && startSelected && endSelected && startEndValid
                 && withinRange) {
-            LOG.log(Level.INFO, "Starting gene research...");
+            logger.log(Level.INFO, "Starting gene research...");
             // TODO LINK WITH MODEL
 
         } else { // Invalid input
