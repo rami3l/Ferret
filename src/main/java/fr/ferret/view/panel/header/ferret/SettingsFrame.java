@@ -1,7 +1,6 @@
 package fr.ferret.view.panel.header.ferret;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.text.NumberFormat;
 import java.util.Hashtable;
 import java.util.Optional;
@@ -29,8 +28,6 @@ import lombok.Getter;
  * The ferret settings frame
  */
 public class SettingsFrame extends JFrame {
-
-    private static final String FONT = "SansSerif";
 
     @Getter
     private final FerretConfig config;
@@ -102,7 +99,7 @@ public class SettingsFrame extends JFrame {
     private void generatePhaseSelectionSection() {
 
         JLabel vcfVersionLabel = new JLabel(Resource.getTextElement("settings.genversion"));
-        vcfVersionLabel.setFont(new Font(FONT, Font.BOLD, 16));
+        vcfVersionLabel.setFont(Resource.SETTINGS_LABEL_FONT);
         settingsPanel.add(vcfVersionLabel);
 
         // list of all phase buttons
@@ -134,7 +131,7 @@ public class SettingsFrame extends JFrame {
 
         /* --- Section title --- */
         JLabel mafOptionLabel = new JLabel(Resource.getTextElement("settings.maf"));
-        mafOptionLabel.setFont(new Font(FONT, Font.BOLD, 16));
+        mafOptionLabel.setFont(Resource.SETTINGS_LABEL_FONT);
 
 
         /* --- Value selection panel: divided in two parts --- */
@@ -214,7 +211,7 @@ public class SettingsFrame extends JFrame {
 
         // Section title
         JLabel filesLabel = new JLabel(Resource.getTextElement("settings.outfiles"));
-        filesLabel.setFont(new Font(FONT, Font.BOLD, 16));
+        filesLabel.setFont(Resource.SETTINGS_LABEL_FONT);
         settingsPanel.add(filesLabel);
 
         // 3 buttons to select output files possible type
@@ -248,7 +245,7 @@ public class SettingsFrame extends JFrame {
 
         // Section title
         JLabel hgVersionLabel = new JLabel(Resource.getTextElement("settings.hugversion"));
-        hgVersionLabel.setFont(new Font(FONT, Font.BOLD, 16));
+        hgVersionLabel.setFont(Resource.SETTINGS_LABEL_FONT);
         settingsPanel.add(hgVersionLabel);
 
         // List of radio buttons (one by possible human genome version)

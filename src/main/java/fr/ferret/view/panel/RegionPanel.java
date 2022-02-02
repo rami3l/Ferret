@@ -21,8 +21,6 @@ import lombok.Getter;
  */
 public class RegionPanel extends JPanel {
 
-    private static final String FONT = "Calibri";
-
     /**
      * Panels for each supported {@link Region}
      */
@@ -57,7 +55,7 @@ public class RegionPanel extends JPanel {
     private void initPanel() {
         // Panel title
         JLabel label = new JLabel(Resource.getTextElement("region.input"), SwingConstants.LEFT);
-        label.setFont(new Font(FONT, Font.BOLD, 24));
+        label.setFont(Resource.TITLE_FONT);
         label.setForeground(Resource.TITLE_COLOR);
         add(label, BorderLayout.NORTH);
 
@@ -106,7 +104,7 @@ public class RegionPanel extends JPanel {
             // Zone panel title
             JLabel label = new JLabel(
                     Resource.getTextElement("region." + region.getName().toLowerCase(Locale.ROOT)));
-            label.setFont(new Font(FONT, Font.BOLD, 20));
+            label.setFont(Resource.ZONE_LABEL_FONT);
             label.setForeground(Resource.ZONE_LABEL_COLOR);
             add(label);
 

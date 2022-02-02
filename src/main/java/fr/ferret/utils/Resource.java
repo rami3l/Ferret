@@ -1,6 +1,7 @@
 package fr.ferret.utils;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.util.Locale;
 import java.util.Optional;
@@ -33,6 +34,10 @@ public class Resource {
     public static final Color LINK_STANDARD_COLOR = new Color(40, 100, 255);
     public static final Color LINK_HOVER_COLOR = new Color(255, 0, 0);
     public static final Color LINK_ACTIVE_COLOR = new Color(128, 0, 128);
+
+    public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
+    public static final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
+    public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
 
     // utils should not be instanciated
     private Resource() {}

@@ -61,7 +61,7 @@ public class LocusPanel extends JPanel {
         String text = Resource
                 .getTextElement("locus.input." + Resource.CONFIG.getSelectedHumanGenome().name());
         JLabel title = new JLabel(text, SwingConstants.LEFT);
-        title.setFont(new Font("Calibri", Font.BOLD, 24));
+        title.setFont(Resource.TITLE_FONT);
         title.setForeground(Resource.TITLE_COLOR);
         return title;
     }

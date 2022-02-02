@@ -64,7 +64,7 @@ public class VariantPanel extends JPanel {
     private JLabel generateTitle() {
         JLabel titleLabel =
                 new JLabel(Resource.getTextElement("variant.input"), SwingConstants.LEFT);
-        titleLabel.setFont(new Font("Calibri", Font.BOLD, 24));
+        titleLabel.setFont(Resource.TITLE_FONT);
         titleLabel.setForeground(Resource.TITLE_COLOR);
         return titleLabel;
     }
