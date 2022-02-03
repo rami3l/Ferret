@@ -75,9 +75,9 @@ public class UpdateFrame extends JFrame {
                 if (propertyChangeEvent.getPropertyName().equals("state")
                         && propertyChangeEvent.getNewValue() == SwingWorker.StateValue.DONE) {
 
-                    String updateReason = updateWorker.updateStatus();
-                    Boolean urgentUpdate = updateWorker.urgentUpdate();
-                    Boolean needUpdate = updateWorker.needUpdate();
+                    String updateReason = updateWorker.getUpdateMessage();
+                    Boolean urgentUpdate = updateWorker.getUrgentUpdate();
+                    Boolean needUpdate = updateWorker.getNeedUpdate();
 
                     // If the update is important
                     if (urgentUpdate || needUpdate) {

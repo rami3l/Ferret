@@ -5,26 +5,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import javax.swing.SwingWorker;
+import lombok.Getter;
 
 /**
  * An update checker for Ferret <br>
  * Not tested
  */
+@Getter
 public class UpdateChecker extends SwingWorker<Boolean, Object> {
-    Boolean needUpdate = null, urgentUpdate = null;
-    String updateMessage = null;
-
-    public Boolean needUpdate() {
-        return needUpdate;
-    }
-
-    public Boolean urgentUpdate() {
-        return urgentUpdate;
-    }
-
-    public String updateStatus() {
-        return updateMessage;
-    }
+    private Boolean needUpdate = null;
+    private Boolean urgentUpdate = null;
+    private String updateMessage = null;
 
     @Override
     protected Boolean doInBackground() throws Exception {
