@@ -1,4 +1,4 @@
-package fr.ferret.view.region;
+package fr.ferret.model;
 
 import java.util.Arrays;
 

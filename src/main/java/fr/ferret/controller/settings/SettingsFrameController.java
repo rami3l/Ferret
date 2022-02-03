@@ -9,12 +9,12 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import fr.ferret.FerretMain;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.panel.header.SettingsFrame;
+import fr.ferret.view.panel.header.ferret.SettingsFrame;
 
 /**
- * Groups all controllers for the {@link fr.ferret.view.panel.header.SettingsFrame}
+ * Groups all controllers for the {@link fr.ferret.view.panel.header.ferret.SettingsFrame}
  */
 public class SettingsFrameController {
     /**
@@ -97,8 +97,8 @@ public class SettingsFrameController {
             }
             settingsFrame.getConfig().setSelectedHumanGenome(selectedv);
 
-            ferretFrame.getLocusPanel().getTitleLabel().setText(FerretMain.getLocale().getString(
-                    "locus.input." + FerretMain.getConfig().getSelectedHumanGenome().name()));
+            ferretFrame.getLocusPanel().getTitleLabel().setText(Resource.getTextElement(
+                    "locus.input." + Resource.CONFIG.getSelectedHumanGenome().name()));
             ferretFrame.getRegionPanel().reloadPanel();
             settingsFrame.dispose();
         }

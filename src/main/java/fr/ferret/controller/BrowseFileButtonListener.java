@@ -7,11 +7,13 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import fr.ferret.FerretMain;
+import fr.ferret.utils.Resource;
+import lombok.Getter;
 
 /**
  * Listens events of the run button and sends input data to the model
  */
+@Getter
 public class BrowseFileButtonListener implements ActionListener {
     /**
      * The panel containing the button
@@ -47,30 +49,14 @@ public class BrowseFileButtonListener implements ActionListener {
         JFileChooser saveFileChooser = new JFileChooser();
         String fileNameAndPath;
         saveFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        saveFileChooser.setDialogTitle(FerretMain.getLocale().getString("run.save"));
+        saveFileChooser.setDialogTitle(Resource.getTextElement("run.save"));
         int returnVal = saveFileChooser.showSaveDialog(panel);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = saveFileChooser.getSelectedFile();
             fileNameAndPath = file.getAbsolutePath();
-            selectedFileLabel.setText(FerretMain.getLocale().getString("browse.selectedfile") + " "
-                    + fileNameAndPath);
+            selectedFileLabel.setText(
+                    Resource.getTextElement("browse.selectedfile") + " " + fileNameAndPath);
             selectedFile = file;
         }
-    }
-
-    public File getSelectedFile() {
-        return selectedFile;
-    }
-
-    public JPanel getPanel() {
-        return panel;
-    }
-
-    public JLabel getSelectedFileLabel() {
-        return selectedFileLabel;
-    }
-
-    public JButton getRunButton() {
-        return runButton;
     }
 }

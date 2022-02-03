@@ -5,51 +5,56 @@ import java.net.URI;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import fr.ferret.FerretMain;
-import fr.ferret.controller.settings.FerretConfig;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
+import fr.ferret.view.panel.header.ferret.SettingsFrame;
+import fr.ferret.view.panel.header.ferret.UpdateFrame;
+import fr.ferret.view.panel.header.help.AboutFrame;
+import fr.ferret.view.panel.header.help.ContactFrame;
 
 /**
  * Menu of the Ferret Frame
  */
 public class MenuPanel extends JMenuBar {
     public MenuPanel(FerretFrame ferretFrame) {
+
+        // Ferret menu
         JMenu ferretMenu = new JMenu("Ferret");
-        JMenu helpMenu = new JMenu(FerretMain.getLocale().getString("menu.help"));
-
-        JMenuItem settingsMenuItem =
-                new JMenuItem(FerretMain.getLocale().getString("settings.title"));
-        JMenuItem updateMenuItem = new JMenuItem(FerretMain.getLocale().getString("update.title"));
-        JMenuItem exitMenuItem = new JMenuItem(FerretMain.getLocale().getString("menu.quit"));
-        JMenuItem aboutMenuItem = new JMenuItem(FerretMain.getLocale().getString("about.title"));
-        JMenuItem faqMenuItem = new JMenuItem(FerretMain.getLocale().getString("menu.faq"));
-        JMenuItem contactMenuItem =
-                new JMenuItem(FerretMain.getLocale().getString("contact.title"));
-
+        JMenuItem settingsMenuItem = new JMenuItem(Resource.getTextElement("settings.title"));
+        JMenuItem updateMenuItem = new JMenuItem(Resource.getTextElement("update.title"));
+        JMenuItem exitMenuItem = new JMenuItem(Resource.getTextElement("menu.quit"));
         ferretMenu.add(settingsMenuItem);
         ferretMenu.add(updateMenuItem);
         ferretMenu.add(exitMenuItem);
+
+        // Help menu
+        JMenu helpMenu = new JMenu(Resource.getTextElement("menu.help"));
+        JMenuItem aboutMenuItem = new JMenuItem(Resource.getTextElement("about.title"));
+        JMenuItem faqMenuItem = new JMenuItem(Resource.getTextElement("menu.faq"));
+        JMenuItem contactMenuItem = new JMenuItem(Resource.getTextElement("contact.title"));
         helpMenu.add(aboutMenuItem);
         helpMenu.add(faqMenuItem);
         helpMenu.add(contactMenuItem);
+
+        // Adds the two menus defined above
         this.add(ferretMenu);
         this.add(helpMenu);
 
-        // update window
-        updateMenuItem.addActionListener(arg0 -> {
-            new UpdateFrame().showFrame(ferretFrame);
-        });
 
-        // Settings pane:
-        FerretConfig config = FerretMain.getConfig();
-        settingsMenuItem.addActionListener(arg0 -> {
-            SettingsFrame settingsFrame = new SettingsFrame(ferretFrame, config);
+        // We define menu items action
+
+        // Update window
+        updateMenuItem.addActionListener(event -> new UpdateFrame().showFrame(ferretFrame));
+
+        // Settings window
+        settingsMenuItem.addActionListener(event -> {
+            SettingsFrame settingsFrame = new SettingsFrame(ferretFrame, Resource.CONFIG);
             settingsFrame.setLocationRelativeTo(ferretFrame);
             settingsFrame.setVisible(true);
         });
 
         // About window
-        aboutMenuItem.addActionListener(arg0 -> {
+        aboutMenuItem.addActionListener(event -> {
             AboutFrame aboutFrame = new AboutFrame();
             aboutFrame.setLocationRelativeTo(ferretFrame);
             aboutFrame.setVisible(true);
@@ -62,16 +67,17 @@ public class MenuPanel extends JMenuBar {
             contactFrame.setVisible(true);
         });
 
-        // Other action listeners
-        exitMenuItem.addActionListener(arg0 -> System.exit(0));
-        faqMenuItem.addActionListener(arg0 -> {
+        // FAQ link
+        faqMenuItem.addActionListener(event -> {
             try {
-                // On met le lien dans la traduction : possible de faire des faq dans d'autres
-                // langues
-                Desktop.getDesktop().browse(new URI(FerretMain.getLocale().getString("faq.link")));
+                // FAQ link can be different for each language
+                Desktop.getDesktop().browse(new URI(Resource.getTextElement("faq.link")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+
+        // Exit Ferret
+        exitMenuItem.addActionListener(event -> System.exit(0));
     }
 }

@@ -5,17 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
-import fr.ferret.FerretMain;
 import fr.ferret.controller.settings.HumanGenomeVersions;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.panel.LocusPanel;
+import fr.ferret.view.panel.inputs.LocusPanel;
 
 /**
  * The {@link LocusPanel} controller
  */
 public class LocusPanelController extends InputPanelController {
+
+    private static final Logger logger = Logger.getLogger(LocusPanelController.class.getName());
+
     private final LocusPanel locusPanel;
 
     public LocusPanelController(FerretFrame frame, LocusPanel locusPanel) {
@@ -61,8 +65,7 @@ public class LocusPanelController extends InputPanelController {
                 startEndValid = (tempEndPos >= tempStartPos);
                 if (startEndValid) {
                     Map<String, Integer> chrMap = new HashMap<>();
-                    if (FerretMain.getConfig()
-                            .getSelectedHumanGenome() == HumanGenomeVersions.hg19) {
+                    if (Resource.CONFIG.getSelectedHumanGenome() == HumanGenomeVersions.hg19) {
                         // Avoid too much if/else
                         chrMap.put("X", 155270560);
                         chrMap.put("1", 249250621);
@@ -131,110 +134,42 @@ public class LocusPanelController extends InputPanelController {
         // Valid input
         if (isChrSelected && populationSelected && startSelected && endSelected && startEndValid
                 && withinRange) {
-            FerretMain.getLog().log(Level.INFO, "Starting gene research...");
+            logger.log(Level.INFO, "Starting gene research...");
             // TODO LINK WITH MODEL
 
-            /*
-             * inputRegion[] queries = {new inputRegion(chrSelected,
-             * Integer.parseInt(startPosition), Integer.parseInt(endPosition))};
-             * 
-             * // if not get esp, string is none, else if get only ref, then string is ref, else
-             * string is both // this should be combined with the one single call to Ferret later //
-             * HERE final Integer[] variants = {0}; String output = null;
-             * 
-             * switch (currFileOut[0]){ case ALL: output = "all"; break; case FRQ: output = "freq";
-             * break; case VCF: output = "vcf"; break; }
-             * 
-             * String webAddress = null; if (currVersion[0] == version1KG.ONE){ webAddress =
-             * "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20110521/ALL.chr$.phase1_release_v3.20101123.snps_indels_svs.genotypes.vcf.gz";
-             * } else if (currVersion[0] == version1KG.THREE & defaultHG[0]){ webAddress =
-             * "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr$.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz";
-             * } else if (currVersion[0] == version1KG.THREE & !defaultHG[0]){ webAddress =
-             * "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/supporting/GRCh38_positions/ALL.chr$.phase3_shapeit2_mvncall_integrated_v3plus_nounphased.rsID.genotypes.GRCh38_dbSNP_no_SVs.vcf.gz";
-             * }
-             * 
-             * //This is the new ferret URL from Sophie //webAddress =
-             * "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/?fbclid=IwAR0kMq3tB0cjZ5L49gfR4_uXSUgM6RK5VTeaM9O_EVXxQ0856Cnc7kmIBL8";
-             * webAddress =
-             * "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr$.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz";
-             * 
-             * final FerretData currFerretWorker = new FerretData(queries, populations,
-             * fileNameAndPath, getESP, progressText, webAddress, mafThreshold[0], ESPMAFBoolean[0]
-             * , output);
-             * 
-             * currFerretWorker.addPropertyChangeListener(new PropertyChangeListener() {
-             * 
-             * @Override public void propertyChange(PropertyChangeEvent evt) { switch
-             * (evt.getPropertyName()){ case "progress": progressBar.setValue((Integer)
-             * evt.getNewValue()); case "state": try{ switch ((StateValue) evt.getNewValue()){ case
-             * DONE: progressWindow.setVisible(false); try{ variants[0] = currFerretWorker.get(); }
-             * catch (ExecutionException e){ e.printStackTrace(); variants[0] = -1; } catch
-             * (InterruptedException e){ e.printStackTrace(); variants[0] = -1; }
-             * 
-             * new File("evsClient0_15.jar").delete(); Object[] options ={"Yes","No"}; int choice;
-             * System.out.println("Total Time: " + (System.nanoTime() - startTime)); if(variants[0]
-             * == 1){ choice = JOptionPane.showOptionDialog(SNPFerret,
-             * "Files have been downloaded\nDo you want to close Ferret?", "Close Ferret?",
-             * JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, null); } else
-             * if(variants[0] == -3){ choice = JOptionPane.showOptionDialog(SNPFerret,
-             * "After applying the MAF threshold, no variants were found" +
-             * "\nDo you want to close Ferret?", "Close Ferret?", JOptionPane.YES_NO_OPTION,
-             * JOptionPane.PLAIN_MESSAGE, null, options, null); } else if(variants[0] == 0) { choice
-             * = JOptionPane.showOptionDialog(SNPFerret,
-             * "No variants were found in this region\nDo you want to close Ferret?",
-             * "Close Ferret?", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, options,
-             * null); } else { choice = JOptionPane.showOptionDialog(SNPFerret,
-             * "Ferret has encountered a problem downloading data. \n" +
-             * "Please try again later or consult the FAQ. \nDo you want to close Ferret?",
-             * "Close Ferret?", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null, options,
-             * null); } if(choice == JOptionPane.YES_OPTION ){ SNPFerret.dispose(); System.exit(0);
-             * }else{ enableComponents(SNPFerret, true); if (currFileOut[0] == fileOutput.VCF){
-             * snpESPCheckBox.setEnabled(false); geneESPCheckBox.setEnabled(false);
-             * chrESPCheckBox.setEnabled(false); } for(int i = 0; i < asnsub.length; i++) {
-             * asnPanel.add(asnsub[i]); if(asnsub[i].getText().contains("n=0")){
-             * asnsub[i].setEnabled(false); } } progressText.setText("Initializing...");
-             * progressBar.setValue(0); checkBoxReset(); } break; case STARTED: case PENDING:
-             * Dimension windowSize = SNPFerret.getSize(); progressWindow.setSize(new
-             * Dimension((int)(windowSize.width*.5),(int)(windowSize.height*.2)));
-             * progressWindow.setLocationRelativeTo(SNPFerret); progressWindow.setVisible(true);
-             * enableComponents(SNPFerret, false); } }catch(ClassCastException e){} }
-             * 
-             * } }); currFerretWorker.execute();
-             */
         } else { // Invalid input
-            StringBuffer errorMessage =
-                    new StringBuffer(FerretMain.getLocale().getString("run.fixerrors"));
+            StringBuffer errorMessage = new StringBuffer(Resource.getTextElement("run.fixerrors"));
             if (!isChrSelected) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.selectchr"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectchr"));
                 locusPanel.getChromosomeList()
                         .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!populationSelected) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.selectpop"));
+                errorMessage.append("\n " + Resource.getTextElement("run.selectpop"));
                 getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!startSelected) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.startpos"));
+                errorMessage.append("\n " + Resource.getTextElement("run.startpos"));
                 locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!endSelected) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.endpos"));
+                errorMessage.append("\n " + Resource.getTextElement("run.endpos"));
                 locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!startEndValid) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.invalidstart"));
+                errorMessage.append("\n " + Resource.getTextElement("run.invalidstart"));
                 locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
                 locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             if (!withinRange) {
-                errorMessage.append("\n " + FerretMain.getLocale().getString("run.invalidpos.1")
-                        + " " + chrSelected + " "
-                        + FerretMain.getLocale().getString("run.invalidpos.2") + " " + chrEndBound);
+                errorMessage.append("\n " + Resource.getTextElement("run.invalidpos.1") + " "
+                        + chrSelected + " " + Resource.getTextElement("run.invalidpos.2") + " "
+                        + chrEndBound);
                 locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
                 locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             }
             JOptionPane.showMessageDialog(getFrame(), errorMessage,
-                    FerretMain.getLocale().getString("run.error"), JOptionPane.OK_OPTION);
+                    Resource.getTextElement("run.error"), JOptionPane.OK_OPTION);
         }
     }
 }
