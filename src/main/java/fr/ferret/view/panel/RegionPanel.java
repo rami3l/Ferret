@@ -83,7 +83,7 @@ public class RegionPanel extends JPanel {
         /**
          * The region displayed on this panel
          */
-        private final Region region;
+        private final transient Region region;
         /**
          * The checkboxes for each zone of the region
          */
