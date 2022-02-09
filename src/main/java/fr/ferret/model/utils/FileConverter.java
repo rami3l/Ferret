@@ -1,24 +1,19 @@
-package fr.ferret.controller;
+package fr.ferret.model.utils;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * The Controler to convert files.
  */
-public class FileConvertion {
+public class FileConverter {
 
     /**
-     * List of the possible extentions of files, without dot.
+     * List of the possible file extentions, without dot.
      */
-    private ArrayList<String> fileExtensions;
+    private static final List<String> fileExtensions = List.of("vcf", "frq", "map", "ped", "info");
 
-    public FileConvertion() {
-        this.fileExtensions = new ArrayList<String>();
-        this.fileExtensions.add("vcf");
-        this.fileExtensions.add("frq");
-        this.fileExtensions.add("map");
-        this.fileExtensions.add("ped");
-        this.fileExtensions.add("info");
+    private FileConverter() {
+        // Util classes shouldn't be instanciated
     }
 
     /**
@@ -26,8 +21,8 @@ public class FileConvertion {
      * 
      * @param vcfFilePath relative path to the VCF file we want to convert.
      */
-    public String convertVcfToFrq(String vcfFilePath) {
-        // TODO.
+    public static String convertVcfToFrq(String vcfFilePath) {
+        // TODO: complete this method
         return vcfFilePath;
     }
 
@@ -37,8 +32,8 @@ public class FileConvertion {
      * 
      * @param vcfFilePath relative path to the VCF file we want to convert.
      */
-    public String convertVcfToMapAndPed(String vcfFilePath) {
-        // TODO.
+    public static String convertVcfToMapAndPed(String vcfFilePath) {
+        // TODO: complete this method
         return vcfFilePath;
     }
 
@@ -47,8 +42,8 @@ public class FileConvertion {
      * 
      * @param vcfFilePath relative path to the VCF file we want to convert.
      */
-    public String convertVcfToInfo(String vcfFilePath) {
-        // TODO.
+    public static String convertVcfToInfo(String vcfFilePath) {
+        // TODO: complete this method
         return vcfFilePath;
     }
 }
