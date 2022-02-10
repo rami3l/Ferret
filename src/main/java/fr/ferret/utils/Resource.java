@@ -3,6 +3,7 @@ package fr.ferret.utils;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -11,6 +12,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import fr.ferret.controller.settings.FerretConfig;
+import fr.ferret.controller.settings.Phases1KG;
 
 /**
  * Util class to deal with resouce files
@@ -92,6 +94,19 @@ public class Resource {
 
     public static String getServerConfig(String element) {
         return serverConfig.getString(element);
+    }
+
+    public static String getPhase(Phases1KG phase1KG) {
+        return switch ((phase1KG)) {
+            case V1 -> "phase1";
+            case V3 -> "phase3";
+            default -> ""; // TODO: throw not implement error (phase NYGC_30X not implemented) ?
+        };
+    }
+
+    public static InputStream getSampleFile() {
+        String filename = "samples/" + getPhase(CONFIG.getSelectedVersion()) + ".txt";
+        return Resource.class.getClassLoader().getResourceAsStream(filename);
     }
 
 }

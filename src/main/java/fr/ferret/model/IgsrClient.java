@@ -44,11 +44,7 @@ public class IgsrClient {
 
     private String getFilePath() {
 
-        String phase = switch ((phase1KG)) {
-            case V1 -> "phase1";
-            case V3 -> "phase3";
-            default -> ""; // TODO: throw not implement error (phase NYGC_30X not implemented) ?
-        };
+        String phase = Resource.getPhase(phase1KG);
         String path = Resource.getServerConfig("1kg." + phase + ".path");
         String filenameTemplate = Resource.getServerConfig("1kg." + phase + ".filename");
         // Replace chromosome in the template string.
