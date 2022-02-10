@@ -27,6 +27,9 @@ public class Resource {
     private static final ResourceBundle textElements =
             ResourceBundle.getBundle("ferret", Locale.getDefault());
 
+    /** application configuration */
+    private static final ResourceBundle serverConfig = ResourceBundle.getBundle("server");
+
     public static final Color TITLE_COLOR = new Color(18, 0, 150);
     public static final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
     public static final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
@@ -85,6 +88,10 @@ public class Resource {
      */
     public static String getTextElement(String element) {
         return textElements.getString(element);
+    }
+
+    public static String getServerConfig(String element) {
+        return serverConfig.getString(element);
     }
 
 }

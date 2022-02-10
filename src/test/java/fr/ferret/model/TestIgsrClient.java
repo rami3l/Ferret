@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import fr.ferret.controller.settings.Phases1KG;
 
 
 public class TestIgsrClient {
@@ -14,7 +15,7 @@ public class TestIgsrClient {
         var chr = "1";
         var start = 196194909;
         var end = 196577570;
-        var igsrClient = IgsrClient.builder().chromosome(chr).build();
+        var igsrClient = IgsrClient.builder().chromosome(chr).phase1KG(Phases1KG.V3).build();
         try (var reader = igsrClient.reader();) {
             var it = reader.query(chr, start, end);
             assertNotEquals(null, it);
@@ -35,7 +36,8 @@ public class TestIgsrClient {
         var chr = "1";
         var start = 196194909;
         var end = 196194913;
-        var igsrClient = IgsrClient.builder().chromosome(chr).start(start).end(end).build();
+        var igsrClient = IgsrClient.builder().chromosome(chr).start(start).end(end)
+                .phase1KG(Phases1KG.V3).build();
         var elements = igsrClient.getAllPopulations();
         var expectedLine1 = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
         var expectedLine2 = List.of("1", "196194911", ".", "T", "C", "100", "PASS");

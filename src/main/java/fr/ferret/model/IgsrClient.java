@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import fr.ferret.controller.settings.Phases1KG;
+import fr.ferret.utils.Resource;
 import htsjdk.tribble.readers.TabixReader;
 import lombok.Builder;
 
@@ -17,6 +19,8 @@ import lombok.Builder;
 public class IgsrClient {
 
     private static final Logger logger = Logger.getLogger(IgsrClient.class.getName());
+
+    private static final String HOST = Resource.getServerConfig("1kg.host") + "/";
 
     /**
      * The chromosome number, eg. `1`.
@@ -35,14 +39,20 @@ public class IgsrClient {
     @Builder.Default
     private int end = Integer.MAX_VALUE;
 
-    // TODO: Change this to constant aliases.
     @Builder.Default
-    private String fileUrlFormat =
-            "http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr{0}.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz";
+    private Phases1KG phase1KG = Resource.CONFIG.getSelectedVersion();
 
     private String getFilePath() {
-        // Replace chromosome number in the template string.
-        return MessageFormat.format(fileUrlFormat, chromosome);
+
+        String phase = switch ((phase1KG)) {
+            case V1 -> "phase1";
+            case V3 -> "phase3";
+            default -> ""; // TODO: throw not implement error (phase NYGC_30X not implemented) ?
+        };
+        String path = Resource.getServerConfig("1kg." + phase + ".path");
+        String filenameTemplate = Resource.getServerConfig("1kg." + phase + ".filename");
+        // Replace chromosome in the template string.
+        return HOST + path + "/" + MessageFormat.format(filenameTemplate, chromosome);
     }
 
     private String getIndexPath() {
