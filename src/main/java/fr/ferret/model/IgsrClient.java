@@ -2,14 +2,13 @@ package fr.ferret.model;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.utils.Resource;
-import htsjdk.tribble.readers.TabixReader;
+import htsjdk.tribble.FeatureReader;
+import htsjdk.tribble.TabixFeatureReader;
+import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.vcf.VCFCodec;
 import lombok.Builder;
 
 /**
@@ -43,7 +42,6 @@ public class IgsrClient {
     private Phases1KG phase1KG = Resource.CONFIG.getSelectedVersion();
 
     private String getFilePath() {
-
         String phase = Resource.getPhase(phase1KG);
         String path = Resource.getServerConfig("1kg." + phase + ".path");
         String filenameTemplate = Resource.getServerConfig("1kg." + phase + ".filename");
@@ -55,33 +53,9 @@ public class IgsrClient {
         return getFilePath() + ".tbi";
     }
 
-    /** Returns a new {@code TabixReader} instance pointing to the given file path. */
-    public TabixReader reader() throws IOException {
+    /** Returns a new {@code TabixFeatureReader} instance pointing to the given file path. */
+    public FeatureReader<VariantContext> reader() throws IOException {
         logger.info("Initializing reader...");
-        return new TabixReader(getFilePath(), getIndexPath());
-    }
-
-    /**
-     * Get genotype from all population for the selected chromosome, between the select start and
-     * end positions
-     * 
-     * @return A list of the lines, each line corresponding to a chromose position (variant) and
-     *         being a list of elements (chromosome, position, etc.)
-     */
-    public List<List<String>> getAllPopulations() {
-        logger.info("getting all population...");
-        List<List<String>> result = new ArrayList<>();
-        try (var reader = reader();) {
-            logger.info("reader started");
-            var it = reader.query(chromosome, start, end);
-            String line;
-            while ((line = it.next()) != null) {
-                logger.info("getting one line");
-                result.add(Arrays.asList(line.split("\\s+")));
-            }
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Vcf access error:", e);
-        }
-        return result;
+        return new TabixFeatureReader<>(getFilePath(), getIndexPath(), new VCFCodec());
     }
 }

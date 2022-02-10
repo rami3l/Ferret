@@ -1,10 +1,13 @@
 package fr.ferret.controller.settings;
 
 import fr.ferret.model.Region;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * 1KG project supported versions
  */
+@AllArgsConstructor
 public enum Phases1KG {
         // Populations name at the start of "GUI" of the old Ferret
         V1(new Region[] {new Region("all_populations", new String[] {"ALL"}, new int[] {661}),
@@ -46,16 +49,6 @@ public enum Phases1KG {
         /**
          * The regions for this phase
          */
+        @Getter
         private final Region[] regions;
-
-        Phases1KG(Region[] regions) {
-                this.regions = regions;
-        }
-
-        /**
-         * @return The regions for this phase
-         */
-        public Region[] getRegions() {
-                return regions;
-        }
 }
