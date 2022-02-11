@@ -3,16 +3,19 @@ package fr.ferret.utils;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.io.InputStreamReader;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.Phases1KG;
+import fr.ferret.model.ZoneSelection;
 
 /**
  * Util class to deal with resouce files
@@ -20,16 +23,22 @@ import fr.ferret.controller.settings.Phases1KG;
 public class Resource {
 
 
-    /** program settings */
+    /**
+     * program settings
+     */
     public static final FerretConfig CONFIG = new FerretConfig();
 
     private static final Logger logger = Logger.getLogger(Resource.class.getName());
 
-    /** text elements for the interface */
+    /**
+     * text elements for the interface
+     */
     private static final ResourceBundle textElements =
             ResourceBundle.getBundle("ferret", Locale.getDefault());
 
-    /** application configuration */
+    /**
+     * application configuration
+     */
     private static final ResourceBundle serverConfig = ResourceBundle.getBundle("server");
 
     public static final Color TITLE_COLOR = new Color(18, 0, 150);
@@ -45,10 +54,10 @@ public class Resource {
     public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
 
     // utils should not be instanciated
-    private Resource() {}
+    private Resource() {
+    }
 
     /**
-     * 
      * @param resourceFileName relative path of the resource image
      * @return an optional image
      */
@@ -66,7 +75,6 @@ public class Resource {
     }
 
     /**
-     * 
      * @param resourceFileName relative path of the resource icon
      * @return an optional icon
      */
@@ -85,7 +93,7 @@ public class Resource {
 
     /**
      * Gets an element of text from the resources according to system langage
-     * 
+     *
      * @param element of text to get in the resources
      */
     public static String getTextElement(String element) {
@@ -100,13 +108,31 @@ public class Resource {
         return switch ((phase1KG)) {
             case V1 -> "phase1";
             case V3 -> "phase3";
-            default -> ""; // TODO: throw not implement error (phase NYGC_30X not implemented) ?
+            default -> ""; // TODO: throw not implemented exception (phase NYGC_30X not implemented) ?
         };
     }
 
-    public static InputStream getSampleFile() {
+    public static InputStream getSampleFile(Phases1KG phase) {
         String filename = "samples/" + getPhase(CONFIG.getSelectedVersion()) + ".txt";
         return Resource.class.getClassLoader().getResourceAsStream(filename);
+    }
+
+    public static Set<String> getSamples(Phases1KG phase, ZoneSelection selection) throws IOException {
+        Set<String> samples = new HashSet<>();
+
+        try (var streamReader = new InputStreamReader(getSampleFile(phase))) {
+            var reader = new BufferedReader(streamReader);
+
+            reader.lines()
+                    .map(line -> line.split("\t"))
+                    .filter(fields -> selection.isSelected(fields[2], fields[1]))
+                    .map(fields -> fields[0])
+                    .forEach(samples::add);
+
+            reader.close();
+        }
+
+        return samples;
     }
 
 }

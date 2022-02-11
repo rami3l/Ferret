@@ -33,11 +33,14 @@ public class IgsrClient {
     private int start = 0;
 
     /**
-     * The end position (default: infini)
+     * The end position (default: infinite)
      */
     @Builder.Default
     private int end = Integer.MAX_VALUE;
 
+    /**
+     * The phase to use for getting variants (default: selected version)
+     */
     @Builder.Default
     private Phases1KG phase1KG = Resource.CONFIG.getSelectedVersion();
 
