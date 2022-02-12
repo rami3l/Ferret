@@ -13,11 +13,15 @@ public class FileWriter {
     }
 
     public static void writeVCF(File outFile, VCFHeader header, Stream<VariantContext> contexts) {
-        var writer = new VariantContextWriterBuilder()
+        try (var writer = new VariantContextWriterBuilder()
                 .setReferenceDictionary(header.getSequenceDictionary()).setOutputFile(outFile)
-                .setOutputFileType(VariantContextWriterBuilder.OutputType.VCF).build();
-        writer.writeHeader(header);
-        contexts.forEach(writer::add);
-        writer.close();
+                .setOutputFileType(VariantContextWriterBuilder.OutputType.VCF).build()) {
+            writer.writeHeader(header);
+            contexts.forEach(writer::add);
+        }
+    }
+
+    public static void writeVCF(String outFile, VCFHeader header, Stream<VariantContext> contexts) {
+        writeVCF(new File(outFile), header, contexts);
     }
 }
