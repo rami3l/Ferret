@@ -66,19 +66,26 @@ class TestIgsrClient {
             var selection = new ZoneSelection();
             selection.add("EUR", List.of("GBR"));
             var samples = Resource.getSamples(Phases1KG.V3, selection);
-            var contexts = it.stream().map(context -> context.subContextFromSamples(samples));
-            var header = (VCFHeader) reader.getHeader();
+            var contexts =
+                    it.stream().map(context -> context.subContextFromSamples(samples)).toList();
+            var oldHeader = (VCFHeader) reader.getHeader();
+            var meta = oldHeader.getMetaDataInInputOrder();
+
+            // Use the old meta and selected samples to construct a new VCF file.
+            // Otherwise, the result will contain elements "{0,1}|{0,1}" for people of the sample
+            // and "./." for others, but we only want elements from the sample.
+            var header = new VCFHeader(meta, samples);
 
             var tempVcfPath = tempDir.resolve("test.vcf");
             var tempVcf = tempVcfPath.toFile();
-            FileWriter.writeVCF(tempVcf, header, contexts);
+            FileWriter.writeVCF(tempVcf, header, contexts.stream());
 
-            // The result contains elements "{0,1}|{0,1}" for people of the sample and "./." for
-            // others but we only want elements for the sample
-            // We must also find a way to write the header
             try (var tempReader = new VCFFileReader(tempVcfPath.toFile())) {
-                assertAll(() -> assertTrue(Files.exists(tempVcfPath)),
-                        () -> assertEquals(2, tempReader.iterator().stream().count()));
+                assertAll(() -> assertNotEquals(samples.size(), oldHeader.getNGenotypeSamples()),
+                        () -> assertEquals(samples.size(), header.getNGenotypeSamples()),
+                        () -> assertTrue(Files.exists(tempVcfPath)),
+                        () -> assertEquals(contexts.size(),
+                                tempReader.iterator().stream().count()));
             }
         }
     }
