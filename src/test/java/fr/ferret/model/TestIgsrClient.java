@@ -32,22 +32,24 @@ class TestIgsrClient {
             // `it.next()` is the next line in the iterator.
             var fields = it.next();
 
-            // Fixed fields:
-            // #CHROM POS ID REF ALT QUAL FILTER INFO
-            // https://samtools.github.io/hts-specs/VCFv4.2.pdf
-            // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
-            assertEquals(196187886, fields.getStart());
-            assertEquals(".", fields.getID());
-            assertEquals(Allele.REF_T, fields.getReference());
-            // TODO: What is "<CN2>"?
-            assertEquals(List.of("<CN2>"),
-                    fields.getAlternateAlleles().stream().map(Allele::getDisplayString).toList());
-            // This position has passed all filters, so nothing fails.
-            assertEquals(Set.of(), fields.getFilters());
+            assertAll(
+                    // Fixed fields:
+                    // #CHROM POS ID REF ALT QUAL FILTER INFO
+                    // https://samtools.github.io/hts-specs/VCFv4.2.pdf
+                    // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
+                    () -> assertEquals(196187886, fields.getStart()),
+                    () -> assertEquals(".", fields.getID()),
+                    () -> assertEquals(Allele.REF_T, fields.getReference()),
+                    // TODO: What is "<CN2>"?
+                    () -> assertEquals(List.of("<CN2>"),
+                            fields.getAlternateAlleles().stream().map(Allele::getDisplayString)
+                                    .toList()),
+                    // This position has passed all filters, so nothing fails.
+                    () -> assertEquals(Set.of(), fields.getFilters()),
 
-            // The INFO field contains some key-value pairs...
-            var alleleFrequency = fields.getAttributeAsDouble("AF", 0);
-            assertEquals(0.000399361, alleleFrequency);
+                    // The INFO field contains some key-value pairs...
+                    // eg. "AF" for Allele Frequency...
+                    () -> assertEquals(0.000399361, fields.getAttributeAsDouble("AF", 0)));
         }
     }
 
