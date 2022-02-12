@@ -7,22 +7,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.ZoneSelection;
+import lombok.experimental.UtilityClass;
 
 /**
  * Util class to deal with resouce files
  */
+@UtilityClass
 public class Resource {
-
-
     /**
      * program settings
      */
@@ -52,10 +55,6 @@ public class Resource {
     public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
     public static final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
     public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
-
-    // utils should not be instanciated
-    private Resource() {
-    }
 
     /**
      * @param resourceFileName relative path of the resource image
@@ -105,10 +104,11 @@ public class Resource {
     }
 
     public static String getPhase(Phases1KG phase1KG) {
-        return switch ((phase1KG)) {
+        return switch (phase1KG) {
             case V1 -> "phase1";
             case V3 -> "phase3";
-            default -> ""; // TODO: throw not implemented exception (phase NYGC_30X not implemented) ?
+            default -> ""; // TODO: throw not implemented exception (phase NYGC_30X not implemented)
+                           // ?
         };
     }
 
@@ -117,22 +117,13 @@ public class Resource {
         return Resource.class.getClassLoader().getResourceAsStream(filename);
     }
 
-    public static Set<String> getSamples(Phases1KG phase, ZoneSelection selection) throws IOException {
-        Set<String> samples = new HashSet<>();
-
-        try (var streamReader = new InputStreamReader(getSampleFile(phase))) {
-            var reader = new BufferedReader(streamReader);
-
-            reader.lines()
-                    .map(line -> line.split("\t"))
+    public static Set<String> getSamples(Phases1KG phase, ZoneSelection selection)
+            throws IOException {
+        try (var streamReader = new InputStreamReader(getSampleFile(phase));
+                var reader = new BufferedReader(streamReader)) {
+            return reader.lines().map(line -> line.split("\t"))
                     .filter(fields -> selection.isSelected(fields[2], fields[1]))
-                    .map(fields -> fields[0])
-                    .forEach(samples::add);
-
-            reader.close();
+                    .map(fields -> fields[0]).collect(Collectors.toSet());
         }
-
-        return samples;
     }
-
 }
