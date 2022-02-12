@@ -1,10 +1,10 @@
 package fr.ferret.model.utils;
 
+import java.io.File;
+import java.util.stream.Stream;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
 import htsjdk.variant.vcf.VCFHeader;
-
-import java.util.stream.Stream;
 
 public class FileWriter {
 
@@ -12,10 +12,9 @@ public class FileWriter {
         // util classes should not be implemented
     }
 
-    public static void writeVCF(String filename, VCFHeader header, Stream<VariantContext> contexts) {
+    public static void writeVCF(File outFile, VCFHeader header, Stream<VariantContext> contexts) {
         var writer = new VariantContextWriterBuilder()
-                .setReferenceDictionary(header.getSequenceDictionary())
-                .setOutputFile(filename)
+                .setReferenceDictionary(header.getSequenceDictionary()).setOutputFile(outFile)
                 .setOutputFileType(VariantContextWriterBuilder.OutputType.VCF).build();
         writer.writeHeader(header);
         contexts.forEach(writer::add);
