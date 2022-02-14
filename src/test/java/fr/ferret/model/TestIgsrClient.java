@@ -54,7 +54,7 @@ class TestIgsrClient {
     }
 
     @Test
-    void testSubSampleAndVcfEncode(@TempDir Path tempDir) throws IOException {
+    void testWriteVCFFromSample(@TempDir Path tempDir) throws IOException {
         var chr = "1";
         var start = 196194909;
         var end = 196194913;
@@ -68,9 +68,6 @@ class TestIgsrClient {
                     it.stream().map(context -> context.subContextFromSamples(samples)).toList();
             var oldHeader = (VCFHeader) reader.getHeader();
 
-            // Use the old meta and selected samples to construct a new VCF file.
-            // Otherwise, the result will contain elements "{0,1}|{0,1}" for people of the sample
-            // and "./." for others, but we only want elements from the sample.
             var header = VCFHeaderExt.subVCFHeaderFromSamples(oldHeader, samples);
 
             var tempVcfPath = tempDir.resolve("test.vcf");

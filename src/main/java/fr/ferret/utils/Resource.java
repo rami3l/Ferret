@@ -19,6 +19,7 @@ import javax.swing.ImageIcon;
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.ZoneSelection;
+import jdk.jshell.spi.ExecutionControl;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -29,38 +30,38 @@ public class Resource {
     /**
      * program settings
      */
-    public static final FerretConfig CONFIG = new FerretConfig();
+    public  final FerretConfig CONFIG = new FerretConfig();
 
-    private static final Logger logger = Logger.getLogger(Resource.class.getName());
+    private final Logger logger = Logger.getLogger(Resource.class.getName());
 
     /**
      * text elements for the interface
      */
-    private static final ResourceBundle textElements =
+    private final ResourceBundle textElements =
             ResourceBundle.getBundle("ferret", Locale.getDefault());
 
     /**
      * application configuration
      */
-    private static final ResourceBundle serverConfig = ResourceBundle.getBundle("server");
+    private final ResourceBundle serverConfig = ResourceBundle.getBundle("server");
 
-    public static final Color TITLE_COLOR = new Color(18, 0, 150);
-    public static final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
-    public static final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
-    public static final Color BUTTON_COLOR = new Color(201, 157, 240);
-    public static final Color LINK_STANDARD_COLOR = new Color(40, 100, 255);
-    public static final Color LINK_HOVER_COLOR = new Color(255, 0, 0);
-    public static final Color LINK_ACTIVE_COLOR = new Color(128, 0, 128);
+    public final Color TITLE_COLOR = new Color(18, 0, 150);
+    public final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
+    public final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
+    public final Color BUTTON_COLOR = new Color(201, 157, 240);
+    public final Color LINK_STANDARD_COLOR = new Color(40, 100, 255);
+    public final Color LINK_HOVER_COLOR = new Color(255, 0, 0);
+    public final Color LINK_ACTIVE_COLOR = new Color(128, 0, 128);
 
-    public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
-    public static final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
-    public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
+    public final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
+    public final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
+    public final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
 
     /**
      * @param resourceFileName relative path of the resource image
      * @return an optional image
      */
-    public static Optional<BufferedImage> getImage(String resourceFileName) {
+    public Optional<BufferedImage> getImage(String resourceFileName) {
         BufferedImage img = null;
         try {
             // we try to read the image from the resource file
@@ -77,7 +78,7 @@ public class Resource {
      * @param resourceFileName relative path of the resource icon
      * @return an optional icon
      */
-    public static Optional<ImageIcon> getIcon(String resourceFileName) {
+    public Optional<ImageIcon> getIcon(String resourceFileName) {
         ImageIcon icon = null;
         try {
             // we try to read the icon from the resource file
@@ -95,15 +96,15 @@ public class Resource {
      *
      * @param element of text to get in the resources
      */
-    public static String getTextElement(String element) {
+    public String getTextElement(String element) {
         return textElements.getString(element);
     }
 
-    public static String getServerConfig(String element) {
+    public String getServerConfig(String element) {
         return serverConfig.getString(element);
     }
 
-    public static String getPhase(Phases1KG phase1KG) {
+    public String getPhase(Phases1KG phase1KG) {
         return switch (phase1KG) {
             case V1 -> "phase1";
             case V3 -> "phase3";
@@ -112,12 +113,12 @@ public class Resource {
         };
     }
 
-    public static InputStream getSampleFile(Phases1KG phase) {
+    public InputStream getSampleFile(Phases1KG phase) {
         String filename = "samples/" + getPhase(CONFIG.getSelectedVersion()) + ".txt";
         return Resource.class.getClassLoader().getResourceAsStream(filename);
     }
 
-    public static Set<String> getSamples(Phases1KG phase, ZoneSelection selection)
+    public Set<String> getSamples(Phases1KG phase, ZoneSelection selection)
             throws IOException {
         try (var streamReader = new InputStreamReader(getSampleFile(phase));
                 var reader = new BufferedReader(streamReader)) {
