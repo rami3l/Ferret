@@ -42,7 +42,7 @@ public class GenePanelController extends InputPanelController {
         JRadioButton geneNCBIRadioButton = genePanel.getRdoID();
 
         // Selected populations for the model
-        List<CharSequence> populations = getSelectedPopulations();
+        var populations = getSelectedPopulations();
         boolean popSelected = !populations.isEmpty();
 
         String geneString = geneNameField.getText();

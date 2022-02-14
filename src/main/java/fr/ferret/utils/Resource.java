@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import fr.ferret.controller.settings.FerretConfig;
+import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.ZoneSelection;
-import jdk.jshell.spi.ExecutionControl;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -30,7 +30,7 @@ public class Resource {
     /**
      * program settings
      */
-    public  final FerretConfig CONFIG = new FerretConfig();
+    public final FerretConfig CONFIG = new FerretConfig();
 
     private final Logger logger = Logger.getLogger(Resource.class.getName());
 
@@ -109,22 +109,45 @@ public class Resource {
             case V1 -> "phase1";
             case V3 -> "phase3";
             default -> ""; // TODO: throw not implemented exception (phase NYGC_30X not implemented)
-                           // ?
+            // ?
         };
     }
 
     public InputStream getSampleFile(Phases1KG phase) {
-        String filename = "samples/" + getPhase(CONFIG.getSelectedVersion()) + ".txt";
+        String filename = "samples/" + getPhase(phase) + ".txt";
         return Resource.class.getClassLoader().getResourceAsStream(filename);
     }
 
-    public Set<String> getSamples(Phases1KG phase, ZoneSelection selection)
-            throws IOException {
+    public Set<String> getSamples(Phases1KG phase, ZoneSelection selection) throws IOException {
         try (var streamReader = new InputStreamReader(getSampleFile(phase));
-                var reader = new BufferedReader(streamReader)) {
+            var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
-                    .filter(fields -> selection.isSelected(fields[2], fields[1]))
-                    .map(fields -> fields[0]).collect(Collectors.toSet());
+                .filter(fields -> selection.isSelected(fields[2], fields[1]))
+                .map(fields -> fields[0]).collect(Collectors.toSet());
+        }
+    }
+
+    public String getHgVersion(HumanGenomeVersions hgVersion) {
+        return switch (hgVersion) {
+            case hg19 -> "hg19";
+            default -> "hg38";
+        };
+    }
+
+    public InputStream getCharMapFile(HumanGenomeVersions hgVersion) {
+        String filename = "chrmaps/" + getHgVersion(hgVersion) + ".txt";
+        return Resource.class.getClassLoader().getResourceAsStream(filename);
+    }
+
+    public Optional<Integer> getChrLocus(HumanGenomeVersions hgVersion, String chrName) {
+        try (var streamReader = new InputStreamReader(getCharMapFile(hgVersion));
+            var reader = new BufferedReader(streamReader)) {
+            return reader.lines().map(line -> line.split("\t"))
+                .filter(fields -> fields[0].equals(chrName))
+                .map(fields -> fields[1]).findFirst().map(Integer::parseInt);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Impossible to open chr map", e);
+            return  Optional.empty();
         }
     }
 }

@@ -36,24 +36,16 @@ public class RunButtonListener implements ActionListener {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = saveFileChooser.getSelectedFile();
             fileNameAndPath = file.getAbsolutePath();
-            // fileLocation.setText("File Location: " + fileNameAndPath);
             validateInfosAndRun(fileNameAndPath);
         }
     }
 
     private void validateInfosAndRun(String fileNameAndPath) {
-        InputPanelController controller = null;
-        switch (getFrame().getInputTabs().getSelectedIndex()) {
-            case 0:
-                controller = new LocusPanelController(frame, frame.getLocusPanel());
-                break;
-            case 1:
-                controller = new GenePanelController(frame, frame.getGenePanel());
-                break;
-            case 2:
-                controller = new VariantPanelController(frame, frame.getVariantPanel());
-                break;
-        }
+        var controller = switch (getFrame().getInputTabs().getSelectedIndex()) {
+            case 1 -> new GenePanelController(frame, frame.getGenePanel());
+            case 2 -> new VariantPanelController(frame, frame.getVariantPanel());
+            default -> new LocusPanelController(frame, frame.getLocusPanel());
+        };
         controller.validateInfosAndRun(fileNameAndPath);
     }
 

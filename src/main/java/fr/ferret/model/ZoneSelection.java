@@ -13,10 +13,15 @@ public class ZoneSelection {
      * empty list for its value.
      */
     private final Map<String, List<String>> selectedZones = new HashMap<>();
+    private boolean allSelected = false;
+
+    public boolean isEmpty() {
+        return selectedZones.isEmpty();
+    }
 
     public boolean isSelected(String region, String zone) {
-        return selectedZones.containsKey(region) &&
-                (selectedZones.get(region).isEmpty() || selectedZones.get(region).contains(zone));
+        return allSelected || (selectedZones.containsKey(region) &&
+                (selectedZones.get(region).isEmpty() || selectedZones.get(region).contains(zone)));
     }
 
     public void add(String region, List<String> zones) {
@@ -24,6 +29,14 @@ public class ZoneSelection {
     }
 
     public void add(String region) {
+        if ("ALL".equals(region)) {
+            selectAll();
+        } else {
         selectedZones.put(region, new ArrayList<>());
+        }
+    }
+
+    public void selectAll() {
+        allSelected = true;
     }
 }

@@ -18,10 +18,17 @@ public class Region {
      * The region name
      */
     private final String name;
+
+    /**
+     * The abbreviation of the region name
+     */
+    private final String abbrev;
+
     /**
      * The zones (populations) of the region
      */
     private final String[] zones;
+
     /**
      * The individuals count for each zone, respectively
      */
@@ -29,13 +36,14 @@ public class Region {
 
     /**
      * Creates a new Region
-     *
      * @param name The name of the region (for translation)
+     * @param abbrev
      * @param zones The zones (populations) of the region
      * @param individualCount The individuals count for each zone, respectively
      */
-    public Region(String name, String[] zones, int[] individualCount) {
+    public Region(String name, String abbrev, String[] zones, int[] individualCount) {
         this.name = name;
+        this.abbrev = abbrev;
         this.zones = zones;
         this.individualCount = individualCount;
         assert zones.length == Arrays.stream(individualCount)
