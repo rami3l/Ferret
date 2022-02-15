@@ -1,6 +1,7 @@
 package fr.ferret.model;
 
 import java.util.Arrays;
+import lombok.Getter;
 
 /**
  * A <strong>world region</strong> of the 1KG project. <br>
@@ -11,15 +12,23 @@ import java.util.Arrays;
  * The <strong>zones</strong> are the populations inside these world regions. For Europe it's EUR,
  * CEU, GBR, FIN, IBS and TSI.
  */
+@Getter
 public class Region {
     /**
      * The region name
      */
     private final String name;
+
+    /**
+     * The abbreviation of the region name
+     */
+    private final String abbrev;
+
     /**
      * The zones (populations) of the region
      */
     private final String[] zones;
+
     /**
      * The individuals count for each zone, respectively
      */
@@ -27,37 +36,17 @@ public class Region {
 
     /**
      * Creates a new Region
-     *
      * @param name The name of the region (for translation)
+     * @param abbrev
      * @param zones The zones (populations) of the region
      * @param individualCount The individuals count for each zone, respectively
      */
-    public Region(String name, String[] zones, int[] individualCount) {
+    public Region(String name, String abbrev, String[] zones, int[] individualCount) {
         this.name = name;
+        this.abbrev = abbrev;
         this.zones = zones;
         this.individualCount = individualCount;
         assert zones.length == Arrays.stream(individualCount)
                 .count() : "Zones length doesn't match to individuals count";
-    }
-
-    /**
-     * @return The region name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @return The zones (populations) of the region
-     */
-    public String[] getZones() {
-        return zones;
-    }
-
-    /**
-     * @return The individuals count for each zone, respectively
-     */
-    public int[] getIndividualCount() {
-        return individualCount;
     }
 }

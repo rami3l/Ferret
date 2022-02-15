@@ -11,4 +11,5 @@ public class FerretMain {
         FerretFrame frame = new FerretFrame(); // Show ferret frame
         frame.setVisible(true);
     }
+
 }

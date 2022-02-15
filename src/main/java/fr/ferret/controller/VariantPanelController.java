@@ -43,7 +43,7 @@ public class VariantPanelController extends InputPanelController {
 
 
         // Selected populations for the model
-        List<CharSequence> populations = getSelectedPopulations();
+        var populations = getSelectedPopulations();
         boolean popSelected = !populations.isEmpty();
 
         String snpString = geneNameField.getText();
