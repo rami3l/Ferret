@@ -58,21 +58,21 @@ class TestIgsrClient {
         var chr = "1";
         var start = 196194909;
         var end = 196194913;
-        var igsrClient = IgsrClient.builder().chromosome(chr).phase1KG(Phases1KG.V3).build();
+        var phase = Phases1KG.V3;
+        var igsrClient = IgsrClient.builder().chromosome(chr).phase1KG(phase).build();
         try (var reader = igsrClient.reader(); var it = reader.query(chr, start, end)) {
             var selection = new ZoneSelection();
             selection.add("EUR", List.of("GBR"));
-            var phase = Phases1KG.V3;
             var samples = Resource.getSamples(phase, selection);
-            var contexts =
-                    it.stream().map(context -> context.subContextFromSamples(samples)).toList();
+            var variants =
+                    it.stream().map(variant -> variant.subContextFromSamples(samples)).toList();
             var oldHeader = (VCFHeader) reader.getHeader();
 
             var header = VCFHeaderExt.subVCFHeaderFromSamples(oldHeader, samples);
 
             var tempVcfPath = tempDir.resolve("test.vcf");
             var tempVcf = tempVcfPath.toFile();
-            FileWriter.writeVCF(tempVcf, header, contexts.stream());
+            FileWriter.writeVCF(tempVcf, header, variants.stream());
 
             try (var tempReader = new VCFFileReader(tempVcfPath.toFile())) {
                 assertAll(() -> assertTrue(Files.exists(tempVcfPath)),
@@ -81,14 +81,13 @@ class TestIgsrClient {
                         () -> assertNotEquals(samples.size(), oldHeader.getNGenotypeSamples()),
                         () -> assertEquals(samples.size(), header.getNGenotypeSamples()),
                         // The size of contexts remains the same before and after truncation.
-                        () -> assertEquals(contexts.size(), tempReader.iterator().stream().count()),
+                        () -> assertEquals(variants.size(), tempReader.iterator().stream().count()),
                         // The wrapped method works in exactly the same way as this test case.
                         () -> {
                             var oldContent = Files.readString(tempVcfPath);
                             var newTempVCFPath = tempDir.resolve("test2.vcf");
                             var newTempVCF = newTempVCFPath.toFile();
-                            igsrClient.exportVCFFromSamples(newTempVCF, start, end, phase,
-                                    selection);
+                            igsrClient.exportVCFFromSamples(newTempVCF, start, end, selection);
                             assertEquals(oldContent, Files.readString(newTempVCFPath));
                         });
             }

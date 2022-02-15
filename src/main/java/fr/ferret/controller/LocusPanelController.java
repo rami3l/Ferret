@@ -1,6 +1,7 @@
 package fr.ferret.controller;
 
 import java.awt.Color;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -108,12 +109,8 @@ public class LocusPanelController extends InputPanelController {
             int start, int end) {
         var isgrClient = IgsrClient.builder().chromosome(chr)
                 .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
-        try (var reader = isgrClient.reader();
-                var lines = reader.query(chr, start, end)) {
-            var samples = Resource.getSamples(Resource.CONFIG.getSelectedVersion(), populations);
-            var variants = lines.stream().map(variant -> variant.subContextFromSamples(samples));
-            var header = VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
-            FileWriter.writeVCF(fileNameAndPath, header, variants);
+        try {
+            isgrClient.exportVCFFromSamples(new File(fileNameAndPath), start, end, populations);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Impossible to get distant vcf file", e);
         }

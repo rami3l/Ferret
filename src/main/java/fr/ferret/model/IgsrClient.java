@@ -67,9 +67,9 @@ public class IgsrClient {
      * @param phase the 1000 Genome project phase of this query
      * @param selection the selected populations
      */
-    public void exportVCFFromSamples(File outFile, int start, int end, Phases1KG phase,
-            ZoneSelection selection) throws IOException {
-        exportVCFFromSamples(outFile, start, end, Resource.getSamples(phase, selection));
+    public void exportVCFFromSamples(File outFile, int start, int end, ZoneSelection selection)
+            throws IOException {
+        exportVCFFromSamples(outFile, start, end, Resource.getSamples(phase1KG, selection));
     }
 
     /**
@@ -83,10 +83,10 @@ public class IgsrClient {
     public void exportVCFFromSamples(File outFile, int start, int end, Set<String> samples)
             throws IOException {
         try (var reader = this.reader(); var lines = reader.query(chromosome, start, end)) {
-            var contexts = lines.stream().map(context -> context.subContextFromSamples(samples));
+            var variants = lines.stream().map(variant -> variant.subContextFromSamples(samples));
             var header =
                     VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
-            FileWriter.writeVCF(outFile, header, contexts);
+            FileWriter.writeVCF(outFile, header, variants);
         }
     }
 }
