@@ -135,18 +135,18 @@ public class Resource {
     }
 
     public InputStream getCharMapFile(HumanGenomeVersions hgVersion) {
-        String filename = "chrmaps/" + getHgVersion(hgVersion) + ".txt";
+        String filename = "chrEndPositions/" + getHgVersion(hgVersion) + ".txt";
         return Resource.class.getClassLoader().getResourceAsStream(filename);
     }
 
-    public Optional<Integer> getChrLocus(HumanGenomeVersions hgVersion, String chrName) {
+    public Optional<Integer> getChrEndPosition(HumanGenomeVersions hgVersion, String chrName) {
         try (var streamReader = new InputStreamReader(getCharMapFile(hgVersion));
             var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
                 .filter(fields -> fields[0].equals(chrName))
                 .map(fields -> fields[1]).findFirst().map(Integer::parseInt);
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Impossible to open chr map", e);
+            logger.log(Level.WARNING, "Impossible to open file", e);
             return  Optional.empty();
         }
     }

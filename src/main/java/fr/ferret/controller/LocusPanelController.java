@@ -1,15 +1,11 @@
 package fr.ferret.controller;
 
 import java.awt.Color;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
-import fr.ferret.controller.settings.HumanGenomeVersions;
-import fr.ferret.model.ZoneSelection;
+
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
@@ -38,42 +34,53 @@ public class LocusPanelController extends InputPanelController {
         var populations = getSelectedPopulations();
         boolean populationSelected = !populations.isEmpty();
 
-        // Chr position input method
+        // Gets the selected chromosome
         String chrSelected = (String) locusPanel.getChromosomeList().getSelectedItem();
         boolean isChrSelected = !" ".equals(chrSelected);
 
+        // Gets the selected start position
         String startPosition = locusPanel.getInputStart().getText();
-        String endPosition = locusPanel.getInputEnd().getText();
-
         boolean startSelected = !startPosition.isEmpty();
+
+        // Gets the selected end position
+        String endPosition = locusPanel.getInputEnd().getText();
         boolean endSelected = !endPosition.isEmpty();
+
         boolean startEndValid = true;
         boolean withinRange = true;
         int chrEndBound = 0;
 
         if (startSelected && endSelected) {
-            int tempEndPos = -1;
-            int tempStartPos = -1;
+            int startPos = -1;
+            int endPos = -1;
+
+            // Tries to get start position
             try {
-                tempStartPos = Integer.parseInt(startPosition);
+                startPos = Integer.parseInt(startPosition);
             } catch (NumberFormatException ex) {
                 startSelected = false;
             }
+
+            // Tries to get end position
             try {
-                tempEndPos = Integer.parseInt(endPosition);
+                endPos = Integer.parseInt(endPosition);
             } catch (NumberFormatException ex) {
                 endSelected = false;
             }
-            if (startSelected && endSelected) {
-                startEndValid = (tempEndPos >= tempStartPos);
-                if (startEndValid) {
-                    int validEnd = Resource
-                            .getChrLocus(Resource.CONFIG.getSelectedHumanGenome(), chrSelected)
-                            .orElseThrow();
-                    if (tempEndPos > validEnd || tempStartPos < 1) {
-                        withinRange = false;
-                        chrEndBound = validEnd;
-                    }
+            startEndValid = (endPos >= startPos);
+
+            // Checks that given end position is not greater than chromosome end position
+            if (startSelected && endSelected && startEndValid){
+                int validEnd = Resource
+                        .getChrEndPosition(Resource.CONFIG.getSelectedHumanGenome(), chrSelected)
+                        .orElseGet(() -> {
+                            logger.log(Level.WARNING, "Impossible to get chromosome end position."
+                                + " Given end position may be invalid");
+                            return Integer.MAX_VALUE;
+                        });
+                if (endPos > validEnd || startPos < 1) {
+                    withinRange = false;
+                    chrEndBound = validEnd;
                 }
             }
         }
@@ -85,39 +92,47 @@ public class LocusPanelController extends InputPanelController {
             // TODO LINK WITH MODEL
 
         } else { // Invalid input
-            var errorMessage = new StringBuilder(Resource.getTextElement("run.fixerrors"));
-            if (!isChrSelected) {
-                errorMessage.append("\n ").append(Resource.getTextElement("run.selectchr"));
-                locusPanel.getChromosomeList()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-            }
-            if (!populationSelected) {
-                errorMessage.append("\n ").append(Resource.getTextElement("run.selectpop"));
-                getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-            }
-            if (!startSelected) {
-                errorMessage.append("\n ").append(Resource.getTextElement("run.startpos"));
-                locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-            }
-            if (!endSelected) {
-                errorMessage.append("\n ").append(Resource.getTextElement("run.endpos"));
-                locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-            }
-            if (!startEndValid) {
-                errorMessage.append("\n ").append(Resource.getTextElement("run.invalidstart"));
-                locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-            }
-            if (!withinRange) {
-                errorMessage.append("\n ").append(Resource.getTextElement("run.invalidpos.1"))
-                    .append(" ").append(chrSelected).append(" ")
-                    .append(Resource.getTextElement("run.invalidpos.2")).append(" ")
-                    .append(chrEndBound);
-                locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-            }
-            JOptionPane.showMessageDialog(getFrame(), errorMessage,
-                    Resource.getTextElement("run.error"), JOptionPane.ERROR_MESSAGE);
+            displayError(isChrSelected, populationSelected, startSelected, endSelected,
+                    startEndValid, withinRange, chrSelected, chrEndBound);
+
+       }
+    }
+
+    private void displayError(boolean isChrSelected, boolean populationSelected,
+            boolean startSelected, boolean endSelected, boolean startEndValid, boolean withinRange,
+            String chrSelected, int chrEndBound) {
+        var errorMessage = new StringBuilder(Resource.getTextElement("run.fixerrors"));
+        if (!isChrSelected) {
+            errorMessage.append("\n ").append(Resource.getTextElement("run.selectchr"));
+            locusPanel.getChromosomeList()
+                .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
         }
+        if (!populationSelected) {
+            errorMessage.append("\n ").append(Resource.getTextElement("run.selectpop"));
+            getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+        }
+        if (!startSelected) {
+            errorMessage.append("\n ").append(Resource.getTextElement("run.startpos"));
+            locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+        }
+        if (!endSelected) {
+            errorMessage.append("\n ").append(Resource.getTextElement("run.endpos"));
+            locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+        }
+        if (!startEndValid) {
+            errorMessage.append("\n ").append(Resource.getTextElement("run.invalidstart"));
+            locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+        }
+        if (!withinRange) {
+            errorMessage.append("\n ").append(Resource.getTextElement("run.invalidpos.1"))
+                .append(" ").append(chrSelected).append(" ")
+                .append(Resource.getTextElement("run.invalidpos.2")).append(" ")
+                .append(chrEndBound);
+            locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+        }
+        JOptionPane.showMessageDialog(getFrame(), errorMessage,
+            Resource.getTextElement("run.error"), JOptionPane.ERROR_MESSAGE);
     }
 }
