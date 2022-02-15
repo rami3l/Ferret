@@ -1,14 +1,20 @@
 package fr.ferret.controller;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 
+import fr.ferret.model.IgsrClient;
+import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.utils.FileWriter;
+import fr.ferret.model.utils.VCFHeaderExt;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
+import htsjdk.variant.vcf.VCFHeader;
 
 /**
  * The {@link LocusPanel} controller
@@ -50,9 +56,11 @@ public class LocusPanelController extends InputPanelController {
         boolean withinRange = true;
         int chrEndBound = 0;
 
+        int startPos = -1;
+        int endPos = -1;
+
+        // Gets and check start and end positions
         if (startSelected && endSelected) {
-            int startPos = -1;
-            int endPos = -1;
 
             // Tries to get start position
             try {
@@ -89,13 +97,26 @@ public class LocusPanelController extends InputPanelController {
         if (isChrSelected && populationSelected && startSelected && endSelected && startEndValid
                 && withinRange) {
             logger.log(Level.INFO, "Starting gene research...");
-            // TODO LINK WITH MODEL
-
+            downloadVcf(fileNameAndPath, populations, chrSelected, startPos, endPos);
         } else { // Invalid input
             displayError(isChrSelected, populationSelected, startSelected, endSelected,
                     startEndValid, withinRange, chrSelected, chrEndBound);
-
        }
+    }
+
+    private void downloadVcf(String fileNameAndPath, ZoneSelection populations, String chr,
+            int start, int end) {
+        var isgrClient = IgsrClient.builder().chromosome(chr)
+                .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
+        try (var reader = isgrClient.reader();
+                var lines = reader.query(chr, start, end)) {
+            var samples = Resource.getSamples(Resource.CONFIG.getSelectedVersion(), populations);
+            var variants = lines.stream().map(variant -> variant.subContextFromSamples(samples));
+            var header = VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
+            FileWriter.writeVCF(fileNameAndPath, header, variants);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Impossible to get distant vcf file", e);
+        }
     }
 
     private void displayError(boolean isChrSelected, boolean populationSelected,
