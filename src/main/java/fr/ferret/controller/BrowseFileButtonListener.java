@@ -7,6 +7,8 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import fr.ferret.controller.utils.FileUtils;
 import fr.ferret.utils.Resource;
 import lombok.Getter;
 
@@ -46,17 +48,11 @@ public class BrowseFileButtonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JFileChooser saveFileChooser = new JFileChooser();
-        String fileNameAndPath;
-        saveFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        saveFileChooser.setDialogTitle(Resource.getTextElement("run.save"));
-        int returnVal = saveFileChooser.showSaveDialog(panel);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = saveFileChooser.getSelectedFile();
-            fileNameAndPath = file.getAbsolutePath();
-            selectedFileLabel.setText(
-                    Resource.getTextElement("browse.selectedfile") + " " + fileNameAndPath);
-            selectedFile = file;
-        }
+        var file = FileUtils.chooseFile(panel, JFileChooser.FILES_ONLY);
+        file.ifPresent(f -> {
+            selectedFile = f;
+            selectedFileLabel.setText(Resource.getTextElement("browse.selectedfile")
+                + f.getAbsolutePath());
+        });
     }
 }
