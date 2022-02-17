@@ -13,10 +13,13 @@ plugins {
 }
 
 ext {
-    junitVersion = '5.8.2'
-    guavaVersion = '31.0.1-jre'
-    htsjdkVersion = '2.24.1'
-    reactorVersion = '3.4.15'
+    versions = [
+            'junit': '5.8.2',
+            'guava': '31.0.1-jre',
+            'htsjdk': '2.24.1',
+            'reactor': '3.4.15',
+            'awaitility': '4.1.1'
+    ]
 }
 
 repositories {
@@ -51,16 +54,20 @@ java {
 
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter', version: junitVersion)
 
     // This dependency is used by the application.
-    implementation(group: 'com.google.guava', name: 'guava', version: guavaVersion)
-    // https://mvnrepository.com/artifact/com.github.samtools/htsjdk
-    implementation(group: 'com.github.samtools', name: 'htsjdk', version: htsjdkVersion)
+    implementation(group: 'com.google.guava', name: 'guava', version: versions['guava'])
 
-    implementation(group: 'io.projectreactor', name: 'reactor-core', version: reactorVersion)
-    testImplementation(group: 'io.projectreactor', name: 'reactor-test', version: reactorVersion)
+    // https://mvnrepository.com/artifact/com.github.samtools/htsjdk
+    implementation(group: 'com.github.samtools', name: 'htsjdk', version: versions['htsjdk'])
+
+    // Use reactor for asynchronous operations
+    implementation(group: 'io.projectreactor', name: 'reactor-core', version: versions['reactor'])
+
+    // Use JUnit Jupiter, reactor-test and awaitility for testing.
+    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter', version: versions['junit'])
+    testImplementation(group: 'io.projectreactor', name: 'reactor-test', version: versions['reactor'])
+    testImplementation(group: 'org.awaitility', name: 'awaitility', version: versions['awaitility'])
 }
 
 tasks.named('test') {

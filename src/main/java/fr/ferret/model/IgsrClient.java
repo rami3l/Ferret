@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.utils.FileWriter;
@@ -15,6 +16,9 @@ import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFCodec;
 import htsjdk.variant.vcf.VCFHeader;
 import lombok.Builder;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Simple query client for the IGSR (International Genome Sample Resource).
@@ -50,43 +54,51 @@ public class IgsrClient {
     /**
      * Connect to the IGSR database and launch a VCF file reader.
      * 
-     * @return a {@code TabixFeatureReader} instance pointing to the given file path
-     * @throws IOException
+     * @return a {@link TabixFeatureReader} instance pointing to the given file path
      */
-    public FeatureReader<VariantContext> reader() throws IOException {
+    public Mono<FeatureReader<VariantContext>> getReader() {
         logger.info("Initializing reader...");
-        return new TabixFeatureReader<>(getFilePath(), getIndexPath(), new VCFCodec());
+        return Mono.fromCallable(() -> new TabixFeatureReader<>(getFilePath(), getIndexPath(), new VCFCodec()));
     }
 
     /**
      * Exports a "distilled" VCF file from an IGSR online database query.
      * 
-     * @param outFile the output {@code File}
+     * @param outFile the output {@link File}
      * @param start the starting index of the query
      * @param end the ending index of the query
-     * @param phase the 1000 Genome project phase of this query
      * @param selection the selected populations
+     * @return {@link Disposable} linked to the launched task
      */
-    public void exportVCFFromSamples(File outFile, int start, int end, ZoneSelection selection)
+    public Disposable exportVCFFromSamples(File outFile, int start, int end, ZoneSelection selection)
             throws IOException {
-        exportVCFFromSamples(outFile, start, end, Resource.getSamples(phase1KG, selection));
+        logger.info("Exporting...");
+        return exportVCFFromSamples(outFile, start, end, Resource.getSamples(phase1KG, selection));
     }
 
     /**
      * Exports a "distilled" VCF file from an IGSR online database query.
      * 
-     * @param outFile the output {@code File}
+     * @param outFile the output {@link File}
      * @param start the starting index of the query
      * @param end the ending index of the query
      * @param samples the sample names, eg. {HG00096, HG0009}
+     * @return {@link Disposable} linked to the launched task
      */
-    public void exportVCFFromSamples(File outFile, int start, int end, Set<String> samples)
-            throws IOException {
-        try (var reader = this.reader(); var lines = reader.query(chromosome, start, end)) {
-            var variants = lines.stream().map(variant -> variant.subContextFromSamples(samples));
-            var header =
-                    VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
-            FileWriter.writeVCF(outFile, header, variants);
-        }
+    public Disposable exportVCFFromSamples(File outFile, int start, int end, Set<String> samples) {
+        return getReader().subscribeOn(Schedulers.boundedElastic())
+            .doOnNext(reader -> {
+                logger.info("Reading lines from remote vcf file...");
+                try {
+                    var lines = reader.query(chromosome, start, end);
+                    var variants = lines.stream().map(variant -> variant.subContextFromSamples(samples));
+                    var header = VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
+                    logger.info("Writing to disk...");
+                    FileWriter.writeVCF(outFile, header, variants);
+                    reader.close();
+                } catch (IOException e) {
+                    logger.log(Level.WARNING, "Failed to get vcf file", e);
+                }
+            }).subscribe();
     }
 }

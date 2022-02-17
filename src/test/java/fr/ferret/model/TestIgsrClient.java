@@ -1,9 +1,5 @@
 package fr.ferret.model;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,51 +12,64 @@ import fr.ferret.model.utils.FileWriter;
 import fr.ferret.model.utils.VCFHeaderExt;
 import fr.ferret.utils.Resource;
 import htsjdk.variant.variantcontext.Allele;
+import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
+import reactor.test.StepVerifier;
+
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class TestIgsrClient {
+
+    private final String chr = "1";
+    private final int start = 196194909;
+    private final int end = 196194913;
+    private final Phases1KG phase = Phases1KG.V3;
+    private final IgsrClient igsrClient = IgsrClient.builder().chromosome(chr).phase1KG(phase).build();
+
     @Test
-    void testBasicQuery() throws IOException {
-        var chr = "1";
-        var start = 196194909;
-        var end = 196577570;
-        var igsrClient = IgsrClient.builder().chromosome(chr).phase1KG(Phases1KG.V3).build();
-        try (var reader = igsrClient.reader(); var it = reader.query(chr, start, end)) {
-            assertNotEquals(null, it);
-            // `it.next()` is the next line in the iterator.
-            var fields = it.next();
+    void testBasicQuery() {
 
-            assertAll(
-                    // Fixed fields:
-                    // #CHROM POS ID REF ALT QUAL FILTER INFO
-                    // https://samtools.github.io/hts-specs/VCFv4.2.pdf
-                    // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
-                    () -> assertEquals(196187886, fields.getStart()),
-                    () -> assertEquals(".", fields.getID()),
-                    () -> assertEquals(Allele.REF_T, fields.getReference()),
-                    // TODO: What is "<CN2>"?
-                    () -> assertEquals(List.of("<CN2>"),
-                            fields.getAlternateAlleles().stream().map(Allele::getDisplayString)
-                                    .toList()),
-                    // This position has passed all filters, so nothing fails.
-                    () -> assertEquals(Set.of(), fields.getFilters()),
+        var mono = igsrClient.getReader().map(reader -> {
+            VariantContext fields = null;
+            try {
+                var it = reader.query(chr, start, end);
+                fields = it.next();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return fields;
+        });
 
-                    // The INFO field contains some key-value pairs...
-                    // eg. "AF" for Allele Frequency...
-                    () -> assertEquals(0.000399361, fields.getAttributeAsDouble("AF", 0)));
-        }
+        StepVerifier.create(mono)
+            .expectNextMatches(fields ->
+                // Fixed fields:
+                // #CHROM POS ID REF ALT QUAL FILTER INFO
+                // https://samtools.github.io/hts-specs/VCFv4.2.pdf
+                // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
+
+                fields.getStart() == 196187886 &&
+                ".".equals(fields.getID()) &&
+                Allele.REF_T.equals(fields.getReference()) &&
+
+                // TODO: What is "<CN2>"?
+                List.of("<CN2>").equals(fields.getAlternateAlleles().stream().map(Allele::getDisplayString).toList()) &&
+
+                // This position has passed all filters, so nothing fails.
+                Set.of().equals(fields.getFilters()) &&
+
+                // The INFO field contains some key-value pairs...
+                // eg. "AF" for Allele Frequency...
+                fields.getAttributeAsDouble("AF", 0) == 0.000399361
+            ).verifyComplete();
     }
 
     @Test
     void testWriteVCFFromSample(@TempDir Path tempDir) throws IOException {
-        var chr = "1";
-        var start = 196194909;
-        var end = 196194913;
-        var phase = Phases1KG.V3;
-        var igsrClient = IgsrClient.builder().chromosome(chr).phase1KG(phase).build();
-        try (var reader = igsrClient.reader(); var it = reader.query(chr, start, end)) {
+
+        try (var reader = igsrClient.getReader().block(); var it = reader.query(chr, start, end)) {
             var selection = new ZoneSelection();
             selection.add("EUR", List.of("GBR"));
             var samples = Resource.getSamples(phase, selection);
@@ -87,7 +96,8 @@ class TestIgsrClient {
                             var oldContent = Files.readString(tempVcfPath);
                             var newTempVCFPath = tempDir.resolve("test2.vcf");
                             var newTempVCF = newTempVCFPath.toFile();
-                            igsrClient.exportVCFFromSamples(newTempVCF, start, end, selection);
+                            var task = igsrClient.exportVCFFromSamples(newTempVCF, start, end, selection);
+                            await().until(task::isDisposed);
                             assertEquals(oldContent, Files.readString(newTempVCFPath));
                         });
             }
