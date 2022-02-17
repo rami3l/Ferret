@@ -1,44 +1,38 @@
 package fr.ferret.controller;
 
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.VariantPanel;
 
 /**
  * The {@link VariantPanel} controller
  */
-public class VariantPanelController extends InputPanelController {
+public class VariantPanelController extends InputPanelController<VariantPanel> {
 
     private static final Logger logger = Logger.getLogger(VariantPanelController.class.getName());
 
-    private final VariantPanel variantPanel;
-
     public VariantPanelController(FerretFrame frame, VariantPanel variantPanel) {
-        super(frame);
-        this.variantPanel = variantPanel;
+        super(frame, variantPanel);
     }
 
     public void validateInfosAndRun(String fileNameAndPath) {
         // Reset borders
-        variantPanel.getVariantIdField().setBorder(null);
-        variantPanel.getFileSelector().getRunButton().setBorder(null);
-        variantPanel.getBpField().setBorder(null);
+        panel.getVariantIdField().setBorder(null);
+        panel.getFileSelector().getRunButton().setBorder(null);
+        panel.getBpField().setBorder(null);
 
         // Traitement
-        JTextField geneNameField = variantPanel.getVariantIdField();
-        JCheckBox snpESPCheckBox = variantPanel.getCheckbox();
+        JTextField geneNameField = panel.getVariantIdField();
+        JCheckBox snpESPCheckBox = panel.getCheckbox();
 
 
         // Selected populations for the model
@@ -47,8 +41,8 @@ public class VariantPanelController extends InputPanelController {
 
         String snpString = geneNameField.getText();
         boolean snpListInputted = snpString.length() > 0;
-        String snpFileNameAndPath = variantPanel.getFileSelector().getSelectedFile() == null ? null
-                : variantPanel.getFileSelector().getSelectedFile().getAbsolutePath();
+        String snpFileNameAndPath = panel.getFileSelector().getSelectedFile() == null ? null
+                : panel.getFileSelector().getSelectedFile().getAbsolutePath();
         boolean snpFileImported = snpFileNameAndPath != null;
 
         boolean snpFileError = false;
@@ -56,7 +50,7 @@ public class VariantPanelController extends InputPanelController {
         boolean invalidCharacter = false;
         String invalidRegex = ".*\\D.*"; // This is everything except numbers
         ArrayList<String> snpListArray = new ArrayList<String>();
-        String snpWindowSize = variantPanel.getBpField().getText();
+        String snpWindowSize = panel.getBpField().getText();
         boolean snpWindowSelected = snpESPCheckBox.isSelected();
         boolean validWindowSizeEntered = true; // must be both not empty and an int
 
@@ -79,22 +73,15 @@ public class VariantPanelController extends InputPanelController {
                 snpFileError = true;
             } else {
                 String fileType = snpFileNameAndPath.substring(snpFileNameAndPath.length() - 4);
-                String delimiter = null;
-                switch (fileType) {
-                    case ".csv":
-                        delimiter = ",";
-                        break;
-                    case ".tab":
-                    case ".tsv":
-                        delimiter = "\\t";
-                        break;
-                    case ".txt":
-                        delimiter = " ";
-                        break;
-                    default:
+                String delimiter = switch (fileType) {
+                    case ".csv" -> ",";
+                    case ".tab", ".tsv" -> "\\t";
+                    case ".txt" -> " ";
+                    default -> {
                         snpFileExtensionError = true;
-                        break;
-                }
+                        yield null;
+                    }
+                };
                 if (delimiter != null) {
                     try (BufferedReader snpFileRead =
                             new BufferedReader(new FileReader(snpFileNameAndPath));) {
@@ -115,10 +102,8 @@ public class VariantPanelController extends InputPanelController {
                                 }
                             }
                         }
-                    } catch (IOException e) {
+                    } catch (IOException | NullPointerException e) {
                         // e.printStackTrace();
-                        snpFileError = true;
-                    } catch (NullPointerException e) {
                         snpFileError = true;
                     }
                 }
@@ -150,44 +135,30 @@ public class VariantPanelController extends InputPanelController {
             // this should be combined with the one single call to Ferret later
 
         } else {
-            StringBuffer errorMessage = new StringBuffer("Correct the following errors:");
+            var error = new Error();
+
+            var idSelector = panel.getVariantIdField();
+            var runButton = panel.getFileSelector().getRunButton();
+
             if (!snpListInputted && !snpFileImported) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectvari"));
-                variantPanel.getVariantIdField()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                variantPanel.getFileSelector().getRunButton()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                error.append("run.selectvari").highlight(List.of(idSelector, runButton));
             }
             if (snpFileImported && snpFileError) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectvari.ferr"));
-                variantPanel.getFileSelector().getRunButton()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                error.append("run.selectvari.ferr").highlight(List.of(runButton));
             }
             if (snpFileImported && snpFileExtensionError) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectvari.fext"));
-                variantPanel.getFileSelector().getRunButton()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                error.append("run.selectvari.fext").highlight(List.of(runButton));
             }
             if ((snpListInputted || snpFileImported) && invalidCharacter) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectvari.cerr"));
-                if (snpListInputted) {
-                    variantPanel.getVariantIdField()
-                            .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                } else {
-                    variantPanel.getFileSelector().getRunButton()
-                            .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                }
+                error.append("run.selectvari.cerr").highlight(List.of(snpListInputted ? idSelector : runButton));
             }
             if (!popSelected) {
-                errorMessage.append("\n ").append(Resource.getTextElement("run.selectpop"));
-                getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                error.append("run.selectpop").highlight(List.of(frame.getRegionPanel()));
             }
             if (!validWindowSizeEntered) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectvari.wsize"));
-                variantPanel.getBpField().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                error.append("run.selectvari.wsize").highlight(List.of(panel.getBpField()));
             }
-            JOptionPane.showMessageDialog(getFrame(), errorMessage,
-                    Resource.getTextElement("run.error"), JOptionPane.OK_OPTION);
+            error.show();
         }
     }
 }

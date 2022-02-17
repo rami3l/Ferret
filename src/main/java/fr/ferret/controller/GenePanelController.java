@@ -22,26 +22,23 @@ import fr.ferret.view.panel.inputs.GenePanel;
 /**
  * The {@link GenePanel} controller
  */
-public class GenePanelController extends InputPanelController {
+public class GenePanelController extends InputPanelController<GenePanel> {
 
     private static final Logger logger = Logger.getLogger(GenePanelController.class.getName());
 
-    private final GenePanel genePanel;
-
     public GenePanelController(FerretFrame frame, GenePanel genePanel) {
-        super(frame);
-        this.genePanel = genePanel;
+        super(frame, genePanel);
     }
 
     public void validateInfosAndRun(String fileNameAndPath) {
         // Reset borders
-        genePanel.getInputField().setBorder(null);
-        genePanel.getFileSelector().getRunButton().setBorder(null);
+        panel.getInputField().setBorder(null);
+        panel.getFileSelector().getRunButton().setBorder(null);
 
         // Traitement
-        JTextField geneNameField = genePanel.getInputField();
-        JRadioButton geneNameRadioButton = genePanel.getRdoName();
-        JRadioButton geneNCBIRadioButton = genePanel.getRdoID();
+        JTextField geneNameField = panel.getInputField();
+        JRadioButton geneNameRadioButton = panel.getRdoName();
+        JRadioButton geneNCBIRadioButton = panel.getRdoID();
 
         // Selected populations for the model
         var populations = getSelectedPopulations();
@@ -50,8 +47,8 @@ public class GenePanelController extends InputPanelController {
         String geneString = geneNameField.getText();
         String[] geneListArray = null;
         boolean geneListInputted = geneString.length() > 0;
-        String geneFileNameAndPath = genePanel.getFileSelector().getSelectedFile() == null ? null
-                : genePanel.getFileSelector().getSelectedFile().getAbsolutePath();
+        String geneFileNameAndPath = panel.getFileSelector().getSelectedFile() == null ? null
+                : panel.getFileSelector().getSelectedFile().getAbsolutePath();
         boolean geneFileImported = geneFileNameAndPath != null;
         boolean geneFileError = false;
         boolean geneFileExtensionError = false;
@@ -103,13 +100,11 @@ public class GenePanelController extends InputPanelController {
                         }
                         geneListArray =
                                 geneListArrayList.toArray(new String[geneListArrayList.size()]);
-                    } catch (IOException e) {
+                    } catch (IOException | NullPointerException e) {
                         // e.printStackTrace();
                         geneFileError = true;
-                    } catch (NullPointerException e) {
-                        // File is empty
-                        geneFileError = true;
-                    }
+                    } // File is empty
+
                 }
             }
 
@@ -131,37 +126,30 @@ public class GenePanelController extends InputPanelController {
             // TODO LINK WITH MODEL
 
         } else {
-            var errorMessage = new StringBuffer("Correct the following errors:");
-            JComponent inputField = genePanel.getInputField();
-            JComponent runButton = genePanel.getFileSelector().getRunButton();
-            JComponent regionPanel = getFrame().getRegionPanel();
+            JComponent inputField = panel.getInputField();
+            JComponent runButton = panel.getFileSelector().getRunButton();
 
-            BiConsumer<String, List<? extends JComponent>> appendError = (element, components) -> {
-                errorMessage.append("\n " + Resource.getTextElement(element));
-                components.forEach(component -> component
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1)));
-            };
+            var error = new Error();
 
             if (!geneListInputted && !geneFileImported) {
-                appendError.accept("run.selectgene", List.of(inputField, runButton));
+                error.cr().append("run.selectgene").highlight(List.of(inputField, runButton));
             }
             if (geneFileImported && geneFileError) {
-                appendError.accept("run.selectgene.ferr", List.of(runButton));
+                error.cr().append("run.selectgene.ferr").highlight(List.of(runButton));
             }
             if (geneFileImported && geneFileExtensionError) {
-                appendError.accept("run.selectgene.fext", List.of(runButton));
+                error.cr().append("run.selectgene.fext").highlight(List.of(runButton));
             }
             if (geneListInputted && invalidCharacter) {
-                appendError.accept("run.selectgene.cerr", List.of(inputField));
+                error.cr().append("run.selectgene.cerr").highlight(List.of(inputField));
             }
             if (geneFileImported && invalidCharacter) {
-                appendError.accept("run.selectgene.cerr", List.of(runButton));
+                error.cr().append("run.selectgene.cerr").highlight(List.of(runButton));
             }
             if (!popSelected) {
-                appendError.accept("run.selectpop", List.of(regionPanel));
+                error.cr().append("run.selectpop").highlight(List.of(frame.getRegionPanel()));
             }
-            JOptionPane.showMessageDialog(getFrame(), errorMessage,
-                    Resource.getTextElement("run.error"), JOptionPane.OK_OPTION);
+            error.show();
         }
     }
 }

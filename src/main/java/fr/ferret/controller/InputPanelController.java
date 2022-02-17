@@ -1,22 +1,28 @@
 package fr.ferret.controller;
 
+import java.awt.*;
 import java.util.List;
 import fr.ferret.model.Region;
 import fr.ferret.model.ZoneSelection;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import javax.swing.*;
 
 /**
  * The base for input panel controllers (locus, gene and variant panel controllers)
  */
 @AllArgsConstructor
-public abstract class InputPanelController {
-    /**
-     * The main ferret frame
-     */
+public abstract class InputPanelController<T extends JPanel> {
+
+    /** The main ferret frame */
     @Getter
-    private final FerretFrame frame;
+    protected final FerretFrame frame;
+    /** The panel which is controlled by this {@link InputPanelController} */
+    protected final T panel;
 
     /**
      * Validates input and runs the program if it's valid
@@ -47,5 +53,40 @@ public abstract class InputPanelController {
             }
         });
         return selection;
+    }
+
+    /**
+     * Use it to create an error message and highlight components
+     */
+    @NoArgsConstructor
+    protected final class Error {
+
+        private final StringBuilder errorMessage =
+            new StringBuilder(Resource.getTextElement("run.fixerrors"));
+
+        public Error append(String element) {
+            errorMessage.append(" ").append(Resource.getTextElement(element));
+            return this;
+        }
+
+        public Error addText(String text) {
+            errorMessage.append(text);
+            return this;
+        }
+
+        public Error cr() {
+            errorMessage.append("\n");
+            return this;
+        }
+
+        public void highlight(List<? extends JComponent> components) {
+            components.forEach(component -> component
+                .setBorder(BorderFactory.createLineBorder(Color.RED, 1)));
+        }
+
+        public void show() {
+            JOptionPane.showMessageDialog(getFrame(), errorMessage,
+                Resource.getTextElement("run.error"), JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
