@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -57,34 +59,28 @@ public class GenePanelController extends InputPanelController {
         boolean geneNameInputted = geneNameRadioButton.isSelected();
         // boolean fromNCBI = geneNCBIRadioButton.isSelected();
 
-        String invalidRegex;
-        if (geneNameInputted) {
-            invalidRegex = ".*[^a-zA-Z0-9\\-].*"; // This is everything except letters and numbers,
-                                                  // including underscore
-        } else {
-            invalidRegex = ".*\\D.*"; // This is everything except numbers
-        }
+        var invalidRegex = geneNameInputted
+                // This is everything except letters and numbers, including underscore
+                ? ".*[^a-zA-Z0-9\\-].*"
+                // This is everything except numbers
+                : ".*\\D.*";
+
 
         if (geneFileImported) {
             if (geneFileNameAndPath.length() <= 4) {
                 geneFileError = true;
             } else {
                 String fileType = geneFileNameAndPath.substring(geneFileNameAndPath.length() - 4);
-                String delimiter = null;
-                switch (fileType) {
-                    case ".csv":
-                        delimiter = ",";
-                        break;
-                    case ".tab", ".tsv":
-                        delimiter = "\\t";
-                        break;
-                    case ".txt":
-                        delimiter = " ";
-                        break;
-                    default:
+                var delimiter = switch (fileType) {
+                    case ".csv" -> ",";
+                    case ".tab", ".tsv" -> "\\t";
+                    case ".txt" -> " ";
+                    default -> {
                         geneFileExtensionError = true;
-                        break;
-                }
+                        yield null;
+                    }
+                };
+
                 ArrayList<String> geneListArrayList = new ArrayList<String>();
 
                 if (delimiter != null) {
@@ -127,6 +123,7 @@ public class GenePanelController extends InputPanelController {
             geneListArray = geneList.split(",");
         }
 
+        // TODO: WUT IS THIS? (SHOULD PUT SAD PATH FIRST WITH EARLY EXIT, AND THEN HAPPY PATH)
         if ((geneListInputted || (geneFileImported && !geneFileError && !geneFileExtensionError))
                 && !invalidCharacter && popSelected) {
 
@@ -134,36 +131,34 @@ public class GenePanelController extends InputPanelController {
             // TODO LINK WITH MODEL
 
         } else {
-            StringBuffer errorMessage = new StringBuffer("Correct the following errors:");
+            var errorMessage = new StringBuffer("Correct the following errors:");
+            JComponent inputField = genePanel.getInputField();
+            JComponent runButton = genePanel.getFileSelector().getRunButton();
+            JComponent regionPanel = getFrame().getRegionPanel();
+
+            BiConsumer<String, List<? extends JComponent>> appendError = (element, components) -> {
+                errorMessage.append("\n " + Resource.getTextElement(element));
+                components.forEach(component -> component
+                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1)));
+            };
+
             if (!geneListInputted && !geneFileImported) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectgene"));
-                genePanel.getInputField().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                genePanel.getFileSelector().getRunButton()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                appendError.accept("run.selectgene", List.of(inputField, runButton));
             }
             if (geneFileImported && geneFileError) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectgene.ferr"));
-                genePanel.getFileSelector().getRunButton()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                appendError.accept("run.selectgene.ferr", List.of(runButton));
             }
             if (geneFileImported && geneFileExtensionError) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectgene.fext"));
-                genePanel.getFileSelector().getRunButton()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                appendError.accept("run.selectgene.fext", List.of(runButton));
             }
-            if ((geneListInputted || geneFileImported) && invalidCharacter) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectgene.cerr"));
-                if (geneListInputted) {
-                    genePanel.getInputField()
-                            .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                } else {
-                    genePanel.getFileSelector().getRunButton()
-                            .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                }
+            if (geneListInputted && invalidCharacter) {
+                appendError.accept("run.selectgene.cerr", List.of(inputField));
+            }
+            if (geneFileImported && invalidCharacter) {
+                appendError.accept("run.selectgene.cerr", List.of(runButton));
             }
             if (!popSelected) {
-                errorMessage.append("\n ").append(Resource.getTextElement("run.selectpop"));
-                getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                appendError.accept("run.selectpop", List.of(regionPanel));
             }
             JOptionPane.showMessageDialog(getFrame(), errorMessage,
                     Resource.getTextElement("run.error"), JOptionPane.OK_OPTION);

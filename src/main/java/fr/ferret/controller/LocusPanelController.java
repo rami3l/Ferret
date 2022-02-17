@@ -7,15 +7,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
-
 import fr.ferret.model.IgsrClient;
 import fr.ferret.model.ZoneSelection;
-import fr.ferret.model.utils.FileWriter;
-import fr.ferret.model.utils.VCFHeaderExt;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
-import htsjdk.variant.vcf.VCFHeader;
 
 /**
  * The {@link LocusPanel} controller
@@ -79,12 +75,12 @@ public class LocusPanelController extends InputPanelController {
             startEndValid = (endPos >= startPos);
 
             // Checks that given end position is not greater than chromosome end position
-            if (startSelected && endSelected && startEndValid){
+            if (startSelected && endSelected && startEndValid) {
                 int validEnd = Resource
                         .getChrEndPosition(Resource.CONFIG.getSelectedHumanGenome(), chrSelected)
                         .orElseGet(() -> {
                             logger.log(Level.WARNING, "Impossible to get chromosome end position."
-                                + " Given end position may be invalid");
+                                    + " Given end position may be invalid");
                             return Integer.MAX_VALUE;
                         });
                 if (endPos > validEnd || startPos < 1) {
@@ -102,7 +98,7 @@ public class LocusPanelController extends InputPanelController {
         } else { // Invalid input
             displayError(isChrSelected, populationSelected, startSelected, endSelected,
                     startEndValid, withinRange, chrSelected, chrEndBound);
-       }
+        }
     }
 
     private void downloadVcf(String fileNameAndPath, ZoneSelection populations, String chr,
@@ -122,8 +118,7 @@ public class LocusPanelController extends InputPanelController {
         var errorMessage = new StringBuilder(Resource.getTextElement("run.fixerrors"));
         if (!isChrSelected) {
             errorMessage.append("\n ").append(Resource.getTextElement("run.selectchr"));
-            locusPanel.getChromosomeList()
-                .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            locusPanel.getChromosomeList().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
         }
         if (!populationSelected) {
             errorMessage.append("\n ").append(Resource.getTextElement("run.selectpop"));
@@ -144,13 +139,13 @@ public class LocusPanelController extends InputPanelController {
         }
         if (!withinRange) {
             errorMessage.append("\n ").append(Resource.getTextElement("run.invalidpos.1"))
-                .append(" ").append(chrSelected).append(" ")
-                .append(Resource.getTextElement("run.invalidpos.2")).append(" ")
-                .append(chrEndBound);
+                    .append(" ").append(chrSelected).append(" ")
+                    .append(Resource.getTextElement("run.invalidpos.2")).append(" ")
+                    .append(chrEndBound);
             locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
             locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
         }
         JOptionPane.showMessageDialog(getFrame(), errorMessage,
-            Resource.getTextElement("run.error"), JOptionPane.ERROR_MESSAGE);
+                Resource.getTextElement("run.error"), JOptionPane.ERROR_MESSAGE);
     }
 }
