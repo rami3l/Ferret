@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.BiConsumer;
@@ -15,6 +16,11 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+
+import com.google.common.io.Files;
+import fr.ferret.controller.exceptions.FileContentException;
+import fr.ferret.controller.exceptions.FileFormatException;
+import fr.ferret.controller.utils.FileUtils;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.GenePanel;
@@ -45,10 +51,11 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         boolean popSelected = !populations.isEmpty();
 
         String geneString = geneNameField.getText();
-        String[] geneListArray = null;
+        List<String> geneList = new ArrayList<>();
         boolean geneListInputted = geneString.length() > 0;
-        String geneFileNameAndPath = panel.getFileSelector().getSelectedFile() == null ? null
-                : panel.getFileSelector().getSelectedFile().getAbsolutePath();
+        String geneFileNameAndPath = panel.getFileSelector().getSelectedFile() == null ?
+            null :
+            panel.getFileSelector().getSelectedFile().getAbsolutePath();
         boolean geneFileImported = geneFileNameAndPath != null;
         boolean geneFileError = false;
         boolean geneFileExtensionError = false;
@@ -57,65 +64,33 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         // boolean fromNCBI = geneNCBIRadioButton.isSelected();
 
         var invalidRegex = geneNameInputted
-                // This is everything except letters and numbers, including underscore
-                ? ".*[^a-zA-Z0-9\\-].*"
-                // This is everything except numbers
-                : ".*\\D.*";
+            // This is everything except letters and numbers, including underscore
+            ? ".*[^a-zA-Z0-9\\-].*"
+            // This is everything except numbers
+            : ".*\\D.*";
 
 
         if (geneFileImported) {
-            if (geneFileNameAndPath.length() <= 4) {
+
+            try {
+                geneList = FileUtils.readCsvLike(geneFileNameAndPath, invalidRegex);
+            } catch (FileFormatException e) {
+                geneFileExtensionError = true;
+            } catch (FileContentException e) {
+                invalidCharacter = true;
+            } catch (IOException e) {
                 geneFileError = true;
-            } else {
-                String fileType = geneFileNameAndPath.substring(geneFileNameAndPath.length() - 4);
-                var delimiter = switch (fileType) {
-                    case ".csv" -> ",";
-                    case ".tab", ".tsv" -> "\\t";
-                    case ".txt" -> " ";
-                    default -> {
-                        geneFileExtensionError = true;
-                        yield null;
-                    }
-                };
-
-                ArrayList<String> geneListArrayList = new ArrayList<String>();
-
-                if (delimiter != null) {
-                    try (BufferedReader geneFileRead =
-                            new BufferedReader(new FileReader(geneFileNameAndPath));) {
-                        String geneStringToParse;
-                        while ((geneStringToParse = geneFileRead.readLine()) != null) {
-                            String[] text = geneStringToParse.split(delimiter);
-                            for (int i = 0; i < text.length; i++) {
-                                text[i] = text[i].replace(" ", "").toUpperCase(new Locale("all")); // remove
-                                                                                                   // spaces
-                                if (text[i].matches(invalidRegex)) { // identify invalid characters
-                                    invalidCharacter = true;
-                                    break;
-                                }
-                                if (text[i].length() > 0) {
-                                    geneListArrayList.add(text[i]);
-                                }
-                            }
-                        }
-                        geneListArray =
-                                geneListArrayList.toArray(new String[geneListArrayList.size()]);
-                    } catch (IOException | NullPointerException e) {
-                        // e.printStackTrace();
-                        geneFileError = true;
-                    } // File is empty
-
-                }
             }
+
 
         } else if (geneListInputted) {
             geneString = geneString.toUpperCase(new Locale("all"));
-            String geneList = geneString.replace(" ", "");
-            invalidCharacter = geneList.replace(",", "").matches(invalidRegex);
-            if (geneList.endsWith(",")) {
-                geneList = geneList.substring(0, geneList.length() - 1);
+            String geneStringList = geneString.replace(" ", "");
+            invalidCharacter = geneStringList.replace(",", "").matches(invalidRegex);
+            if (geneStringList.endsWith(",")) {
+                geneStringList = geneStringList.substring(0, geneStringList.length() - 1);
             }
-            geneListArray = geneList.split(",");
+            geneList = Arrays.stream(geneStringList.split(",")).toList();
         }
 
         // TODO: WUT IS THIS? (SHOULD PUT SAD PATH FIRST WITH EARLY EXIT, AND THEN HAPPY PATH)

@@ -10,6 +10,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
+
+import fr.ferret.controller.exceptions.FileContentException;
+import fr.ferret.controller.exceptions.FileFormatException;
+import fr.ferret.controller.utils.FileUtils;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.VariantPanel;
 
@@ -49,7 +53,7 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
         boolean snpFileExtensionError = false;
         boolean invalidCharacter = false;
         String invalidRegex = ".*\\D.*"; // This is everything except numbers
-        ArrayList<String> snpListArray = new ArrayList<String>();
+        List<String> snpList = new ArrayList<>();
         String snpWindowSize = panel.getBpField().getText();
         boolean snpWindowSelected = snpESPCheckBox.isSelected();
         boolean validWindowSizeEntered = true; // must be both not empty and an int
@@ -69,44 +73,15 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
         }
 
         if (snpFileImported) {
-            if (snpFileNameAndPath.length() <= 4) {
+
+            try {
+                snpList = FileUtils.readCsvLike(snpFileNameAndPath, invalidRegex);
+            } catch (FileFormatException e) {
+                snpFileExtensionError = true;
+            } catch (FileContentException e) {
+                invalidCharacter = true;
+            } catch (IOException e) {
                 snpFileError = true;
-            } else {
-                String fileType = snpFileNameAndPath.substring(snpFileNameAndPath.length() - 4);
-                String delimiter = switch (fileType) {
-                    case ".csv" -> ",";
-                    case ".tab", ".tsv" -> "\\t";
-                    case ".txt" -> " ";
-                    default -> {
-                        snpFileExtensionError = true;
-                        yield null;
-                    }
-                };
-                if (delimiter != null) {
-                    try (BufferedReader snpFileRead =
-                            new BufferedReader(new FileReader(snpFileNameAndPath));) {
-                        String snpStringToParse;
-                        while ((snpStringToParse = snpFileRead.readLine()) != null) {
-                            String[] text = snpStringToParse.split(delimiter);
-                            for (int i = 0; i < text.length; i++) {
-                                text[i] = text[i].replace(" ", ""); // remove spaces
-                                if (text[i].matches(invalidRegex)) { // identify invalid characters
-                                    invalidCharacter = true; // probably can just throw error here,
-                                                             // might be easier/more straight
-                                                             // forward. But then errors wouldn't be
-                                                             // 'accumulated' to the end
-                                    break;
-                                }
-                                if (text[i].length() > 0) {
-                                    snpListArray.add(text[i]);
-                                }
-                            }
-                        }
-                    } catch (IOException | NullPointerException e) {
-                        // e.printStackTrace();
-                        snpFileError = true;
-                    }
-                }
             }
 
         } else if (snpListInputted) {
@@ -123,7 +98,7 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
                     break;
                 }
             }
-            snpListArray = new ArrayList<String>(Arrays.asList(text));
+            snpList = Arrays.asList(text);
         }
 
         if ((snpListInputted || (snpFileImported && !snpFileError && !snpFileExtensionError))
