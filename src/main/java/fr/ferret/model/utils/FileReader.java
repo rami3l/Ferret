@@ -1,6 +1,5 @@
 package fr.ferret.model.utils;
 
-import com.google.common.io.Files;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
 import lombok.experimental.UtilityClass;
@@ -9,24 +8,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 @UtilityClass
 public class FileReader {
 
-    public Optional<String> getDelimiter(String filename) {
-        String extension = Files.getFileExtension(filename);
-        return Optional.ofNullable(switch (extension) {
-            case "csv" -> ",";
-            case "tab", "tsv" -> "\\t";
-            case "txt" -> " ";
-            default -> null;
-        });
+    private final Map<String, String> delimiters = Map.of("csv", ",", "tab", "\\t", "tsv", "\\t", "txt", " ");
+
+    public Optional<String> getCsvDelimiter(String filename) {
+        return Optional.ofNullable(filename)
+            .filter(f -> f.contains("."))
+            .map(f -> f.substring(f.lastIndexOf(".") + 1))
+            .map(delimiters::get);
     }
 
     public List<String> readCsvLike(String filename, String invalidRegex) throws IOException {
-        var optionalDelemiter = getDelimiter(filename);
+        var optionalDelemiter = getCsvDelimiter(filename);
 
         List<String> content = new ArrayList<>();
         if (optionalDelemiter.isEmpty()) {
@@ -34,7 +33,7 @@ public class FileReader {
             throw new FileFormatException();
         } else {
             String delimiter = optionalDelemiter.get();
-            try (BufferedReader reader = new BufferedReader(new java.io.FileReader(filename));) {
+            try (BufferedReader reader = new BufferedReader(new java.io.FileReader(filename))) {
 
                 reader.lines().flatMap(line -> Stream.of(line.split(delimiter))).map(String::trim)
                     .forEach(text -> {

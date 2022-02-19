@@ -1,8 +1,7 @@
-package fr.ferret.controller.utils;
+package fr.ferret.model.utils;
 
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
-import fr.ferret.model.utils.FileReader;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -10,7 +9,29 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestFileUtils {
+class FileReaderTest {
+
+    @Test void getCsvDelimiter_withValidExtension_shouldReturnDelimiter() {
+        var delim1 = FileReader.getCsvDelimiter("file.csv");
+        var delim2 = FileReader.getCsvDelimiter(".tab");
+        var delim3 = FileReader.getCsvDelimiter("name with spaces.tsv");
+        var delim4 = FileReader.getCsvDelimiter("compose.name.txt");
+        assertTrue(delim1.isPresent());
+        assertTrue(delim2.isPresent());
+        assertTrue(delim3.isPresent());
+        assertTrue(delim4.isPresent());
+        assertEquals(",", delim1.get());
+        assertEquals("\\t", delim2.get());
+        assertEquals("\\t", delim3.get());
+        assertEquals(" ", delim4.get());
+    }
+
+    @Test void getCsvDelimiter_withInvalidOrNoExtension_shouldReturnOptionalEmpty(){
+        assertTrue(FileReader.getCsvDelimiter("no_extension").isEmpty());
+        assertTrue(FileReader.getCsvDelimiter("file.invalid_ext").isEmpty());
+        assertTrue(FileReader.getCsvDelimiter("no_extension").isEmpty());
+        assertTrue(FileReader.getCsvDelimiter("no_extension").isEmpty());
+    }
 
     @Test void readValidCsv_shouldWork() {
         String invalidRegex = ".*\\D.*";
@@ -31,7 +52,7 @@ class TestFileUtils {
         assertEquals("99", elements.get(7));
     }
 
-    @Test void readCsvWithInvalidCharacter_shouldThrowFileContentException() {
+    @Test void readCsv_withInvalidCharacter_shouldThrowFileContentException() {
         System.out.println("---");
         String invalidRegex = ".*\\D.*";
         assertThrowsExactly(
@@ -40,11 +61,12 @@ class TestFileUtils {
         );
     }
 
-    @Test void readFileWithInvalidExtension_shouldThrowFileFormatException() {
+    @Test void readFile_withInvalidExtension_shouldThrowFileFormatException() {
         String invalidRegex = ".*\\D.*";
         assertThrowsExactly(
             FileFormatException.class,
             () -> FileReader.readCsvLike("src/test/resources/file.invalidExt", invalidRegex)
         );
     }
+
 }

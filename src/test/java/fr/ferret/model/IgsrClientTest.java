@@ -21,7 +21,7 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-class TestIgsrClient {
+class IgsrClientTest {
 
     private final String chr = "1";
     private final int start = 196194909;

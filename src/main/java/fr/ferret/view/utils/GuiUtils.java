@@ -20,7 +20,7 @@ public class GuiUtils {
      * @param gridx : the x position of the component in the panel
      * @param gridy : the y position of the component in the panel
      */
-    public void addToPanel(JPanel panel, JComponent componentToAdd, double weightx,
+    public static void addToPanel(JPanel panel, JComponent componentToAdd, double weightx,
             int gridx, int gridy) {
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
