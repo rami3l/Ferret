@@ -4,8 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import fr.ferret.controller.utils.FileUtils;
+
 import fr.ferret.view.FerretFrame;
+import fr.ferret.view.utils.GuiUtils;
 
 /**
  * Listens events of the run button and sends input data to the model
@@ -27,7 +28,7 @@ public class RunButtonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        var file = FileUtils.chooseFile(frame.getRunPanel(), JFileChooser.DIRECTORIES_ONLY);
+        var file = GuiUtils.chooseFile(frame.getRunPanel(), JFileChooser.DIRECTORIES_ONLY);
         file.ifPresent(f -> validateInfosAndRun(f.getAbsolutePath()));
     }
 

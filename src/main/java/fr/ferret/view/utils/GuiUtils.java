@@ -1,13 +1,15 @@
 package fr.ferret.view.utils;
 
+import fr.ferret.utils.Resource;
+import lombok.experimental.UtilityClass;
+
 import java.awt.GridBagConstraints;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import java.io.File;
+import java.util.Optional;
+import javax.swing.*;
 
+@UtilityClass
 public class GuiUtils {
-
-    // utils classes should not be instanciated
-    private GuiUtils() {}
 
     /**
      * Adds a component to a panel (which is a grid)
@@ -18,7 +20,7 @@ public class GuiUtils {
      * @param gridx : the x position of the component in the panel
      * @param gridy : the y position of the component in the panel
      */
-    public static void addToPanel(JPanel panel, JComponent componentToAdd, double weightx,
+    public void addToPanel(JPanel panel, JComponent componentToAdd, double weightx,
             int gridx, int gridy) {
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -28,4 +30,15 @@ public class GuiUtils {
         panel.add(componentToAdd, c);
     }
 
+
+    public Optional<File> chooseFile(JPanel panel, int mode) {
+        JFileChooser saveFileChooser = new JFileChooser();
+        saveFileChooser.setFileSelectionMode(mode);
+        saveFileChooser.setDialogTitle(Resource.getTextElement("run.save"));
+        int returnVal = saveFileChooser.showSaveDialog(panel);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            return Optional.of(saveFileChooser.getSelectedFile());
+        }
+        return Optional.empty();
+    }
 }

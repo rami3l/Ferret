@@ -8,8 +8,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import fr.ferret.controller.utils.FileUtils;
 import fr.ferret.utils.Resource;
+import fr.ferret.view.utils.GuiUtils;
 import lombok.Getter;
 
 /**
@@ -48,7 +48,7 @@ public class BrowseFileButtonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        var file = FileUtils.chooseFile(panel, JFileChooser.FILES_ONLY);
+        var file = GuiUtils.chooseFile(panel, JFileChooser.FILES_ONLY);
         file.ifPresent(f -> {
             selectedFile = f;
             selectedFileLabel.setText(Resource.getTextElement("browse.selectedfile")

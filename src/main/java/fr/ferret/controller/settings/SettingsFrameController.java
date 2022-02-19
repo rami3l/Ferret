@@ -12,20 +12,19 @@ import javax.swing.event.ChangeListener;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.header.ferret.SettingsFrame;
+import lombok.AllArgsConstructor;
 
 /**
- * Groups all controllers for the {@link fr.ferret.view.panel.header.ferret.SettingsFrame}
+ * Groups all controllers for the {@link SettingsFrame}
  */
 public class SettingsFrameController {
     /**
      * Cancel button click listener
      */
+    @AllArgsConstructor
     public static class CancelButtonListener implements ActionListener {
-        private final SettingsFrame settingsFrame;
 
-        public CancelButtonListener(SettingsFrame settingsFrame) {
-            this.settingsFrame = settingsFrame;
-        }
+        private final SettingsFrame settingsFrame;
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -36,7 +35,9 @@ public class SettingsFrameController {
     /**
      * Save button click listener
      */
+    @AllArgsConstructor
     public static class SaveButtonListener implements ActionListener {
+
         private final FerretFrame ferretFrame;
         private final SettingsFrame settingsFrame;
         private final JRadioButton[] phaseButtons;
@@ -45,20 +46,6 @@ public class SettingsFrameController {
         private final JRadioButton allFilesButton;
         private final JRadioButton freqFileButton;
         private final JRadioButton vcfFileButton;
-
-        public SaveButtonListener(FerretFrame ferretFrame, SettingsFrame settingsFrame,
-                JRadioButton[] phaseButtons, JRadioButton[] humanVersionButtons,
-                JFormattedTextField mafText, JRadioButton allFilesButton,
-                JRadioButton freqFileButton, JRadioButton vcfFileButton) {
-            this.ferretFrame = ferretFrame;
-            this.settingsFrame = settingsFrame;
-            this.phaseButtons = phaseButtons;
-            this.humanVersionButtons = humanVersionButtons;
-            this.mafText = mafText;
-            this.allFilesButton = allFilesButton;
-            this.freqFileButton = freqFileButton;
-            this.vcfFileButton = vcfFileButton;
-        }
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -107,14 +94,10 @@ public class SettingsFrameController {
     /**
      * Maf inputs listener
      */
+    @AllArgsConstructor
     public static class MafInputListener implements PropertyChangeListener, ChangeListener {
         private final JFormattedTextField mafText;
         private final JSlider mafSlider;
-
-        public MafInputListener(JFormattedTextField mafText, JSlider mafSlider) {
-            this.mafText = mafText;
-            this.mafSlider = mafSlider;
-        }
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {

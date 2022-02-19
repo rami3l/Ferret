@@ -2,7 +2,7 @@ package fr.ferret.controller;
 
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
-import fr.ferret.controller.utils.FileUtils;
+import fr.ferret.model.utils.FileReader;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.GenePanel;
 
@@ -68,7 +68,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         if (geneFileImported) {
 
             try {
-                geneList = FileUtils.readCsvLike(geneFileNameAndPath, invalidRegex);
+                geneList = FileReader.readCsvLike(geneFileNameAndPath, invalidRegex);
             } catch (FileFormatException e) {
                 geneFileExtensionError = true;
             } catch (FileContentException e) {

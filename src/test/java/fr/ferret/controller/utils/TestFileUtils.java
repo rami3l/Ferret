@@ -2,10 +2,9 @@ package fr.ferret.controller.utils;
 
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
+import fr.ferret.model.utils.FileReader;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,7 +16,7 @@ class TestFileUtils {
         String invalidRegex = ".*\\D.*";
         List<String> elements = null;
         try {
-            elements = FileUtils.readCsvLike("src/test/resources/valid.csv", invalidRegex);
+            elements = FileReader.readCsvLike("src/test/resources/valid.csv", invalidRegex);
         } catch (IOException e) {
             fail("File should have be read without errors", e);
         }
@@ -37,7 +36,7 @@ class TestFileUtils {
         String invalidRegex = ".*\\D.*";
         assertThrowsExactly(
             FileContentException.class,
-            () -> FileUtils.readCsvLike("src/test/resources/invalid.csv", invalidRegex)
+            () -> FileReader.readCsvLike("src/test/resources/invalid.csv", invalidRegex)
         );
     }
 
@@ -45,7 +44,7 @@ class TestFileUtils {
         String invalidRegex = ".*\\D.*";
         assertThrowsExactly(
             FileFormatException.class,
-            () -> FileUtils.readCsvLike("src/test/resources/file.invalidExt", invalidRegex)
+            () -> FileReader.readCsvLike("src/test/resources/file.invalidExt", invalidRegex)
         );
     }
 }

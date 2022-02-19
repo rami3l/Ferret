@@ -1,9 +1,6 @@
 package fr.ferret.controller;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -13,7 +10,7 @@ import javax.swing.JTextField;
 
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
-import fr.ferret.controller.utils.FileUtils;
+import fr.ferret.model.utils.FileReader;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.VariantPanel;
 
@@ -82,7 +79,7 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
         if (snpFileImported) {
 
             try {
-                snpList = FileUtils.readCsvLike(snpFileNameAndPath, invalidRegex);
+                snpList = FileReader.readCsvLike(snpFileNameAndPath, invalidRegex);
             } catch (FileFormatException e) {
                 snpFileExtensionError = true;
             } catch (FileContentException e) {

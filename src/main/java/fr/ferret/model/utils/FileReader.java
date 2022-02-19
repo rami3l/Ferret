@@ -1,33 +1,19 @@
-package fr.ferret.controller.utils;
+package fr.ferret.model.utils;
 
 import com.google.common.io.Files;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
-import fr.ferret.utils.Resource;
 import lombok.experimental.UtilityClass;
 
-import javax.swing.*;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@UtilityClass public class FileUtils {
-
-    public Optional<File> chooseFile(JPanel panel, int mode) {
-        JFileChooser saveFileChooser = new JFileChooser();
-        saveFileChooser.setFileSelectionMode(mode);
-        saveFileChooser.setDialogTitle(Resource.getTextElement("run.save"));
-        int returnVal = saveFileChooser.showSaveDialog(panel);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            return Optional.of(saveFileChooser.getSelectedFile());
-        }
-        return Optional.empty();
-    }
+@UtilityClass
+public class FileReader {
 
     public Optional<String> getDelimiter(String filename) {
         String extension = Files.getFileExtension(filename);
@@ -39,9 +25,8 @@ import java.util.stream.Stream;
         });
     }
 
-
     public List<String> readCsvLike(String filename, String invalidRegex) throws IOException {
-        var optionalDelemiter = FileUtils.getDelimiter(filename);
+        var optionalDelemiter = getDelimiter(filename);
 
         List<String> content = new ArrayList<>();
         if (optionalDelemiter.isEmpty()) {
@@ -49,7 +34,7 @@ import java.util.stream.Stream;
             throw new FileFormatException();
         } else {
             String delimiter = optionalDelemiter.get();
-            try (BufferedReader reader = new BufferedReader(new FileReader(filename));) {
+            try (BufferedReader reader = new BufferedReader(new java.io.FileReader(filename));) {
 
                 reader.lines().flatMap(line -> Stream.of(line.split(delimiter))).map(String::trim)
                     .forEach(text -> {
@@ -63,5 +48,4 @@ import java.util.stream.Stream;
         }
         return content;
     }
-
 }
