@@ -25,40 +25,64 @@ import reactor.core.scheduler.Schedulers;
  */
 @Builder
 public class IgsrClient {
+
     private static final Logger logger = Logger.getLogger(IgsrClient.class.getName());
-    private static final String HOST = Resource.getServerConfig("1kg.host") + "/";
 
     /**
      * The chromosome number, eg. `1`.
      */
-    private String chromosome;
+    private final String chromosome;
 
     /**
      * The phase to use for getting variants (default: selected version)
      */
     @Builder.Default
-    private Phases1KG phase1KG = Resource.CONFIG.getSelectedVersion();
+    private final Phases1KG phase1KG = Resource.CONFIG.getSelectedVersion();
+
+    /**
+     * The vcf url template. `{0}` will be replaced by the chromosome.
+     */
+    @Builder.Default
+    private final String urlTemplate = Resource.getVcfUrlTemplate(Resource.CONFIG.getSelectedVersion());
+
+    /**
+     * The extension to add to the path to get the vcf index url (default: `tbi`)
+     */
+    @Builder.Default
+    private final String indexExtension = "tbi";
+
+    // Attribute name starting with `$` to be excluded from the builder
+    private FeatureReader<VariantContext> $reader;
 
     private String getFilePath() {
-        String phase = Resource.getPhase(phase1KG);
-        String path = Resource.getServerConfig("1kg." + phase + ".path");
-        String filenameTemplate = Resource.getServerConfig("1kg." + phase + ".filename");
         // Replace chromosome in the template string.
-        return HOST + path + "/" + MessageFormat.format(filenameTemplate, chromosome);
+        return MessageFormat.format(urlTemplate, chromosome);
     }
 
     private String getIndexPath() {
-        return getFilePath() + ".tbi";
+        return getFilePath() + "." + indexExtension;
     }
 
     /**
-     * Connect to the IGSR database and launch a VCF file reader.
-     * 
+     * Connects to the IGSR database and initializes a VCF file reader.
+     * The VCF file reader is saved in the $reader attribute
+     *
      * @return a {@link TabixFeatureReader} instance pointing to the given file path
+     */
+    private FeatureReader<VariantContext> initReader() throws IOException {
+        $reader = new TabixFeatureReader<>(getFilePath(), getIndexPath(), new VCFCodec());
+        return $reader;
+    }
+
+    /**
+     * Initializes the VCF file reader if needed and returns it.
+     * The reader is initialized lazily (you need to subscribe to the Mono)
+     *
+     * @return a {@link Mono<FeatureReader<VariantContext>>} encapsulating the reader
      */
     public Mono<FeatureReader<VariantContext>> getReader() {
         logger.info("Initializing reader...");
-        return Mono.fromCallable(() -> new TabixFeatureReader<>(getFilePath(), getIndexPath(), new VCFCodec()));
+        return Mono.fromCallable(() -> $reader == null ? initReader() : $reader);
     }
 
     /**
@@ -96,6 +120,7 @@ public class IgsrClient {
                     logger.info("Writing to disk...");
                     FileWriter.writeVCF(outFile, header, variants);
                     reader.close();
+                    logger.info(String.format("%s file written", outFile.getName()));
                 } catch (IOException e) {
                     logger.log(Level.WARNING, "Failed to get vcf file", e);
                 }

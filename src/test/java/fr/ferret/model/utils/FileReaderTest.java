@@ -21,8 +21,8 @@ class FileReaderTest {
         assertTrue(delim3.isPresent());
         assertTrue(delim4.isPresent());
         assertEquals(",", delim1.get());
-        assertEquals("\\t", delim2.get());
-        assertEquals("\\t", delim3.get());
+        assertEquals("\t", delim2.get());
+        assertEquals("\t", delim3.get());
         assertEquals(" ", delim4.get());
     }
 

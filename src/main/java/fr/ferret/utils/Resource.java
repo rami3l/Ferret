@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -125,6 +126,14 @@ public class Resource {
                 .filter(fields -> selection.isSelected(fields[2], fields[1]))
                 .map(fields -> fields[0]).collect(Collectors.toSet());
         }
+    }
+
+    public String getVcfUrlTemplate(Phases1KG phase1KG) {
+        String phaseText = getPhase(phase1KG);
+        String path = getServerConfig("1kg." + phaseText + ".path");
+        String filenameTemplate = getServerConfig("1kg." + phaseText + ".filename");
+        String host = getServerConfig("1kg.host");
+        return host + "/" + path + "/" + filenameTemplate;
     }
 
     public String getHgVersion(HumanGenomeVersions hgVersion) {

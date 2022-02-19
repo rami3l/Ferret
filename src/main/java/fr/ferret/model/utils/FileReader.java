@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 @UtilityClass
 public class FileReader {
 
-    private final Map<String, String> delimiters = Map.of("csv", ",", "tab", "\\t", "tsv", "\\t", "txt", " ");
+    private final Map<String, String> delimiters = Map.of("csv", ",", "tab", "\t", "tsv", "\t", "txt", " ");
 
     public Optional<String> getCsvDelimiter(String filename) {
         return Optional.ofNullable(filename)
