@@ -29,31 +29,35 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
     }
 
     public void validateInfosAndRun(String fileNameAndPath) {
-        // Reset borders
+        // Reset the borders
         panel.getVariantIdField().setBorder(null);
         panel.getFileSelector().getRunButton().setBorder(null);
         panel.getBpField().setBorder(null);
 
-        // Traitement
         JTextField geneNameField = panel.getVariantIdField();
         JCheckBox snpESPCheckBox = panel.getCheckbox();
-
 
         // Selected populations for the model
         var populations = getSelectedPopulations();
         boolean popSelected = !populations.isEmpty();
 
+        // List which will contain the genes (from field or file)
+        List<String> snpList = null;
+
         String snpString = geneNameField.getText();
+
+        // Did the user input a list of gene
         boolean snpListInputted = snpString.length() > 0;
+
+        // Did the user import a csv file
         String snpFileNameAndPath = panel.getFileSelector().getSelectedFile() == null ? null
                 : panel.getFileSelector().getSelectedFile().getAbsolutePath();
         boolean snpFileImported = snpFileNameAndPath != null;
 
+        // Are they errors in imported file (impossible to read, invalid extension or invalid content)
         boolean snpFileError = false;
         boolean snpFileExtensionError = false;
         boolean invalidCharacter = false;
-        String invalidRegex = ".*\\D.*"; // This is everything except numbers
-        List<String> snpList = new ArrayList<>();
         String snpWindowSize = panel.getBpField().getText();
         boolean snpWindowSelected = snpESPCheckBox.isSelected();
         boolean validWindowSizeEntered = true; // must be both not empty and an int
@@ -72,6 +76,9 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
             snpWindowSize = "0";
         }
 
+        // invalid characters for the genes (inputted as a list or a file)
+        String invalidRegex = ".*\\D.*"; // This is everything except numbers
+
         if (snpFileImported) {
 
             try {
@@ -85,20 +92,12 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
             }
 
         } else if (snpListInputted) {
-
-            while (snpString.endsWith(",") || snpString.endsWith(" ")) { // maybe this should be
-                                                                         // added for gene input too
+            snpString = snpString.replace(" ", "");
+            invalidCharacter = snpString.replace(",", "").matches(invalidRegex);
+            if (snpString.endsWith(",")) {
                 snpString = snpString.substring(0, snpString.length() - 1);
             }
-            String[] text = snpString.split(",");
-            for (int i = 0; i < text.length; i++) {
-                text[i] = text[i].replace(" ", "");// remove spaces
-                if (text[i].matches(invalidRegex)) {
-                    invalidCharacter = true;
-                    break;
-                }
-            }
-            snpList = Arrays.asList(text);
+            snpList = Arrays.asList(snpString.split(","));
         }
 
         if ((snpListInputted || (snpFileImported && !snpFileError && !snpFileExtensionError))

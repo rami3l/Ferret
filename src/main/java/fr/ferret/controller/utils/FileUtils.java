@@ -52,7 +52,7 @@ import java.util.stream.Stream;
             try (BufferedReader reader = new BufferedReader(new FileReader(filename));) {
 
                 reader.lines().flatMap(line -> Stream.of(line.split(delimiter))).map(String::trim)
-                    .map(String::toUpperCase).forEach(text -> {
+                    .forEach(text -> {
                         if (text.matches(invalidRegex))
                             throw new RuntimeException();
                         content.add(text);

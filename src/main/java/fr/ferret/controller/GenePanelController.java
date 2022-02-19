@@ -1,29 +1,18 @@
 package fr.ferret.controller;
 
-import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.function.BiConsumer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-
-import com.google.common.io.Files;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
 import fr.ferret.controller.utils.FileUtils;
-import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.GenePanel;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The {@link GenePanel} controller
@@ -37,32 +26,38 @@ public class GenePanelController extends InputPanelController<GenePanel> {
     }
 
     public void validateInfosAndRun(String fileNameAndPath) {
-        // Reset borders
+        // Reset the borders
         panel.getInputField().setBorder(null);
         panel.getFileSelector().getRunButton().setBorder(null);
 
-        // Traitement
         JTextField geneNameField = panel.getInputField();
         JRadioButton geneNameRadioButton = panel.getRdoName();
-        JRadioButton geneNCBIRadioButton = panel.getRdoID();
 
         // Selected populations for the model
         var populations = getSelectedPopulations();
         boolean popSelected = !populations.isEmpty();
 
+        // List which will contain the genes (from field or file)
+        List<String> geneList = null;
+
         String geneString = geneNameField.getText();
-        List<String> geneList = new ArrayList<>();
+
+        // Did the user input a list of gene
         boolean geneListInputted = geneString.length() > 0;
-        String geneFileNameAndPath = panel.getFileSelector().getSelectedFile() == null ?
-            null :
-            panel.getFileSelector().getSelectedFile().getAbsolutePath();
+        // Names or ids inputted ?
+        boolean geneNameInputted = geneNameRadioButton.isSelected();
+
+        // Did the user import a csv file
+        String geneFileNameAndPath = panel.getFileSelector().getSelectedFile() == null ? null
+                : panel.getFileSelector().getSelectedFile().getAbsolutePath();
         boolean geneFileImported = geneFileNameAndPath != null;
+
+        // Are they errors in imported file (impossible to read, invalid extension or invalid content)
         boolean geneFileError = false;
         boolean geneFileExtensionError = false;
         boolean invalidCharacter = false;
-        boolean geneNameInputted = geneNameRadioButton.isSelected();
-        // boolean fromNCBI = geneNCBIRadioButton.isSelected();
 
+        // invalid characters for the genes (inputted as a list or a file)
         var invalidRegex = geneNameInputted
             // This is everything except letters and numbers, including underscore
             ? ".*[^a-zA-Z0-9\\-].*"
@@ -84,18 +79,21 @@ public class GenePanelController extends InputPanelController<GenePanel> {
 
 
         } else if (geneListInputted) {
-            geneString = geneString.toUpperCase(new Locale("all"));
-            String geneStringList = geneString.replace(" ", "");
-            invalidCharacter = geneStringList.replace(",", "").matches(invalidRegex);
-            if (geneStringList.endsWith(",")) {
-                geneStringList = geneStringList.substring(0, geneStringList.length() - 1);
+            geneString = geneString.replace(" ", "");
+            invalidCharacter = geneString.replace(",", "").matches(invalidRegex);
+            if (geneString.endsWith(",")) {
+                geneString = geneString.substring(0, geneString.length() - 1);
             }
-            geneList = Arrays.stream(geneStringList.split(",")).toList();
+            geneList = Arrays.asList(geneString.split(","));
         }
 
         // TODO: WUT IS THIS? (SHOULD PUT SAD PATH FIRST WITH EARLY EXIT, AND THEN HAPPY PATH)
         if ((geneListInputted || (geneFileImported && !geneFileError && !geneFileExtensionError))
                 && !invalidCharacter && popSelected) {
+
+            // TODO: What is locale "all" ? Locale.ROOT ?
+            var locale = new Locale("all");
+            geneList = geneList.stream().map(text -> text.toUpperCase(locale)).toList();
 
             logger.log(Level.INFO, "Starting gene research...");
             // TODO LINK WITH MODEL
