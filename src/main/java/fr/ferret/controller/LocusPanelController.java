@@ -1,18 +1,15 @@
 package fr.ferret.controller;
 
-import java.awt.Color;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
 import fr.ferret.model.IgsrClient;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The {@link LocusPanel} controller
@@ -120,24 +117,23 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
         var error = new Error();
 
         if (!isChrSelected) {
-            error.cr().append("run.selectchr").highlight(List.of(panel.getChromosomeList()));
+            error.append("run.selectchr").highlight(panel.getChromosomeList());
         }
         if (!populationSelected) {
-            error.cr().append("run.selectpop").highlight(List.of(frame.getRegionPanel()));
+            error.append("run.selectpop").highlight(frame.getRegionPanel());
         }
         if (!startSelected) {
-            error.cr().append("run.startpos").highlight(List.of(startSelector));
+            error.append("run.startpos").highlight(startSelector);
         }
         if (!endSelected) {
-            error.cr().append("run.endpos").highlight(List.of(endSelector));
+            error.append("run.endpos").highlight(endSelector);
         }
         if (!startEndValid) {
-            error.cr().append("run.invalidstart").highlight(List.of(startSelector, endSelector));
+            error.append("run.invalidstart").highlight(startSelector, endSelector);
         }
         if (!withinRange) {
-            error.cr().append("run.invalidpos.1").addText(chrSelected)
-                .append("run.invalidpos.2").addText(String.valueOf(chrEndBound))
-                .highlight(List.of(startSelector, endSelector));
+            error.append("run.invalidpos", chrSelected, chrEndBound)
+                .highlight(startSelector, endSelector);
         }
         error.show();
     }

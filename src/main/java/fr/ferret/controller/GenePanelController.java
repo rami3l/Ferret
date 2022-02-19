@@ -105,22 +105,22 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var error = new Error();
 
             if (!geneListInputted && !geneFileImported) {
-                error.cr().append("run.selectgene").highlight(List.of(inputField, runButton));
+                error.append("run.selectgene").highlight(inputField, runButton);
             }
             if (geneFileImported && geneFileError) {
-                error.cr().append("run.selectgene.ferr").highlight(List.of(runButton));
+                error.append("run.selectgene.ferr").highlight(runButton);
             }
             if (geneFileImported && geneFileExtensionError) {
-                error.cr().append("run.selectgene.fext").highlight(List.of(runButton));
+                error.append("run.selectgene.fext").highlight(runButton);
             }
             if (geneListInputted && invalidCharacter) {
-                error.cr().append("run.selectgene.cerr").highlight(List.of(inputField));
+                error.append("run.selectgene.cerr").highlight(inputField);
             }
             if (geneFileImported && invalidCharacter) {
-                error.cr().append("run.selectgene.cerr").highlight(List.of(runButton));
+                error.append("run.selectgene.cerr").highlight(runButton);
             }
             if (!popSelected) {
-                error.cr().append("run.selectpop").highlight(List.of(frame.getRegionPanel()));
+                error.append("run.selectpop").highlight(frame.getRegionPanel());
             }
             error.show();
         }

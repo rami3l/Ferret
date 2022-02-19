@@ -115,22 +115,22 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
             var runButton = panel.getFileSelector().getRunButton();
 
             if (!snpListInputted && !snpFileImported) {
-                error.append("run.selectvari").highlight(List.of(idSelector, runButton));
+                error.append("run.selectvari").highlight(idSelector, runButton);
             }
             if (snpFileImported && snpFileError) {
-                error.append("run.selectvari.ferr").highlight(List.of(runButton));
+                error.append("run.selectvari.ferr").highlight(runButton);
             }
             if (snpFileImported && snpFileExtensionError) {
-                error.append("run.selectvari.fext").highlight(List.of(runButton));
+                error.append("run.selectvari.fext").highlight(runButton);
             }
             if ((snpListInputted || snpFileImported) && invalidCharacter) {
-                error.append("run.selectvari.cerr").highlight(List.of(snpListInputted ? idSelector : runButton));
+                error.append("run.selectvari.cerr").highlight(snpListInputted ? idSelector : runButton);
             }
             if (!popSelected) {
-                error.append("run.selectpop").highlight(List.of(frame.getRegionPanel()));
+                error.append("run.selectpop").highlight(frame.getRegionPanel());
             }
             if (!validWindowSizeEntered) {
-                error.append("run.selectvari.wsize").highlight(List.of(panel.getBpField()));
+                error.append("run.selectvari.wsize").highlight(panel.getBpField());
             }
             error.show();
         }

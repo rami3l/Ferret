@@ -64,23 +64,13 @@ public abstract class InputPanelController<T extends JPanel> {
         private final StringBuilder errorMessage =
             new StringBuilder(Resource.getTextElement("run.fixerrors"));
 
-        public Error append(String element) {
-            errorMessage.append(" ").append(Resource.getTextElement(element));
+        public Error append(String element, Object... args) {
+            errorMessage.append("\n ").append(String.format(Resource.getTextElement(element), args));
             return this;
         }
 
-        public Error addText(String text) {
-            errorMessage.append(text);
-            return this;
-        }
-
-        public Error cr() {
-            errorMessage.append("\n");
-            return this;
-        }
-
-        public void highlight(List<? extends JComponent> components) {
-            components.forEach(component -> component
+        public void highlight(JComponent... components) {
+            List.of(components).forEach(component -> component
                 .setBorder(BorderFactory.createLineBorder(Color.RED, 1)));
         }
 
