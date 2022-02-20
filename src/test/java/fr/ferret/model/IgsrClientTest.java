@@ -12,10 +12,8 @@ import fr.ferret.model.utils.FileWriter;
 import fr.ferret.model.utils.VCFHeaderExt;
 import fr.ferret.utils.Resource;
 import htsjdk.variant.variantcontext.Allele;
-import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
-import reactor.test.StepVerifier;
 
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,43 +25,41 @@ class IgsrClientTest {
     private final int start = 196194909;
     private final int end = 196194913;
     private final Phases1KG phase = Phases1KG.V3;
-    private final IgsrClient igsrClient = IgsrClient.builder().chromosome(chr).phase1KG(phase).build();
+    private final String vcfPath = "src/test/resources/chr1-africans-phase3.vcf.gz";
+    private final IgsrClient igsrClient = IgsrClient.builder().chromosome(chr)
+        .phase1KG(phase).urlTemplate(vcfPath).build();
 
     @Test
-    void testBasicQuery() {
+    void testBasicQuery() throws IOException {
 
-        var mono = igsrClient.getReader().map(reader -> {
-            VariantContext fields = null;
-            try {
-                var it = reader.query(chr, start, end);
-                fields = it.next();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return fields;
-        });
+        var reader = igsrClient.getReader().block();
+        assertNotNull(reader);
 
-        StepVerifier.create(mono)
-            .expectNextMatches(fields ->
-                // Fixed fields:
-                // #CHROM POS ID REF ALT QUAL FILTER INFO
-                // https://samtools.github.io/hts-specs/VCFv4.2.pdf
-                // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
+        var it = reader.query(chr, start, end);
+        var fields = it.next();
+        it.close();
+        reader.close();
 
-                fields.getStart() == 196187886 &&
-                ".".equals(fields.getID()) &&
-                Allele.REF_T.equals(fields.getReference()) &&
 
-                // TODO: What is "<CN2>"?
-                List.of("<CN2>").equals(fields.getAlternateAlleles().stream().map(Allele::getDisplayString).toList()) &&
+        // Fixed fields:
+        // #CHROM POS ID REF ALT QUAL FILTER INFO
+        // https://samtools.github.io/hts-specs/VCFv4.2.pdf
+        // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
 
-                // This position has passed all filters, so nothing fails.
-                Set.of().equals(fields.getFilters()) &&
+        assertEquals(196187886, fields.getStart());
+        assertEquals(".", fields.getID());
+        assertEquals(Allele.REF_T, fields.getReference());
 
-                // The INFO field contains some key-value pairs...
-                // eg. "AF" for Allele Frequency...
-                fields.getAttributeAsDouble("AF", 0) == 0.000399361
-            ).verifyComplete();
+        // TODO: What is "<CN2>"? It seems to disappear when downloading file to BLOCK_COMPRESSED_VCF format ?
+        assertEquals(List.of(), fields.getAlternateAlleles().stream().map(Allele::getDisplayString).toList());
+
+        // This position has passed all filters, so nothing fails.
+        assertEquals(Set.of(), fields.getFilters());
+
+        // The INFO field contains some key-value pairs...
+        // eg. "AF" for Allele Frequency...
+        assertEquals(0.000399361, fields.getAttributeAsDouble("AF", 0));
+
     }
 
     @Test
@@ -71,7 +67,7 @@ class IgsrClientTest {
 
         try (var reader = igsrClient.getReader().block(); var it = reader.query(chr, start, end)) {
             var selection = new ZoneSelection();
-            selection.add("EUR", List.of("GBR"));
+            selection.add("AFR", List.of("MSL"));
             var samples = Resource.getSamples(phase, selection);
             var variants =
                     it.stream().map(variant -> variant.subContextFromSamples(samples)).toList();

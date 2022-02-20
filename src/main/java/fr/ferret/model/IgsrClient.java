@@ -13,6 +13,7 @@ import fr.ferret.utils.Resource;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.tribble.TabixFeatureReader;
 import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder.OutputType;
 import htsjdk.variant.vcf.VCFCodec;
 import htsjdk.variant.vcf.VCFHeader;
 import lombok.Builder;
@@ -45,22 +46,16 @@ public class IgsrClient {
     @Builder.Default
     private final String urlTemplate = Resource.getVcfUrlTemplate(Resource.CONFIG.getSelectedVersion());
 
-    /**
-     * The extension to add to the path to get the vcf index url (default: `tbi`)
-     */
     @Builder.Default
-    private final String indexExtension = "tbi";
+    private final OutputType outputType = OutputType.VCF;
 
     // Attribute name starting with `$` to be excluded from the builder
     private FeatureReader<VariantContext> $reader;
 
+
     private String getFilePath() {
         // Replace chromosome in the template string.
         return MessageFormat.format(urlTemplate, chromosome);
-    }
-
-    private String getIndexPath() {
-        return getFilePath() + "." + indexExtension;
     }
 
     /**
@@ -70,7 +65,8 @@ public class IgsrClient {
      * @return a {@link TabixFeatureReader} instance pointing to the given file path
      */
     private FeatureReader<VariantContext> initReader() throws IOException {
-        $reader = new TabixFeatureReader<>(getFilePath(), getIndexPath(), new VCFCodec());
+        logger.info("Initializing reader...");
+        $reader = new TabixFeatureReader<>(getFilePath(), new VCFCodec());
         return $reader;
     }
 
@@ -81,7 +77,6 @@ public class IgsrClient {
      * @return a {@link Mono<FeatureReader<VariantContext>>} encapsulating the reader
      */
     public Mono<FeatureReader<VariantContext>> getReader() {
-        logger.info("Initializing reader...");
         return Mono.fromCallable(() -> $reader == null ? initReader() : $reader);
     }
 
@@ -118,7 +113,7 @@ public class IgsrClient {
                     var variants = lines.stream().map(variant -> variant.subContextFromSamples(samples));
                     var header = VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
                     logger.info("Writing to disk...");
-                    FileWriter.writeVCF(outFile, header, variants);
+                    FileWriter.writeVCF(outFile, header, variants, outputType);
                     reader.close();
                     logger.info(String.format("%s file written", outFile.getName()));
                 } catch (IOException e) {
