@@ -85,7 +85,7 @@ public class SettingsFrameController {
             settingsFrame.getConfig().setSelectedHumanGenome(selectedv);
 
             ferretFrame.getLocusPanel().getTitleLabel().setText(Resource.getTextElement(
-                    "locus.input." + Resource.CONFIG.getSelectedHumanGenome().name()));
+                    "locus.input." + Resource.CONFIG.getSelectedHumanGenome()));
             ferretFrame.getRegionPanel().reloadPanel();
             settingsFrame.dispose();
         }

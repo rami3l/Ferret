@@ -111,7 +111,7 @@ public class SettingsFrame extends JFrame {
         // we add buttons to the list and the group, and set their text
         for (int i = 0; i < phaseButtons.length; i++) {
             phaseButtons[i] = new JRadioButton(
-                    Resource.getTextElement("settings.phase." + Phases1KG.values()[i].name()));
+                    Resource.getTextElement("settings.phase." + Phases1KG.values()[i]));
             vcfRadioButtons.add(phaseButtons[i]);
             settingsPanel.add(phaseButtons[i]);
         }
@@ -253,7 +253,7 @@ public class SettingsFrame extends JFrame {
         ButtonGroup hgVersionButtons = new ButtonGroup();
         for (int i = 0; i < humanVersionButtons.length; i++) {
             humanVersionButtons[i] = new JRadioButton(Resource
-                    .getTextElement("settings.hugen." + HumanGenomeVersions.values()[i].name()));
+                    .getTextElement("settings.hugen." + HumanGenomeVersions.values()[i]));
             hgVersionButtons.add(humanVersionButtons[i]);
             settingsPanel.add(humanVersionButtons[i]);
         }

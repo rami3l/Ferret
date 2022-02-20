@@ -22,7 +22,7 @@ public class FerretConfig {
     /**
      * Selected gene version
      */
-    private HumanGenomeVersions selectedHumanGenome = HumanGenomeVersions.hg19;
+    private HumanGenomeVersions selectedHumanGenome = HumanGenomeVersions.HG19;
 
     /**
      * The Minor Allele Frequency
