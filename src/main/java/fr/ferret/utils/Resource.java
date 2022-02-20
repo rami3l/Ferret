@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -63,16 +62,7 @@ public class Resource {
      * @return an optional image
      */
     public Optional<BufferedImage> getImage(String resourceFileName) {
-        BufferedImage img = null;
-        try {
-            // we try to read the image from the resource file
-            img = ImageIO.read(Resource.class.getResource(resourceFileName));
-        } catch (Exception e) {
-            logger.log(Level.WARNING,
-                    String.format("Failed to get resource image %s", resourceFileName), e);
-        }
-        // we return an optional image (with a null value if impossible to get the image)
-        return Optional.ofNullable(img);
+        return ResourceFile.getResource(resourceFileName, ImageIO::read);
     }
 
     /**
@@ -80,16 +70,7 @@ public class Resource {
      * @return an optional icon
      */
     public Optional<ImageIcon> getIcon(String resourceFileName) {
-        ImageIcon icon = null;
-        try {
-            // we try to read the icon from the resource file
-            icon = new ImageIcon(Resource.class.getResource(resourceFileName));
-        } catch (Exception e) {
-            logger.log(Level.WARNING,
-                    String.format("Failed to get resource image %s", resourceFileName), e);
-        }
-        // we return an optional icon (with a null value if impossible to get the icon)
-        return Optional.ofNullable(icon);
+        return ResourceFile.getResource(resourceFileName, ImageIcon::new);
     }
 
     /**
@@ -105,20 +86,25 @@ public class Resource {
         return serverConfig.getString(element);
     }
 
-    public String getPhase(Phases1KG phase1KG) {
-        return switch (phase1KG) {
-            case V1 -> "phase1";
-            case V3 -> "phase3";
-            default -> ""; // TODO: throw not implemented exception (phase NYGC_30X not implemented)
-            // ?
-        };
-    }
-
+    /**
+     *  Gets the file of population samples (people ids by regions and zones)
+     *
+     * @param phase the phase to get samples from
+     * @return the file of population samples
+     */
     public InputStream getSampleFile(Phases1KG phase) {
-        String filename = "samples/" + getPhase(phase) + ".txt";
+        String filename = "samples/" + phase + ".txt";
         return Resource.class.getClassLoader().getResourceAsStream(filename);
     }
 
+    /**
+     * Gets the list of people of the selected zones for the given phase
+     *
+     * @param phase the phase to get the sample from
+     * @param selection the zones and region to get the sample from
+     * @return the sample (a Set containing people ids)
+     * @throws IOException if an error occurred while reading the file
+     */
     public Set<String> getSamples(Phases1KG phase, ZoneSelection selection) throws IOException {
         try (var streamReader = new InputStreamReader(getSampleFile(phase));
             var reader = new BufferedReader(streamReader)) {
@@ -128,28 +114,40 @@ public class Resource {
         }
     }
 
+    /**
+     * Gets the VCF URL template for the given phase
+     *
+     * @param phase1KG the phase to use for getting VCF files
+     * @return the URL template
+     */
     public String getVcfUrlTemplate(Phases1KG phase1KG) {
-        String phaseText = getPhase(phase1KG);
-        String path = getServerConfig("1kg." + phaseText + ".path");
-        String filenameTemplate = getServerConfig("1kg." + phaseText + ".filename");
+        String path = getServerConfig("1kg." + phase1KG + ".path");
+        String filenameTemplate = getServerConfig("1kg." + phase1KG + ".filename");
         String host = getServerConfig("1kg.host");
         return host + "/" + path + "/" + filenameTemplate;
     }
 
-    public String getHgVersion(HumanGenomeVersions hgVersion) {
-        return switch (hgVersion) {
-            case hg19 -> "hg19";
-            default -> "hg38";
-        };
-    }
-
-    public InputStream getCharMapFile(HumanGenomeVersions hgVersion) {
-        String filename = "chrEndPositions/" + getHgVersion(hgVersion) + ".txt";
+    /**
+     * Gets the file of chromosome ending positions for the selected hgVersion
+     *
+     * @param hgVersion the human genome version
+     * @return the file of ending positions
+     */
+    public InputStream getChrEndPositions(HumanGenomeVersions hgVersion) {
+        String filename = "chrEndPositions/" + hgVersion + ".txt";
         return Resource.class.getClassLoader().getResourceAsStream(filename);
     }
 
+    /**
+     * Gets the end position for the given chromosome
+     *
+     * @param hgVersion the human genome version
+     * @param chrName the name of the chromosome. `1` for example.
+     * @return the end position (empty if chromosome not found in the file,
+     * or if an error occurred while reading the file)
+     */
     public Optional<Integer> getChrEndPosition(HumanGenomeVersions hgVersion, String chrName) {
-        try (var streamReader = new InputStreamReader(getCharMapFile(hgVersion));
+        try (var streamReader = new InputStreamReader(getChrEndPositions(hgVersion));
             var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
                 .filter(fields -> fields[0].equals(chrName))

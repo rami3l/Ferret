@@ -103,7 +103,7 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
         try {
             isgrClient.exportVCFFromSamples(new File(fileNameAndPath), start, end, populations);
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Impossible to get distant vcf file", e);
+            logger.log(Level.WARNING, "Impossible to filter variant for the given selection", e);
         }
     }
 
