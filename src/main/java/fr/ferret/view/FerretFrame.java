@@ -46,9 +46,7 @@ public class FerretFrame extends JFrame {
 
         // Set icon
         Optional<BufferedImage> icon = Resource.getImage("/img/ferret.jpg");
-        if (icon.isPresent()) {
-            setIconImage(icon.get());
-        }
+        icon.ifPresent(this::setIconImage);
 
         // Set the window title
         setTitle("Ferret v3");

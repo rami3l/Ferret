@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Optional;
@@ -22,27 +21,24 @@ import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.ZoneSelection;
 import lombok.experimental.UtilityClass;
 
+import static fr.ferret.utils.ResourceFile.*;
+
 /**
  * Util class to deal with resouce files
  */
 @UtilityClass
 public class Resource {
-    /**
-     * program settings
-     */
-    public final FerretConfig CONFIG = new FerretConfig();
 
     private final Logger logger = Logger.getLogger(Resource.class.getName());
 
-    /**
-     * text elements for the interface
-     */
+    /** program settings */
+    public final FerretConfig CONFIG = new FerretConfig();
+
+    /** text elements for the interface */
     private final ResourceBundle textElements =
             ResourceBundle.getBundle("ferret", Locale.getDefault());
 
-    /**
-     * application configuration
-     */
+    /** application configuration */
     private final ResourceBundle serverConfig = ResourceBundle.getBundle("server");
 
     public final Color TITLE_COLOR = new Color(18, 0, 150);
@@ -62,7 +58,7 @@ public class Resource {
      * @return an optional image
      */
     public Optional<BufferedImage> getImage(String resourceFileName) {
-        return ResourceFile.getResource(resourceFileName, ImageIO::read);
+        return getResource(resourceFileName, ImageIO::read);
     }
 
     /**
@@ -70,7 +66,7 @@ public class Resource {
      * @return an optional icon
      */
     public Optional<ImageIcon> getIcon(String resourceFileName) {
-        return ResourceFile.getResource(resourceFileName, ImageIcon::new);
+        return getResource(resourceFileName, ImageIcon::new);
     }
 
     /**
@@ -84,17 +80,6 @@ public class Resource {
 
     public String getServerConfig(String element) {
         return serverConfig.getString(element);
-    }
-
-    /**
-     *  Gets the file of population samples (people ids by regions and zones)
-     *
-     * @param phase the phase to get samples from
-     * @return the file of population samples
-     */
-    public InputStream getSampleFile(Phases1KG phase) {
-        String filename = "samples/" + phase + ".txt";
-        return Resource.class.getClassLoader().getResourceAsStream(filename);
     }
 
     /**
@@ -128,17 +113,6 @@ public class Resource {
     }
 
     /**
-     * Gets the file of chromosome ending positions for the selected hgVersion
-     *
-     * @param hgVersion the human genome version
-     * @return the file of ending positions
-     */
-    public InputStream getChrEndPositions(HumanGenomeVersions hgVersion) {
-        String filename = "chrEndPositions/" + hgVersion + ".txt";
-        return Resource.class.getClassLoader().getResourceAsStream(filename);
-    }
-
-    /**
      * Gets the end position for the given chromosome
      *
      * @param hgVersion the human genome version
@@ -147,7 +121,7 @@ public class Resource {
      * or if an error occurred while reading the file)
      */
     public Optional<Integer> getChrEndPosition(HumanGenomeVersions hgVersion, String chrName) {
-        try (var streamReader = new InputStreamReader(getChrEndPositions(hgVersion));
+        try (var streamReader = new InputStreamReader(getChrEndPositionsFile(hgVersion));
             var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
                 .filter(fields -> fields[0].equals(chrName))

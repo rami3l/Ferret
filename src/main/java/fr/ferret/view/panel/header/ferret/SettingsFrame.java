@@ -30,10 +30,10 @@ import lombok.Getter;
 public class SettingsFrame extends JFrame {
 
     @Getter
-    private final FerretConfig config;
+    private final transient FerretConfig config;
 
 
-    private JPanel settingsPanel;
+    private final JPanel settingsPanel;
 
     private JRadioButton allFilesButton;
     private JRadioButton freqFileButton;

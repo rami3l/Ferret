@@ -37,7 +37,7 @@ public class Region {
     /**
      * Creates a new Region
      * @param name The name of the region (for translation)
-     * @param abbrev
+     * @param abbrev The abbreviation of the region
      * @param zones The zones (populations) of the region
      * @param individualCount The individuals count for each zone, respectively
      */
@@ -46,7 +46,7 @@ public class Region {
         this.abbrev = abbrev;
         this.zones = zones;
         this.individualCount = individualCount;
-        assert zones.length == Arrays.stream(individualCount)
-                .count() : "Zones length doesn't match to individuals count";
+        if (zones.length != individualCount.length)
+            throw new AssertionError("The zones length doesn't match the individuals count");
     }
 }
