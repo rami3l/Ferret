@@ -28,6 +28,7 @@ public class RunButtonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        // TODO: check errors before asking file path (show as the user fill the fields if possible)
         var file = GuiUtils.chooseFile(frame.getRunPanel(), JFileChooser.DIRECTORIES_ONLY);
         file.ifPresent(f -> validateInfosAndRun(f.getAbsolutePath()));
     }

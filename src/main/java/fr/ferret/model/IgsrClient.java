@@ -6,6 +6,8 @@ import java.text.MessageFormat;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import fr.ferret.controller.exceptions.runtime.ResourceAccessException;
+import fr.ferret.controller.exceptions.runtime.VCFReaderInitializationException;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.utils.FileWriter;
 import fr.ferret.model.utils.VCFHeaderExt;
@@ -89,10 +91,14 @@ public class IgsrClient {
      * @param selection the selected populations
      * @return {@link Disposable} linked to the launched task
      */
-    public Disposable exportVCFFromSamples(File outFile, int start, int end, ZoneSelection selection)
-            throws IOException {
+    public Disposable exportVCFFromSamples(File outFile, int start, int end, ZoneSelection selection) {
         logger.info("Exporting...");
-        return exportVCFFromSamples(outFile, start, end, Resource.getSamples(phase1KG, selection));
+        try {
+            var samples = Resource.getSamples(phase1KG, selection);
+            return exportVCFFromSamples(outFile, start, end, samples);
+        } catch (IOException e) {
+            throw new ResourceAccessException(e);
+        }
     }
 
     /**
@@ -117,8 +123,10 @@ public class IgsrClient {
                     reader.close();
                     logger.info(String.format("%s file written", outFile.getName()));
                 } catch (IOException e) {
-                    logger.log(Level.WARNING, "Failed to get vcf file", e);
+                    throw new ResourceAccessException(e);
                 }
-            }).subscribe();
+            })
+            .doOnError(e -> {throw new VCFReaderInitializationException(e);})
+            .subscribe();
     }
 }

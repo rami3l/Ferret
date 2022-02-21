@@ -100,11 +100,8 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
             int start, int end) {
         var isgrClient = IgsrClient.builder().chromosome(chr)
                 .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
-        try {
-            isgrClient.exportVCFFromSamples(new File(fileNameAndPath), start, end, populations);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Impossible to filter variant for the given selection", e);
-        }
+        isgrClient.exportVCFFromSamples(new File(fileNameAndPath), start, end, populations);
+        // TODO: visual alert when file is downloaded
     }
 
     private void displayError(boolean isChrSelected, boolean populationSelected,
