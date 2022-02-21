@@ -2,9 +2,7 @@ package fr.ferret.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.w3c.dom.Node;
-import lombok.var;
 
 public class XmlRelease {
     private Node node;
