@@ -13,14 +13,15 @@ public class XmlRelease {
 
     public XmlRelease(Node node) {
         this.node = node;
-        String releaseString =
-                XmlParse.getChildByName(node, "Gene-commentary_heading").getNodeValue();
-        String[] releaseWords = releaseString.split(" .");
-        if (isNumeric(releaseWords[-2])) {
-            release = Integer.parseInt(releaseWords[-2]);
-            this.date = Integer.parseInt(releaseWords[-1]);
+        String releaseString = XmlParse.getChildByName(node, "Gene-commentary_heading")
+                .getFirstChild().getNodeValue();
+        String[] releaseWords = releaseString.split(" ");
+        releaseWords = releaseWords[releaseWords.length - 1].split("\\.");
+        if (releaseWords.length == 2) {
+            release = Integer.parseInt(releaseWords[0]);
+            this.date = Integer.parseInt(releaseWords[1]);
         } else {
-            this.release = Integer.parseInt(releaseWords[-1]);
+            this.release = Integer.parseInt(releaseWords[0]);
             this.date = 0; // date la plus petite possible
         }
     }
@@ -61,10 +62,10 @@ public class XmlRelease {
         while (true) {
             do {
                 j--;
-            } while (v.releaseInf(t.get(j)));
+            } while (t.get(j).releaseInf(v));
             do {
                 i++;
-            } while (t.get(i).releaseInf(v));
+            } while (v.releaseInf(t.get(j)));
             if (i < j) {
                 elementExchange(t, i, j);
             } else {
@@ -91,16 +92,24 @@ public class XmlRelease {
     }
 
     public static void clean(List<XmlRelease> possibleNodesList) {
-        for (XmlRelease xmlRelease : possibleNodesList) {
-            for (XmlRelease xmlRelease2 : possibleNodesList) {
-                if (xmlRelease != xmlRelease2 && xmlRelease.release == xmlRelease2.release) {
-                    if (xmlRelease.date > xmlRelease2.date) {
-                        possibleNodesList.remove(xmlRelease2);
-                    } else if (xmlRelease.date < xmlRelease2.date) {
-                        possibleNodesList.remove(xmlRelease);
+        int i = 0;
+        while (i < possibleNodesList.size()) {
+            int j = 0;
+            while (j < possibleNodesList.size()) {
+                XmlRelease xmlReleaseI = possibleNodesList.get(i);
+                XmlRelease xmlReleaseJ = possibleNodesList.get(j);
+                if (xmlReleaseI.release == xmlReleaseJ.release
+                        && xmlReleaseI.date != xmlReleaseJ.date) {
+                    if (xmlReleaseI.date < xmlReleaseJ.date) {
+                        possibleNodesList.remove(xmlReleaseI);
+                    } else {
+                        possibleNodesList.remove(xmlReleaseJ);
                     }
+                } else {
+                    j += 1;
                 }
             }
+            i += 1;
         }
     }
 

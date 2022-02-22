@@ -13,6 +13,7 @@ import lombok.var;
 @AllArgsConstructor
 public class GeneToLocus {
         private HumanGenomeVersions version;
+        private static final int offset = 1;
 
         public List<Locus> idToLocus(List<String> idsgene) {
                 List<Locus> locusList = new ArrayList<>();
@@ -47,10 +48,12 @@ public class GeneToLocus {
                         Node positionsNode = findPosition(currentGNode);
                         start = Integer.parseInt(
                                         XmlParse.getChildByName(positionsNode, "Seq-interval_from")
-                                                        .getFirstChild().getNodeValue());
+                                                        .getFirstChild().getNodeValue())
+                                        + offset;
                         stop = Integer.parseInt(
                                         XmlParse.getChildByName(positionsNode, "Seq-interval_to")
-                                                        .getFirstChild().getNodeValue());
+                                                        .getFirstChild().getNodeValue())
+                                        + offset;
                         return new Locus(chromosome, start, stop);
                 } catch (NullPointerException e) {
                         System.out.println("Noeud" + e.getMessage()
@@ -106,7 +109,8 @@ public class GeneToLocus {
                                         "Gene-commentary");
                         if (Objects.equals(XmlParse
                                         .getChildByName(thePossibleNode, "Gene-commentary_heading")
-                                        .getNodeValue().substring(0, 6), this.version.toString())) {
+                                        .getFirstChild().getNodeValue().substring(0, 6),
+                                        this.version.toString())) {
                                 theNode = Optional.of(XmlParse.getChildByName(thePossibleNode,
                                                 "Gene-commentary_comment"));
                         }
