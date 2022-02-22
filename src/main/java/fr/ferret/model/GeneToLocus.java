@@ -8,7 +8,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import lombok.AllArgsConstructor;
-import lombok.var;
 
 @AllArgsConstructor
 public class GeneToLocus {
@@ -32,19 +31,19 @@ public class GeneToLocus {
         }
 
         private Locus locusById(Node currentGNode) {
-                int chromosome;
+                String chromosome;
                 int start;
                 int stop;
 
                 try {
-                        chromosome = Integer.parseInt(XmlParse.getChildByName(
+                        chromosome = XmlParse.getChildByName(
                                         XmlParse.getChildByName(XmlParse.getChildByName(XmlParse
                                                         .getChildByName(XmlParse.getChildByName(
                                                                         currentGNode,
                                                                         "Entrezgene_source"),
                                                                         "BioSource"),
                                                         "BioSource_subtype"), "SubSource"),
-                                        "SubSource_name").getFirstChild().getNodeValue());
+                                        "SubSource_name").getFirstChild().getNodeValue();
                         Node positionsNode = findPosition(currentGNode);
                         start = Integer.parseInt(
                                         XmlParse.getChildByName(positionsNode, "Seq-interval_from")

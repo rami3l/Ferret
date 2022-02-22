@@ -1,8 +1,6 @@
 package fr.ferret.model;
 
-import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
-import lombok.var;
 
 public class XmlReleaseTest {
     @Test
