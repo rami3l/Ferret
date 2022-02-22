@@ -3,18 +3,14 @@ package fr.ferret.controller;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
-
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.utils.GuiUtils;
 
 /**
  * Listens events of the run button and sends input data to the model
  */
 public class RunButtonListener implements ActionListener {
-    /**
-     * The ferret frame
-     */
+
+    /** The ferret frame */
     private final FerretFrame frame;
 
     /**
@@ -28,21 +24,11 @@ public class RunButtonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // TODO: check errors before asking file path (show as the user fill the fields if possible)
-        var file = GuiUtils.chooseFile(frame.getRunPanel(), JFileChooser.DIRECTORIES_ONLY);
-        file.ifPresent(f -> validateInfosAndRun(f.getAbsolutePath()));
-    }
-
-    private void validateInfosAndRun(String fileNameAndPath) {
-        var controller = switch (getFrame().getInputTabs().getSelectedIndex()) {
-            case 1 -> new GenePanelController(frame, frame.getGenePanel());
-            case 2 -> new VariantPanelController(frame, frame.getVariantPanel());
-            default -> new LocusPanelController(frame, frame.getLocusPanel());
+        var controller = switch (frame.getInputTabs().getSelectedIndex()) {
+            case 1 -> new GenePanelController(frame);
+            case 2 -> new VariantPanelController(frame);
+            default -> new LocusPanelController(frame);
         };
-        controller.validateInfosAndRun(fileNameAndPath);
-    }
-
-    public FerretFrame getFrame() {
-        return frame;
+        controller.validateInfoAndRun();
     }
 }

@@ -21,11 +21,11 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
 
     private static final Logger logger = Logger.getLogger(VariantPanelController.class.getName());
 
-    public VariantPanelController(FerretFrame frame, VariantPanel variantPanel) {
-        super(frame, variantPanel);
+    public VariantPanelController(FerretFrame frame) {
+        super(frame, frame.getVariantPanel());
     }
 
-    public void validateInfosAndRun(String fileNameAndPath) {
+    public void validateInfoAndRun() {
         // Reset the borders
         panel.getVariantIdField().setBorder(null);
         panel.getFileSelector().getRunButton().setBorder(null);
@@ -100,10 +100,7 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
         if ((snpListInputted || (snpFileImported && !snpFileError && !snpFileExtensionError))
                 && !invalidCharacter && validWindowSizeEntered && popSelected) {
 
-            logger.log(Level.INFO, "Starting gene research...");
-            // TODO LINK WITH MODEL
-
-            // this should be combined with the one single call to Ferret later
+            // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
 
         } else {
             var error = new Error();

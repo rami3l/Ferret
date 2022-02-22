@@ -5,9 +5,12 @@ import fr.ferret.model.ZoneSelection;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
+import fr.ferret.view.utils.GuiUtils;
 
+import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,11 +21,11 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
 
     private static final Logger logger = Logger.getLogger(LocusPanelController.class.getName());
 
-    public LocusPanelController(FerretFrame frame, LocusPanel locusPanel) {
-        super(frame, locusPanel);
+    public LocusPanelController(FerretFrame frame) {
+        super(frame, frame.getLocusPanel());
     }
 
-    public void validateInfosAndRun(String fileNameAndPath) {
+    public void validateInfoAndRun() {
         // Reset borders
         panel.getChromosomeList().setBorder(null);
         panel.getInputStart().setBorder(null);
@@ -88,20 +91,23 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
         // Valid input
         if (isChrSelected && populationSelected && startSelected && endSelected && startEndValid
                 && withinRange) {
-            logger.log(Level.INFO, "Starting gene research...");
-            downloadVcf(fileNameAndPath, populations, chrSelected, startPos, endPos);
+            // Runs Ferret
+            downloadVcf(populations, chrSelected, startPos, endPos);
         } else { // Invalid input
             displayError(isChrSelected, populationSelected, startSelected, endSelected,
                     startEndValid, withinRange, chrSelected, chrEndBound);
         }
     }
 
-    private void downloadVcf(String fileNameAndPath, ZoneSelection populations, String chr,
-            int start, int end) {
-        var isgrClient = IgsrClient.builder().chromosome(chr)
+    private void downloadVcf(ZoneSelection populations, String chr,
+        final int start, final int end) {
+        run(outFile -> {
+            logger.log(Level.INFO, "Starting gene research...");
+            var isgrClient = IgsrClient.builder().chromosome(chr)
                 .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
-        isgrClient.exportVCFFromSamples(new File(fileNameAndPath), start, end, populations);
-        // TODO: visual alert when file is downloaded
+            isgrClient.exportVCFFromSamples(outFile, start, end, populations);
+            // TODO: visual alert when file is downloaded
+        });
     }
 
     private void displayError(boolean isChrSelected, boolean populationSelected,

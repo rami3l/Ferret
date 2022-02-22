@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import fr.ferret.controller.exceptions.runtime.ResourceAccessException;
@@ -111,7 +112,11 @@ public class IgsrClient {
      * @return {@link Disposable} linked to the launched task
      */
     public Disposable exportVCFFromSamples(File outFile, int start, int end, Set<String> samples) {
-        return getReader().subscribeOn(Schedulers.boundedElastic())
+        return exportVCFFromSamples(outFile, start, end, samples, null);
+    }
+
+    public Disposable exportVCFFromSamples(File outFile, int start, int end, Set<String> samples, Runnable callBack) {
+        var mono = getReader().subscribeOn(Schedulers.boundedElastic())
             .doOnNext(reader -> {
                 logger.info("Reading lines from remote vcf file...");
                 try {
@@ -125,8 +130,9 @@ public class IgsrClient {
                 } catch (IOException e) {
                     throw new ResourceAccessException(e);
                 }
-            })
-            .doOnError(e -> {throw new VCFReaderInitializationException(e);})
-            .subscribe();
+            }).doOnError(e -> {throw new VCFReaderInitializationException(e);});
+        if(callBack != null)
+            mono = mono.doAfterTerminate(callBack);
+        return mono.subscribe();
     }
 }

@@ -21,11 +21,11 @@ public class GenePanelController extends InputPanelController<GenePanel> {
 
     private static final Logger logger = Logger.getLogger(GenePanelController.class.getName());
 
-    public GenePanelController(FerretFrame frame, GenePanel genePanel) {
-        super(frame, genePanel);
+    public GenePanelController(FerretFrame frame) {
+        super(frame, frame.getGenePanel());
     }
 
-    public void validateInfosAndRun(String fileNameAndPath) {
+    public void validateInfoAndRun() {
         // Reset the borders
         panel.getInputField().setBorder(null);
         panel.getFileSelector().getRunButton().setBorder(null);
@@ -95,8 +95,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var locale = new Locale("all");
             geneList = geneList.stream().map(text -> text.toUpperCase(locale)).toList();
 
-            logger.log(Level.INFO, "Starting gene research...");
-            // TODO LINK WITH MODEL
+            // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
 
         } else {
             JComponent inputField = panel.getInputField();
