@@ -15,8 +15,9 @@ public class GeneToLocusTest {
         idList.add("3569");
         idList.add("8542");
         idList.add("4627");
+
         var geneToLocusV = new GeneToLocus(HumanGenomeVersions.hg38);
-        System.out.println(geneToLocusV.idToLocus((List) idList));
+        System.out.println(geneToLocusV.idListToLocus((List) idList));
         System.out.println(System.currentTimeMillis() - currentTime);
     }
 

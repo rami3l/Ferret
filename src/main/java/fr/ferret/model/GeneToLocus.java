@@ -12,47 +12,58 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class GeneToLocus {
         private HumanGenomeVersions version;
-        private static final int offset = 1;
+        private static final int OFFSET = 1; // result of a systematic error of the server when it
+                                             // extract positions
 
-        public List<Locus> idToLocus(List<String> idsgene) {
+
+        /**
+         * @param idsGenes
+         * @return List<Locus>
+         * 
+         *         Return the list of Locus corresponding to a list of idsGenes
+         */
+        public List<Locus> idListToLocus(List<String> idsGenes) {
                 List<Locus> locusList = new ArrayList<>();
-                String idsString = this.idsToString((ArrayList<String>) idsgene);
-                String xmlGeneURL =
-                                "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=gene&id="
-                                                + idsString + "&retmode=xml";
+                String xmlGeneURL = XmlParse.getURLFromIds(idsGenes);
                 org.w3c.dom.Document xmldDocument = XmlParse.document(xmlGeneURL);
                 NodeList gNodeList = xmldDocument.getElementsByTagName("Entrezgene");
 
                 for (int i = 0; i < gNodeList.getLength(); i++) {
                         Node currentGNode = gNodeList.item(i);
-                        locusList.add(locusById(currentGNode));
+                        locusList.add(idToLocus(currentGNode)); // add the found locus for each id
                 }
                 return locusList;
         }
 
-        private Locus locusById(Node currentGNode) {
+
+        /**
+         * @param currentGNode
+         * @return Locus
+         * 
+         *         Return the Locus corresponding to an idGene (represented by a currentGNode)
+         */
+        private Locus idToLocus(Node currentGNode) {
                 String chromosome;
                 int start;
                 int stop;
 
                 try {
-                        chromosome = XmlParse.getChildByName(
-                                        XmlParse.getChildByName(XmlParse.getChildByName(XmlParse
-                                                        .getChildByName(XmlParse.getChildByName(
-                                                                        currentGNode,
-                                                                        "Entrezgene_source"),
-                                                                        "BioSource"),
-                                                        "BioSource_subtype"), "SubSource"),
-                                        "SubSource_name").getFirstChild().getNodeValue();
+                        // value of the chromosome :
+                        chromosome = XmlParse
+                                        .getNodeFromPath(currentGNode, List.of("Entrezgene_source",
+                                                        "BioSource", "BioSource_subtype",
+                                                        "SubSource", "SubSource_name"))
+                                        .getFirstChild().getNodeValue();
+                        // Node containing the start and stop positions.
                         Node positionsNode = findPosition(currentGNode);
                         start = Integer.parseInt(
-                                        XmlParse.getChildByName(positionsNode, "Seq-interval_from")
+                                        XmlParse.getNodeFromPath(positionsNode, "Seq-interval_from")
                                                         .getFirstChild().getNodeValue())
-                                        + offset;
+                                        + OFFSET;
                         stop = Integer.parseInt(
-                                        XmlParse.getChildByName(positionsNode, "Seq-interval_to")
+                                        XmlParse.getNodeFromPath(positionsNode, "Seq-interval_to")
                                                         .getFirstChild().getNodeValue())
-                                        + offset;
+                                        + OFFSET;
                         return new Locus(chromosome, start, stop);
                 } catch (NullPointerException e) {
                         System.out.println("Noeud" + e.getMessage()
@@ -62,67 +73,78 @@ public class GeneToLocus {
                 }
         }
 
-        private Node findPosition(Node currentGNode) {
-                Node geneLocationHistoryNode = XmlParse.xmlCommentFinder(
-                                XmlParse.getChildByName(currentGNode, "Entrezgene_comments")
-                                                .getChildNodes(),
-                                "254", "Gene Location History", "Gene-commentary_comment");
-                Node versioNode = findVersionNode(geneLocationHistoryNode);
 
-                return XmlParse.getChildByName(XmlParse.getChildByName(
-                                XmlParse.getChildByName(XmlParse.xmlCommentFinder(XmlParse
-                                                .xmlCommentFinder(versioNode.getChildNodes(), "25",
-                                                                "Primary Assembly",
-                                                                "Gene-commentary_comment")
-                                                .getChildNodes(), "1", "any",
-                                                "Gene-commentary_seqs"), "Seq-loc"),
-                                "Seq-loc_int"), "Seq-interval");
+        /**
+         * @param currentGNode
+         * @return Node : contains the start and stop positions on 2 direct children
+         */
+        private Node findPosition(Node currentGNode) {
+                // go down on the path :
+                Node geneLocationHistoryNode = XmlParse.xmlCommentFinder(
+                                XmlParse.getNodeFromPath(currentGNode, "Entrezgene_comments"),
+                                "254", "Gene Location History", "Gene-commentary_comment");
+                // find the node which has the highest release then date corresponding to the good
+                // version
+                Node versionNode = findVersionNode(geneLocationHistoryNode);
+
+                // go down on the path :
+                return XmlParse.getNodeFromPath(XmlParse.xmlCommentFinder(
+                                XmlParse.xmlCommentFinder(versionNode, "25", "Primary Assembly",
+                                                "Gene-commentary_comment"),
+                                "1", "any", "Gene-commentary_seqs"),
+                                List.of("Seq-loc", "Seq-loc_int", "Seq-interval"));
         }
 
 
 
+        /**
+         * @param geneLocationHistoryNode
+         * @return Node : has the highest release then date corresponding to the good version
+         */
         private Node findVersionNode(Node geneLocationHistoryNode) {
                 NodeList annotationReleases = geneLocationHistoryNode.getChildNodes();
                 ArrayList<XmlRelease> possibleNodesList = new ArrayList<>();
                 for (int i = 0; i < annotationReleases.getLength(); i++) {
+                        // add each node with it’s corresponding release and date
                         possibleNodesList.add(new XmlRelease(annotationReleases.item(i)));
 
                 }
+                // Keep only the highest date for each realease :
                 XmlRelease.clean(possibleNodesList);
+
+                // Classify by release descending order :
                 XmlRelease.classify(possibleNodesList);
+
+                // Select the first node with the good version :
                 var nodeSelected = selectNode(possibleNodesList);
                 if (nodeSelected.isPresent()) {
                         return nodeSelected.get();
                 }
-                return null;
+                return null; // return null if we didn’t find any node corresponding
         }
 
+
+        /**
+         * @param possibleNodesList
+         * @return Optional<Node> : first Node corresponding to the version if it exists
+         */
         public Optional<Node> selectNode(List<XmlRelease> possibleNodesList) {
-                Optional<Node> theNode = Optional.empty();
                 int i = 0;
                 int length = possibleNodesList.size();
-                while (theNode.isEmpty() && i < length) {
-                        var thePossibleNode = XmlParse.getChildByName(
-                                        XmlParse.getChildByName(possibleNodesList.get(i).getNode(),
-                                                        "Gene-commentary_comment"),
-                                        "Gene-commentary");
+                String verString = this.version.toString();
+                while (i < length) {
+                        var thePossibleNode = XmlParse.getNodeFromPath(
+                                        possibleNodesList.get(i).getNode(),
+                                        List.of("Gene-commentary_comment", "Gene-commentary"));
                         if (Objects.equals(XmlParse
-                                        .getChildByName(thePossibleNode, "Gene-commentary_heading")
+                                        .getNodeFromPath(thePossibleNode, "Gene-commentary_heading")
                                         .getFirstChild().getNodeValue().substring(0, 6),
-                                        this.version.toString())) {
-                                theNode = Optional.of(XmlParse.getChildByName(thePossibleNode,
+                                        verString)) { // tests if the versions are the same
+                                return Optional.of(XmlParse.getNodeFromPath(thePossibleNode,
                                                 "Gene-commentary_comment"));
                         }
                         i += 1;
                 }
-                return theNode;
-        }
-
-        private String idsToString(ArrayList<String> idsgene) {
-                StringBuilder idsString = new StringBuilder();
-                for (String id : idsgene) {
-                        idsString.append(id + ",");
-                }
-                return idsString.substring(0, idsString.length() - 1);
+                return Optional.empty(); // no node corresponding to the version found
         }
 }

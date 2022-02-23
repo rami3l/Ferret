@@ -1,6 +1,7 @@
 package fr.ferret.model;
 
 import java.io.IOException;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -10,24 +11,74 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class XmlParse {
-    public static Node getChildByName(Node parentNode, String childName) {
+
+    private XmlParse() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static final String URL =
+            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=gene&id=";
+    public static final String RETMODE = "&retmode=xml";
+
+    public static String getURLFromIds(List<String> idsGenes) {
+
+        StringBuilder idsString = new StringBuilder();
+        for (String id : idsGenes) {
+            idsString.append(id + ",");
+        }
+        return URL + idsString.substring(0, idsString.length() - 1) + RETMODE;
+    }
+
+
+    /**
+     * @param parentNode
+     * @param childName
+     * @return Node : first child of the parentNode named childName
+     */
+    public static Node getNodeFromPath(Node parentNode, String childName) {
         NodeList childrenNodeList = parentNode.getChildNodes();
         int listLength = childrenNodeList.getLength();
-        for (int i = 0; i < listLength; i++) {
-            if (childrenNodeList.item(i).getNodeName().equals(childName)) {
+        for (int i = 0; i < listLength; i++) { // Search into all children of parentNode
+            if (childrenNodeList.item(i).getNodeName().equals(childName)) { // We select the first
+                                                                            // one corresponding
                 return childrenNodeList.item(i);
             }
         }
         return null;
     }
 
-    public static Node xmlCommentFinder(NodeList test, String typeDesired, String headingDesired,
+
+    /**
+     * @param parentNode
+     * @param childNames
+     * @return Node : child leaded by the path. the first childname of the list is the direct child
+     *         of the parentNode
+     */
+    public static Node getNodeFromPath(Node parentNode, List<String> childNames) {
+        if (childNames.size() == 1) { // There is only one child
+            return getNodeFromPath(parentNode, childNames.get(0));
+        } else { // We get the first child named after childNames.get(0) and we go again with the
+                 // same list without the first childName
+            return getNodeFromPath(getNodeFromPath(parentNode, childNames.get(0)),
+                    childNames.subList(1, childNames.size()));
+        }
+    }
+
+
+    /**
+     * @param test
+     * @param typeDesired
+     * @param headingDesired
+     * @param nodeNameToRetrieve
+     * @return Node
+     * 
+     *         Each comment has a commentary type and commentary heading. Given a parentNode of
+     *         comment nodes, this will search through the comments finding the one with matching
+     *         type and matching heading. It will return the specified node.
+     */
+    public static Node xmlCommentFinder(Node parentNode, String typeDesired, String headingDesired,
             String nodeNameToRetrieve) {
-        /*
-         * Each comment has a commentary type and commentary heading. Given a list of comment nodes,
-         * this will search through the comments finding the one with matching type and matching
-         * heading. It will return the specified node.
-         */
+        NodeList test = parentNode.getChildNodes();
         Node toReturn = null;
         int listLength = test.getLength();
         Node desiredNode = null;
@@ -52,8 +103,19 @@ public class XmlParse {
         return toReturn;
     }
 
+
+    /**
+     * @param test
+     * @param typeDesired
+     * @param headingDesired
+     * @return boolean : Check if the node tested has the type desired and the heading desired
+     * 
+     *         taken from ferret v2
+     */
     private static boolean xmlCommentChecker(Node test, String typeDesired, String headingDesired) {
-        boolean typeMatch = false, headingMatch = false;
+        boolean typeMatch = false;
+        boolean headingMatch = false;
+        // If we get "any", we don’t check the corresponding type/heading
         if (typeDesired.equals("any")) {
             typeMatch = true;
         }
@@ -90,6 +152,11 @@ public class XmlParse {
         return typeMatch && headingMatch;
     }
 
+
+    /**
+     * @param xmlGeneURL
+     * @return Document
+     */
     public static Document document(String xmlGeneURL) {
         DocumentBuilder docBldr;
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
