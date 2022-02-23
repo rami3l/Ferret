@@ -2,14 +2,35 @@ package fr.ferret.controller.exceptions;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import fr.ferret.controller.Error;
+import lombok.experimental.UtilityClass;
 
-public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
+import javax.swing.*;
 
-    private static final Logger logger = Logger.getLogger(ExceptionHandler.class.getName());
+@UtilityClass
+public class ExceptionHandler {
 
-    @Override
-    public void uncaughtException(Thread thread, Throwable throwable) {
-        // TODO: Open popup with information on error (use Error class defined in InputPanelController)
-        logger.log(Level.WARNING, "Error handler: ", throwable);
+    private final Logger logger = Logger.getLogger(ExceptionHandler.class.getName());
+
+    private JFrame f;
+
+    public void setFrame(JFrame frame) {
+        f = frame;
     }
+
+    public void connectionError(Throwable throwable) {
+        logger.log(Level.WARNING, "No internet connection", throwable);
+        new Error(f).append("error.connection").show();
+    }
+
+    public void vcfStreamingError(Throwable throwable) {
+        logger.log(Level.WARNING, "VCF streaming error", throwable);
+        new Error(f).append("error.vcfstreaming").show();
+    }
+
+    public void ressourceAccessError(Throwable throwable) {
+        logger.log(Level.WARNING, "Resource access error", throwable);
+        new Error(f).append("error.resource").show();
+    }
+
 }

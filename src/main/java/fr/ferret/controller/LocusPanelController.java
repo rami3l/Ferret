@@ -117,7 +117,7 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
         var startSelector = panel.getInputStart();
         var endSelector = panel.getInputEnd();
 
-        var error = new Error();
+        var error = new Error(frame).append("run.fixerrors");
 
         if (!isChrSelected) {
             error.append("run.selectchr").highlight(panel.getChromosomeList());

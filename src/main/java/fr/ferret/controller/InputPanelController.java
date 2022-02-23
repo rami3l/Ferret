@@ -1,22 +1,18 @@
 package fr.ferret.controller;
 
-import java.awt.*;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.model.Region;
 import fr.ferret.model.ZoneSelection;
-import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.swing.*;
 
@@ -26,7 +22,7 @@ import javax.swing.*;
 @AllArgsConstructor
 public abstract class InputPanelController<T extends JPanel> {
 
-    private static final Logger logger = Logger.getLogger(ExceptionHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(InputPanelController.class.getName());
 
     /** The main ferret frame */
     @Getter
@@ -81,28 +77,4 @@ public abstract class InputPanelController<T extends JPanel> {
         return selection;
     }
 
-    /**
-     * Use it to create an error message and highlight components
-     */
-    @NoArgsConstructor
-    protected final class Error {
-
-        private final StringBuilder errorMessage =
-            new StringBuilder(Resource.getTextElement("run.fixerrors"));
-
-        public Error append(String element, Object... args) {
-            errorMessage.append("\n ").append(String.format(Resource.getTextElement(element), args));
-            return this;
-        }
-
-        public void highlight(JComponent... components) {
-            List.of(components).forEach(component -> component
-                .setBorder(BorderFactory.createLineBorder(Color.RED, 1)));
-        }
-
-        public void show() {
-            JOptionPane.showMessageDialog(getFrame(), errorMessage,
-                Resource.getTextElement("run.error"), JOptionPane.ERROR_MESSAGE);
-        }
-    }
 }

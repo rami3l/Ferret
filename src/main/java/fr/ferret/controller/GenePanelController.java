@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -101,7 +100,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             JComponent inputField = panel.getInputField();
             JComponent runButton = panel.getFileSelector().getRunButton();
 
-            var error = new Error();
+            var error = new Error(frame).append("run.fixerrors");
 
             if (!geneListInputted && !geneFileImported) {
                 error.append("run.selectgene").highlight(inputField, runButton);

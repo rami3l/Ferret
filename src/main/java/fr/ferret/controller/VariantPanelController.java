@@ -103,7 +103,7 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
             // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
 
         } else {
-            var error = new Error();
+            var error = new Error(frame).append("run.fixerrors");
 
             var idSelector = panel.getVariantIdField();
             var runButton = panel.getFileSelector().getRunButton();

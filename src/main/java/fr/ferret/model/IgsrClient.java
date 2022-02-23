@@ -4,11 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import fr.ferret.controller.exceptions.runtime.ResourceAccessException;
-import fr.ferret.controller.exceptions.runtime.VCFReaderInitializationException;
+import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.utils.FileWriter;
 import fr.ferret.model.utils.VCFHeaderExt;
@@ -77,7 +74,7 @@ public class IgsrClient {
      * Initializes the VCF file reader if needed and returns it.
      * The reader is initialized lazily (you need to subscribe to the Mono)
      *
-     * @return a {@link Mono<FeatureReader<VariantContext>>} encapsulating the reader
+     * @return a {@link Mono} encapsulating the reader
      */
     public Mono<FeatureReader<VariantContext>> getReader() {
         return Mono.fromCallable(() -> $reader == null ? initReader() : $reader);
@@ -98,7 +95,8 @@ public class IgsrClient {
             var samples = Resource.getSamples(phase1KG, selection);
             return exportVCFFromSamples(outFile, start, end, samples);
         } catch (IOException e) {
-            throw new ResourceAccessException(e);
+            ExceptionHandler.ressourceAccessError(e);
+            return Mono.empty().subscribe();
         }
     }
 
@@ -128,9 +126,9 @@ public class IgsrClient {
                     reader.close();
                     logger.info(String.format("%s file written", outFile.getName()));
                 } catch (IOException e) {
-                    throw new ResourceAccessException(e);
+                    ExceptionHandler.vcfStreamingError(e);
                 }
-            }).doOnError(e -> {throw new VCFReaderInitializationException(e);});
+            }).doOnError(ExceptionHandler::connectionError);
         if(callBack != null)
             mono = mono.doAfterTerminate(callBack);
         return mono.subscribe();
