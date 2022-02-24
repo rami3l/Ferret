@@ -1,5 +1,6 @@
 package fr.ferret.model;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,8 +26,8 @@ public class GeneToLocus {
         public List<Locus> idListToLocus(List<String> idsGenes) {
                 List<Locus> locusList = new ArrayList<>();
                 String xmlGeneURL = XmlParse.getURLFromIds(idsGenes);
-                org.w3c.dom.Document xmldDocument = XmlParse.document(xmlGeneURL);
-                NodeList gNodeList = xmldDocument.getElementsByTagName("Entrezgene");
+                org.w3c.dom.Document xmlDocument = XmlParse.document(xmlGeneURL);
+                NodeList gNodeList = xmlDocument.getElementsByTagName("Entrezgene");
 
                 for (int i = 0; i < gNodeList.getLength(); i++) {
                         Node currentGNode = gNodeList.item(i);

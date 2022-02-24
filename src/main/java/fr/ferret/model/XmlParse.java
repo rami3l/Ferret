@@ -16,9 +16,13 @@ public class XmlParse {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String URL =
+    public static final String URLID =
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=gene&id=";
-    public static final String RETMODE = "&retmode=xml";
+    public static final String RETMODEID = "&retmode=xml";
+
+    public static final String URLNAME =
+            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&term=";
+    public static final String ENDURLNAME = "[GENE]%20AND%20human[ORGN]&retmode=xml";
 
     public static String getURLFromIds(List<String> idsGenes) {
 
@@ -26,7 +30,7 @@ public class XmlParse {
         for (String id : idsGenes) {
             idsString.append(id + ",");
         }
-        return URL + idsString.substring(0, idsString.length() - 1) + RETMODE;
+        return URLID + idsString.substring(0, idsString.length() - 1) + RETMODEID;
     }
 
 
@@ -172,5 +176,26 @@ public class XmlParse {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * @param strNum
+     * @return boolean : True if strNum is an integer
+     */
+    public static boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            Integer.parseInt(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+
+    public static String getURLFromName(String name) {
+        return URLNAME + name + ENDURLNAME;
     }
 }

@@ -43,24 +43,6 @@ public class XmlRelease {
         this.node = node;
     }
 
-
-    /**
-     * @param strNum
-     * @return boolean : True if strNum is an integer
-     */
-    public static boolean isNumeric(String strNum) {
-        if (strNum == null) {
-            return false;
-        }
-        try {
-            Integer.parseInt(strNum);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
-    }
-
-
     /**
      * @param list
      * @param m
@@ -74,8 +56,6 @@ public class XmlRelease {
         list.set(m, list.get(n));
         list.set(n, temp);
     }
-
-
 
     /**
      * @param list
