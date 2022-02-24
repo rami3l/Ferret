@@ -50,6 +50,7 @@ dependencies {
     implementation 'com.google.guava:guava:30.1.1-jre'
     // https://mvnrepository.com/artifact/com.github.samtools/htsjdk
     implementation 'com.github.samtools:htsjdk:2.21.2'
+    implementation 'com.jayway.jsonpath:json-path:2.7.0'
 }
 
 tasks.named('test') {
