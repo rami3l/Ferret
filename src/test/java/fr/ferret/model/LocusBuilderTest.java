@@ -16,7 +16,7 @@ class LocusBuilderTest {
 
     @Test void getLocusFromFile_ShouldReturnLocus() {
         var assemblyAccVer = "GCF_000001405.39";
-        var locusBuilder = new LocusBuilder("GCF_000001405.39");
+        var locusBuilder = new LocusBuilder(assemblyAccVer);
         var json = getContent("gene-id-to-locus.json");
         var locus = locusBuilder.from("1234", json);
         locus.ifPresentOrElse(System.out::println, () -> System.out.println("Locus not found..."));
