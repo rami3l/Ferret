@@ -1,6 +1,5 @@
 package fr.ferret.model;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,10 +17,8 @@ public class GeneToLocus {
 
 
         /**
-         * @param idsGenes
-         * @return List<Locus>
-         * 
-         *         Return the list of Locus corresponding to a list of idsGenes
+         * @param idsGenes list of ids of a gene
+         * @return List<Locus> : list of Locus corresponding to a list of idsGenes
          */
         public List<Locus> idListToLocus(List<String> idsGenes) {
                 List<Locus> locusList = new ArrayList<>();
@@ -38,10 +35,8 @@ public class GeneToLocus {
 
 
         /**
-         * @param currentGNode
-         * @return Locus
-         * 
-         *         Return the Locus corresponding to an idGene (represented by a currentGNode)
+         * @param currentGNode general node corresponding to an idGene
+         * @return Locus : Locus corresponding to an idGene (represented by a currentGNode)
          */
         private Locus idToLocus(Node currentGNode) {
                 String chromosome;
@@ -76,7 +71,7 @@ public class GeneToLocus {
 
 
         /**
-         * @param currentGNode
+         * @param currentGNode general node corresponding to an idGene
          * @return Node : contains the start and stop positions on 2 direct children
          */
         private Node findPosition(Node currentGNode) {
@@ -129,7 +124,7 @@ public class GeneToLocus {
          * @param possibleNodesList
          * @return Optional<Node> : first Node corresponding to the version if it exists
          */
-        public Optional<Node> selectNode(List<XmlRelease> possibleNodesList) {
+        private Optional<Node> selectNode(List<XmlRelease> possibleNodesList) {
                 int i = 0;
                 int length = possibleNodesList.size();
                 String verString = this.version.toString();

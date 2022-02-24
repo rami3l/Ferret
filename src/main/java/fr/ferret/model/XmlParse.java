@@ -70,15 +70,15 @@ public class XmlParse {
 
 
     /**
+     * Each comment has a commentary type and commentary heading. Given a parentNode of comment
+     * nodes, this will search through the comments finding the one with matching type and matching
+     * heading. It will return the specified node.
+     * 
      * @param test
      * @param typeDesired
      * @param headingDesired
      * @param nodeNameToRetrieve
      * @return Node
-     * 
-     *         Each comment has a commentary type and commentary heading. Given a parentNode of
-     *         comment nodes, this will search through the comments finding the one with matching
-     *         type and matching heading. It will return the specified node.
      */
     public static Node xmlCommentFinder(Node parentNode, String typeDesired, String headingDesired,
             String nodeNameToRetrieve) {
@@ -109,12 +109,12 @@ public class XmlParse {
 
 
     /**
+     * taken from ferret v2
+     * 
      * @param test
      * @param typeDesired
      * @param headingDesired
      * @return boolean : Check if the node tested has the type desired and the heading desired
-     * 
-     *         taken from ferret v2
      */
     private static boolean xmlCommentChecker(Node test, String typeDesired, String headingDesired) {
         boolean typeMatch = false;
@@ -170,6 +170,7 @@ public class XmlParse {
         dbf.setCoalescing(false);
         try {
             docBldr = dbf.newDocumentBuilder();
+            pause(500);
             return docBldr.parse(xmlGeneURL);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             System.out.println("Parsing du XML donnant les locus à partir des ids de gène échoué");
@@ -177,6 +178,15 @@ public class XmlParse {
             return null;
         }
     }
+
+    private static void pause(int time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * @param strNum

@@ -3,11 +3,15 @@ package fr.ferret.model;
 import java.util.ArrayList;
 import java.util.List;
 import org.w3c.dom.Node;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Allow to have the release and the date of a specified node
  */
 public class XmlRelease {
+    @Getter
+    @Setter
     private Node node;
     private int release;
     private int date;
@@ -27,30 +31,14 @@ public class XmlRelease {
         }
     }
 
-
     /**
-     * @return Node
-     */
-    public Node getNode() {
-        return node;
-    }
-
-
-    /**
-     * @param node
-     */
-    public void setNode(Node node) {
-        this.node = node;
-    }
-
-    /**
+     * exchange list[m] and list[n]
+     * 
      * @param list
      * @param m
      * @param n
-     * 
-     *        exchange list[m] and list[n]
      */
-    static void elementExchange(ArrayList<XmlRelease> list, int m, int n) {
+    private static void elementExchange(List<XmlRelease> list, int m, int n) {
         var temp = list.get(m);
 
         list.set(m, list.get(n));
@@ -58,12 +46,14 @@ public class XmlRelease {
     }
 
     /**
+     * source : internet
+     * 
      * @param list
      * @param m
      * @param n
      * @return int
      */
-    static int partition(ArrayList<XmlRelease> list, int m, int n) {
+    private static int partition(List<XmlRelease> list, int m, int n) {
         var v = list.get(m); // pivot value
         int i = m - 1;
         int j = n + 1; // pivot final index
@@ -89,7 +79,7 @@ public class XmlRelease {
      * @param m
      * @param n
      */
-    static void classify(ArrayList<XmlRelease> list, int m, int n) {
+    private static void classify(List<XmlRelease> list, int m, int n) {
         if (m < n) {
             int p = partition(list, m, n);
             classify(list, m, p);
@@ -102,24 +92,24 @@ public class XmlRelease {
     /**
      * @param list : to classify by descending order
      */
-    static void classify(ArrayList<XmlRelease> list) {
+    public static void classify(List<XmlRelease> list) {
         classify(list, 0, list.size() - 1);
     }
 
 
     /**
-     * @param o
-     * @return boolean
+     * @param xmlRelease The release to compare this release to
+     * @return boolean : True if the actual release is inferior to xmlRelease
      */
-    public boolean releaseInf(Object o) {
-        return this.release < ((XmlRelease) o).release;
+    public boolean releaseInf(XmlRelease xmlRelease) {
+        return this.release < xmlRelease.release;
     }
 
 
     /**
+     * Select the node which has the highest date for each release
+     *
      * @param possibleNodesList
-     * 
-     *        Select the node which has the highest date for each release
      */
     public static void clean(List<XmlRelease> possibleNodesList) {
         int i = 0;
@@ -144,6 +134,4 @@ public class XmlRelease {
             i += 1;
         }
     }
-
-
 }
