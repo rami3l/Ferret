@@ -3,6 +3,8 @@ package fr.ferret.model;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import fr.ferret.controller.exceptions.ExceptionHandler;
@@ -18,6 +20,7 @@ import htsjdk.variant.vcf.VCFCodec;
 import htsjdk.variant.vcf.VCFHeader;
 import lombok.Builder;
 import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -82,55 +85,71 @@ public class IgsrClient {
 
     /**
      * Exports a "distilled" VCF file from an IGSR online database query.
-     * 
+     *
      * @param outFile the output {@link File}
      * @param start the starting index of the query
      * @param end the ending index of the query
      * @param selection the selected populations
-     * @return {@link Disposable} linked to the launched task
+     * @return {@link Flux} of {@link String strings} indicating the progress of the treatment
      */
-    public Disposable exportVCFFromSamples(File outFile, int start, int end, ZoneSelection selection) {
-        logger.info("Exporting...");
+    public Flux<String> exportVCFFromSamples(File outFile, int start, int end, ZoneSelection selection) {
         try {
             var samples = Resource.getSamples(phase1KG, selection);
             return exportVCFFromSamples(outFile, start, end, samples);
         } catch (IOException e) {
             ExceptionHandler.ressourceAccessError(e);
-            return Mono.empty().subscribe();
+            return Flux.error(e);
         }
     }
 
     /**
      * Exports a "distilled" VCF file from an IGSR online database query.
-     * 
+     *
      * @param outFile the output {@link File}
      * @param start the starting index of the query
      * @param end the ending index of the query
-     * @param samples the sample names, eg. {HG00096, HG0009}
-     * @return {@link Disposable} linked to the launched task
+     * @param samples the sample names, e.g. {HG00096, HG0009}
+     * @return {@link Flux} of {@link String strings} indicating the progress of the treatment
      */
-    public Disposable exportVCFFromSamples(File outFile, int start, int end, Set<String> samples) {
-        return exportVCFFromSamples(outFile, start, end, samples, null);
-    }
+    public Flux<String> exportVCFFromSamples(File outFile, int start, int end, Set<String> samples) {
+        return Flux.create(state -> {
+                // We initialize the reader (download of the VCF header)
+                state.next("Downloading VCF Header");
+                getReader().subscribeOn(Schedulers.boundedElastic()).doOnNext(reader -> {
 
-    public Disposable exportVCFFromSamples(File outFile, int start, int end, Set<String> samples, Runnable callBack) {
-        var mono = getReader().subscribeOn(Schedulers.boundedElastic())
-            .doOnNext(reader -> {
-                logger.info("Reading lines from remote vcf file...");
-                try {
-                    var lines = reader.query(chromosome, start, end);
-                    var variants = lines.stream().map(variant -> variant.subContextFromSamples(samples));
-                    var header = VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
-                    logger.info("Writing to disk...");
-                    FileWriter.writeVCF(outFile, header, variants, outputType);
-                    reader.close();
-                    logger.info(String.format("%s file written", outFile.getName()));
-                } catch (IOException e) {
-                    ExceptionHandler.vcfStreamingError(e);
-                }
-            }).doOnError(ExceptionHandler::connectionError);
-        if(callBack != null)
-            mono = mono.doAfterTerminate(callBack);
-        return mono.subscribe();
+                    try {
+                        // We download the lines from start to end positions
+                        state.next("Downloading VCF lines");
+                        logger.info("Downloading VCF lines...");
+                        var lines = reader.query(chromosome, start, end);
+
+                        // We filter the lines (to keep only the selected populations)
+                        var variants = lines.stream().map(variant -> variant.subContextFromSamples(samples));
+
+                        // We filter the header
+                        var header =
+                            VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
+
+                        // We write the VCF file
+                        state.next("Writing file to disk");
+                        logger.info("Writing to disk...");
+                        FileWriter.writeVCF(outFile, header, variants, outputType);
+
+                        // The download is ok
+                        state.next(String.format("%s file written", outFile.getName()));
+                        logger.info(String.format("%s file written", outFile.getName()));
+                        state.complete();
+                        reader.close();
+
+                        // We catch exception which could happen with the use of the reader
+                    } catch (IOException e) {
+                        ExceptionHandler.vcfStreamingError(e);
+                        state.error(e);
+                    }
+                }).doOnError(ExceptionHandler::connectionError)
+                    .doOnError(state::error)
+                    .onErrorStop().subscribe();
+            }
+        );
     }
 }

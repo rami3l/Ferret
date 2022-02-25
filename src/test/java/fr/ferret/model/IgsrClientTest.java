@@ -15,7 +15,6 @@ import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -92,8 +91,7 @@ class IgsrClientTest {
                             var oldContent = Files.readString(tempVcfPath);
                             var newTempVCFPath = tempDir.resolve("test2.vcf");
                             var newTempVCF = newTempVCFPath.toFile();
-                            var task = igsrClient.exportVCFFromSamples(newTempVCF, start, end, selection);
-                            await().until(task::isDisposed);
+                            igsrClient.exportVCFFromSamples(newTempVCF, start, end, selection).blockLast();
                             assertEquals(oldContent, Files.readString(newTempVCFPath));
                         });
             }

@@ -1,6 +1,5 @@
 package fr.ferret.model;
 
-import java.util.Arrays;
 import lombok.Getter;
 
 /**
