@@ -54,7 +54,7 @@ public class SettingsFrame extends JFrame {
         super(Resource.getTextElement("settings.title"));
         this.config = config;
 
-        // Initialize the settings panel
+        // Initializes the settings panel
         settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
         settingsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

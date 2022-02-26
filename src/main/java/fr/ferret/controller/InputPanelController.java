@@ -35,16 +35,12 @@ public abstract class InputPanelController<T extends JPanel> {
      */
     public abstract void validateInfoAndRun();
 
-    public Optional<File> getFile() {
-        return GuiUtils.chooseFile(frame.getRunPanel(), JFileChooser.DIRECTORIES_ONLY);
-    }
-
     /**
      * Ask the user for a file and runs the given action if file selected
      * @param action The action to execute with the selected file
      */
     protected void run(Consumer<? super File> action) {
-        GuiUtils.chooseFile(frame.getRunPanel(), JFileChooser.DIRECTORIES_ONLY)
+        GuiUtils.chooseFile(frame.getBottomPanel(), JFileChooser.DIRECTORIES_ONLY)
             .ifPresentOrElse(action, this::actionOnFileNotSelected);
     }
 

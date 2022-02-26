@@ -11,8 +11,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import fr.ferret.utils.Resource;
+import fr.ferret.view.panel.BottomPanel;
 import fr.ferret.view.panel.RegionPanel;
-import fr.ferret.view.panel.RunPanel;
 import fr.ferret.view.panel.header.MenuPanel;
 import fr.ferret.view.panel.inputs.GenePanel;
 import fr.ferret.view.panel.inputs.LocusPanel;
@@ -31,7 +31,7 @@ public class FerretFrame extends JFrame {
     private final JTabbedPane inputTabs;
     private final LocusPanel locusPanel;
     private final RegionPanel regionPanel;
-    private final RunPanel runPanel;
+    private final BottomPanel bottomPanel;
     private final GenePanel genePanel;
     private final VariantPanel variantPanel;
 
@@ -45,8 +45,7 @@ public class FerretFrame extends JFrame {
         }
 
         // Set icon
-        Optional<BufferedImage> icon = Resource.getImage("/img/ferret.jpg");
-        icon.ifPresent(this::setIconImage);
+        Resource.getImage("/img/ferret.jpg").ifPresent(this::setIconImage);
 
         // Set the window title
         setTitle("Ferret v3");
@@ -77,9 +76,9 @@ public class FerretFrame extends JFrame {
         regionPanel = new RegionPanel();
         panel.add(regionPanel);
 
-        // Creates the run panel
-        runPanel = new RunPanel(this);
-        panel.add(runPanel);
+        // Creates the bottom panel
+        bottomPanel = new BottomPanel(this);
+        panel.add(bottomPanel);
 
         // Window settings
         setDefaultCloseOperation(EXIT_ON_CLOSE);
