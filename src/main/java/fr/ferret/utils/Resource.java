@@ -8,14 +8,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import com.univocity.parsers.common.record.Record;
+import com.univocity.parsers.tsv.TsvParser;
+import com.univocity.parsers.tsv.TsvParserSettings;
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.Phases1KG;
@@ -56,6 +61,10 @@ public class Resource {
     public final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
     public final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
     public final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
+
+    public InputStream getFileInputStream(String file) {
+        return Resource.class.getClassLoader().getResourceAsStream(file);
+    }
 
     /**
      * @param resourceFileName relative path of the resource image
@@ -114,16 +123,24 @@ public class Resource {
     }
 
     public InputStream getSampleFile(Phases1KG phase) {
-        String filename = "samples/" + getPhase(phase) + ".txt";
-        return Resource.class.getClassLoader().getResourceAsStream(filename);
+        return getFileInputStream("samples/" + getPhase(phase) + ".txt");
+    }
+
+    public Map<String, Record> getPedigrees() {
+        var fin = getFileInputStream("pedigrees.txt");
+        var settings = new TsvParserSettings();
+        settings.getFormat().setLineSeparator("\n");
+        var parser = new TsvParser(settings);
+        return parser.parseAllRecords(fin).stream().collect(
+                Collectors.toMap(rec -> rec.getString("Individual ID"), Function.identity()));
     }
 
     public Set<String> getSamples(Phases1KG phase, ZoneSelection selection) throws IOException {
         try (var streamReader = new InputStreamReader(getSampleFile(phase));
-            var reader = new BufferedReader(streamReader)) {
+                var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
-                .filter(fields -> selection.isSelected(fields[2], fields[1]))
-                .map(fields -> fields[0]).collect(Collectors.toSet());
+                    .filter(fields -> selection.isSelected(fields[2], fields[1]))
+                    .map(fields -> fields[0]).collect(Collectors.toSet());
         }
     }
 
@@ -135,19 +152,18 @@ public class Resource {
     }
 
     public InputStream getCharMapFile(HumanGenomeVersions hgVersion) {
-        String filename = "chrEndPositions/" + getHgVersion(hgVersion) + ".txt";
-        return Resource.class.getClassLoader().getResourceAsStream(filename);
+        return getFileInputStream("chrEndPositions/" + getHgVersion(hgVersion) + ".txt");
     }
 
     public Optional<Integer> getChrEndPosition(HumanGenomeVersions hgVersion, String chrName) {
         try (var streamReader = new InputStreamReader(getCharMapFile(hgVersion));
-            var reader = new BufferedReader(streamReader)) {
+                var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
-                .filter(fields -> fields[0].equals(chrName))
-                .map(fields -> fields[1]).findFirst().map(Integer::parseInt);
+                    .filter(fields -> fields[0].equals(chrName)).map(fields -> fields[1])
+                    .findFirst().map(Integer::parseInt);
         } catch (IOException e) {
             logger.log(Level.WARNING, "Impossible to open file", e);
-            return  Optional.empty();
+            return Optional.empty();
         }
     }
 }
