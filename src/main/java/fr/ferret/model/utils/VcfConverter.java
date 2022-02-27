@@ -25,12 +25,21 @@ public class VcfConverter {
     }
 
     /**
-     * Read the given VCF file and create the corresponding MAP and PED files, returning their
-     * relative path.
+     * Read the given VCF file and create the corresponding PED file, returning their relative path.
      * 
      * @param vcfFilePath relative path to the VCF file we want to convert.
      */
-    public static String toMapPed(String vcfFilePath) {
+    public static String toPed(String vcfFilePath) {
+        // TODO: complete this method
+        return vcfFilePath;
+    }
+
+    /**
+     * Read the given VCF file and create the corresponding MAP file, returning their relative path.
+     * 
+     * @param vcfFilePath relative path to the VCF file we want to convert.
+     */
+    public static String toMap(String vcfFilePath) {
         // TODO: complete this method
         return vcfFilePath;
     }
