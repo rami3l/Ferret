@@ -1,27 +1,25 @@
 package fr.ferret.model.utils;
 
 import java.util.List;
+import lombok.experimental.UtilityClass;
 
 /**
- * The Controler to convert files.
+ * The util class to convert `.vcf` files.
  */
-public class FileConverter {
+@UtilityClass
+public class VcfConverter {
 
     /**
      * List of the possible file extentions, without dot.
      */
     private static final List<String> fileExtensions = List.of("vcf", "frq", "map", "ped", "info");
 
-    private FileConverter() {
-        // Util classes shouldn't be instanciated
-    }
-
     /**
      * Read the given VCF file and create the corresponding FRQ file, returning its relative path.
      * 
      * @param vcfFilePath relative path to the VCF file we want to convert.
      */
-    public static String convertVcfToFrq(String vcfFilePath) {
+    public static String toFrq(String vcfFilePath) {
         // TODO: complete this method
         return vcfFilePath;
     }
@@ -32,7 +30,7 @@ public class FileConverter {
      * 
      * @param vcfFilePath relative path to the VCF file we want to convert.
      */
-    public static String convertVcfToMapAndPed(String vcfFilePath) {
+    public static String toMapPed(String vcfFilePath) {
         // TODO: complete this method
         return vcfFilePath;
     }
@@ -42,7 +40,7 @@ public class FileConverter {
      * 
      * @param vcfFilePath relative path to the VCF file we want to convert.
      */
-    public static String convertVcfToInfo(String vcfFilePath) {
+    public static String toInfo(String vcfFilePath) {
         // TODO: complete this method
         return vcfFilePath;
     }
