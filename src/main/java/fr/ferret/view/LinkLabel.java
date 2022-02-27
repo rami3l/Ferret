@@ -11,9 +11,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
+
+import fr.ferret.controller.LocusPanelController;
 import fr.ferret.utils.Resource;
 import lombok.Setter;
 
@@ -21,6 +25,8 @@ import lombok.Setter;
  * A clickable JTextField containing a link
  */
 public class LinkLabel extends JTextField implements MouseListener, FocusListener, ActionListener {
+
+    private static final Logger logger = Logger.getLogger(LinkLabel.class.getName());
 
     private URI target;
 
@@ -45,7 +51,7 @@ public class LinkLabel extends JTextField implements MouseListener, FocusListene
         try {
             this.target = new URI(url);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Invalid link", e);
         }
     }
 
@@ -80,7 +86,7 @@ public class LinkLabel extends JTextField implements MouseListener, FocusListene
         try {
             Desktop.getDesktop().browse(target);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, String.format("Impossible to browse %s", target), e);
         }
         setForeground(standardColor);
         setBorder(standardBorder);

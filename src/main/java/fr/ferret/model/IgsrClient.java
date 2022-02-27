@@ -114,12 +114,12 @@ public class IgsrClient {
     public Flux<String> exportVCFFromSamples(File outFile, int start, int end, Set<String> samples) {
         return Flux.create(state -> {
                 // We initialize the reader (download of the VCF header)
-                state.next("Downloading VCF Header");
+                state.next(State.DOWNLOADING_HEADER);
                 getReader().subscribeOn(Schedulers.boundedElastic()).doOnNext(reader -> {
 
                     try {
                         // We download the lines from start to end positions
-                        state.next("Downloading VCF lines");
+                        state.next(State.DOWNLOADING_LINES);
                         logger.info("Downloading VCF lines...");
                         var lines = reader.query(chromosome, start, end);
 
@@ -131,17 +131,18 @@ public class IgsrClient {
                             VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
 
                         // We write the VCF file
-                        state.next("Writing file to disk");
+                        state.next(State.WRITING);
                         logger.info("Writing to disk...");
                         FileWriter.writeVCF(outFile, header, variants, outputType);
 
                         // The download is ok
-                        state.next(String.format("%s file written", outFile.getName()));
+                        state.next(String.format(State.WRITTEN, outFile.getName()));
                         logger.info(String.format("%s file written", outFile.getName()));
                         state.complete();
                         reader.close();
 
                         // We catch exception which could happen with the use of the reader
+                        // TODO: catch FileSystemException
                     } catch (IOException e) {
                         ExceptionHandler.vcfStreamingError(e);
                         state.error(e);

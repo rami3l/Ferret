@@ -1,11 +1,12 @@
 package fr.ferret.view.panel;
 
 import fr.ferret.controller.RunButtonListener;
-import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 
 import javax.swing.*;
 import java.awt.*;
+
+import static fr.ferret.utils.Resource.*;
 
 public class BottomPanel extends JPanel {
 
@@ -31,9 +32,9 @@ public class BottomPanel extends JPanel {
     }
 
     private JButton generateRunButton() {
-        JButton runButton = new JButton(Resource.getTextElement("run.button"));
+        JButton runButton = new JButton(getTextElement("run.button"));
         runButton.setPreferredSize(new Dimension(300, 60));
-        runButton.setBackground(Resource.BUTTON_COLOR);
+        runButton.setBackground(BUTTON_COLOR);
         return runButton;
     }
 
@@ -53,6 +54,7 @@ public class BottomPanel extends JPanel {
         return statePanel;
     }
 
+    // TODO: when the mouse has not hovered the state panel for a certain time, hide it (progressively)
     public void remove(StatePanel panel) {
         statesPanel.remove(panel);
     }
@@ -62,31 +64,38 @@ public class BottomPanel extends JPanel {
 
         /** the label describing the current state (downloading header, lines, etc.) */
         private final JLabel stateLabel;
+        /** The spinner displayed while downloading */
+        private final JLabel spinner;
         /** The button to open the download location */
         private final JButton openButton;
 
-        public StatePanel(String textElement) {
+        public StatePanel(String text) {
 
-            stateLabel = new JLabel(textElement);
+            stateLabel = new JLabel(text);
+            spinner = new JLabel();
+            getIcon("/img/loading.gif")
+                .ifPresentOrElse(spinner::setIcon, () -> spinner.setText("..."));
+            spinner.setToolTipText(getTextElement("tooltip.downloading"));
 
-            // TODO: Add a spinner visible until the download completes
             openButton = new JButton();
             openButton.setVisible(false);
             openButton.setSize(10, 10);
-            openButton.setToolTipText("Open download location");
-            Resource.getIcon("/img/open-folder.png")
-                .ifPresentOrElse(openButton::setIcon, () -> openButton.setText("Open"));
 
             this.add(stateLabel);
+            this.add(spinner);
             this.add(openButton);
         }
 
-        public void setState(String textElement) {
-            stateLabel.setText(textElement);
+        public void setState(String text) {
+            stateLabel.setText(text);
         }
 
         public void complete() {
-            // This button is only visible when the download is complete
+            // When the download is complete, hides spinner and makes the open button visible
+            spinner.setVisible(false);
+            openButton.setToolTipText(getTextElement("tooltip.openDownload"));
+            getIcon("/img/open-folder.png")
+                .ifPresentOrElse(openButton::setIcon, () -> openButton.setText(getTextElement("button.open")));
             openButton.setVisible(true);
             // TODO: add open download location implementation
         }
