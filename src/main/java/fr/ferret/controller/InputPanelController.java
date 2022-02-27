@@ -1,9 +1,15 @@
 package fr.ferret.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import fr.ferret.model.Region;
+import fr.ferret.model.ZoneSelection;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.RegionPanel;
+
+import javax.swing.*;
 
 /**
  * The base for input panel controllers (locus, gene and variant panel controllers)
@@ -33,19 +39,24 @@ public abstract class InputPanelController {
      * Resets the RegionPanel borders and gets all selected populations by zone
      *
      * @return A list of the selected zones (using the zones codes of the
-     *         {@link fr.ferret.model.Region} class)
+     *         {@link Region} class)
      */
-    protected List<CharSequence> getSelectedPopulations() {
+    protected ZoneSelection getSelectedPopulations() {
         frame.getRegionPanel().setBorder(null);
-        List<CharSequence> populations = new ArrayList<>();
-        for (RegionPanel.ZonesPanel regionPanel : frame.getRegionPanel().getRegions()) {
-            for (int i = 0; i < regionPanel.getCheckBoxes().length; i++) {
-                if (regionPanel.getCheckBoxes()[i].isSelected()) {
-                    // Add the selected region to the populations list
-                    populations.add(regionPanel.getRegion().getZones()[i]);
+        var selection = new ZoneSelection();
+        frame.getRegionPanel().getRegions().forEach(region -> {
+            for (int i = 0; i < region.getCheckBoxes().length; i++) {
+                if (region.getCheckBoxes()[i].isSelected()) {
+                    // Adds the selected region to the populations list
+                    if(i==0) {
+                        selection.add(region.getRegion().getAbbrev());
+                    } else {
+                        String zone = region.getRegion().getZones()[i];
+                        selection.add(region.getRegion().getAbbrev(), List.of(zone));
+                    }
                 }
             }
-        }
-        return populations;
+        });
+        return selection;
     }
 }
