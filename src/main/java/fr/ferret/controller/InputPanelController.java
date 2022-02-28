@@ -40,7 +40,7 @@ public abstract class InputPanelController<T extends JPanel> {
      * @param action The action to execute with the selected file
      */
     protected void run(Consumer<? super File> action) {
-        GuiUtils.chooseFile(frame.getBottomPanel(), JFileChooser.DIRECTORIES_ONLY)
+        GuiUtils.chooseFile(frame.getBottomPanel(), true)
             .ifPresentOrElse(action, this::actionOnFileNotSelected);
     }
 

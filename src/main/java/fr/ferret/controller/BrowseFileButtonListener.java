@@ -48,7 +48,7 @@ public class BrowseFileButtonListener implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        var file = GuiUtils.chooseFile(panel, JFileChooser.FILES_ONLY);
+        var file = GuiUtils.chooseFile(panel, false);
         file.ifPresent(f -> {
             selectedFile = f;
             selectedFileLabel.setText(Resource.getTextElement("browse.selectedfile")

@@ -37,10 +37,10 @@ public class GuiUtils {
     }
 
 
-    public Optional<File> chooseFile(JPanel panel, int mode) {
+    public Optional<File> chooseFile(JPanel panel, boolean save) {
         JFileChooser saveFileChooser = new JFileChooser();
-        saveFileChooser.setFileSelectionMode(mode);
-        saveFileChooser.setDialogTitle(Resource.getTextElement("run.save"));
+        saveFileChooser.setFileSelectionMode(save ? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
+        saveFileChooser.setDialogTitle(Resource.getTextElement(save ? "run.save" : "gene.selectfile"));
         int returnVal = saveFileChooser.showSaveDialog(panel);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             return Optional.ofNullable(saveFileChooser.getSelectedFile());
