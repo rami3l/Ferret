@@ -4,20 +4,16 @@ import javax.annotation.Nonnull;
 import com.opencsv.bean.CsvBindByName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 /**
  * A single record line in the `pedigrees.txt` file.
  */
-@Getter
 @Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@EqualsAndHashCode
 public class Pedigree {
     @CsvBindByName(column = "Family ID", required = true)
     private String familyId;
