@@ -39,8 +39,11 @@ class TestIgsrClient {
                     // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
                     () -> assertEquals(196187886, fields.getStart()),
                     () -> assertEquals(".", fields.getID()),
+                    // REF: Allele 2 code (missing = 'N')
                     () -> assertEquals(Allele.REF_T, fields.getReference()),
-                    // TODO: What is "<CN2>"?
+                    // ALT: Allele 1 code (missing = '.')
+                    // `<CN2>` means "Copy Number = 2"
+                    // See: https://www.biostars.org/p/232205/
                     () -> assertEquals(List.of("<CN2>"),
                             fields.getAlternateAlleles().stream().map(Allele::getDisplayString)
                                     .toList()),
