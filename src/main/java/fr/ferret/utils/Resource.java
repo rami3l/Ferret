@@ -126,6 +126,13 @@ public class Resource {
         return getFileInputStream("samples/" + getPhase(phase) + ".txt");
     }
 
+    /**
+     * Returns the mapping from individual ID to a record in the pedigrees file.
+     * 
+     * Available field names in the record are: "Family ID", "Individual ID", "Paternal ID",
+     * "Maternal ID", "Gender", "Phenotype", "Population", "Relationship", "Siblings", "Second
+     * Order", "Third Order", "Children", "Other Comments"
+     */
     public Map<String, Record> getPedigrees() {
         var fin = getFileInputStream("pedigrees.txt");
         var settings = new TsvParserSettings();
