@@ -1,4 +1,4 @@
-package fr.ferret.model.utils;
+package fr.ferret.model.conversions;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import fr.ferret.utils.Resource;
 import htsjdk.tribble.TabixFeatureReader;
 import htsjdk.variant.vcf.VCFCodec;
 import htsjdk.variant.vcf.VCFHeader;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import picard.pedigree.PedFile;
 import picard.pedigree.Sex;
@@ -16,10 +17,10 @@ import picard.pedigree.Sex;
  */
 @UtilityClass
 public class VcfConverter {
-
     /**
      * List of the possible file extentions, without dot.
      */
+    @Getter
     private static final List<String> fileExtensions = List.of("vcf", "frq", "map", "ped", "info");
 
     /**
@@ -44,7 +45,7 @@ public class VcfConverter {
             var ped = new PedFile(true);
             var pedigrees = Resource.getPedigrees();
             ((VCFHeader) reader.getHeader()).getGenotypeSamples().stream().forEach(sample -> {
-                // The Record instance from the `pedigrees` table.
+                // A pedigree record from the `pedigrees` table.
                 var r = pedigrees.get(sample);
                 var trio = ped.new PedTrio(r.getFamilyId(), r.getIndividualId(), r.getPaternalId(),
                         r.getMaternalId(), Sex.fromCode(r.getGender()), r.getPhenotype());

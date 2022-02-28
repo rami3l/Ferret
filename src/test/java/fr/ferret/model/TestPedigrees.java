@@ -3,10 +3,11 @@ package fr.ferret.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
+import fr.ferret.model.conversions.Pedigree;
 import fr.ferret.utils.Resource;
 import picard.pedigree.Sex;
 
-public class TestPedigrees {
+class TestPedigrees {
     @Test
     void testGetPedigrees() throws IOException {
         // Family ID Individual ID Paternal ID Maternal ID Gender Phenotype Population Relationship
@@ -15,7 +16,7 @@ public class TestPedigrees {
         var pedigrees = Resource.getPedigrees();
         var got = pedigrees.get("HG00153");
 
-        var expected = PedigreeRecord.builder().familyId("GBR003").individualId("HG00153")
+        var expected = Pedigree.builder().familyId("GBR003").individualId("HG00153")
                 .maternalId("HG00158").gender(Sex.Female.toCode()).population("GBR")
                 .relationship("child").build();
         assertEquals(expected, got);

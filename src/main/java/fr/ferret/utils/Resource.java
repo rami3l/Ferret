@@ -22,8 +22,8 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.Phases1KG;
-import fr.ferret.model.PedigreeRecord;
 import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.conversions.Pedigree;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -132,10 +132,10 @@ public class Resource {
      * "Maternal ID", "Gender", "Phenotype", "Population", "Relationship", "Siblings", "Second
      * Order", "Third Order", "Children", "Other Comments"
      */
-    public Map<String, PedigreeRecord> getPedigrees() {
+    public Map<String, Pedigree> getPedigrees() {
         var fin = getFileInputStream("pedigrees.txt");
-        var parser = new CsvToBeanBuilder<PedigreeRecord>(new InputStreamReader(fin))
-                .withType(PedigreeRecord.class).withSeparator('\t').build();
+        var parser = new CsvToBeanBuilder<Pedigree>(new InputStreamReader(fin))
+                .withType(Pedigree.class).withSeparator('\t').build();
         return parser.parse().stream()
                 .collect(Collectors.toMap(rec -> rec.getIndividualId(), Function.identity()));
     }

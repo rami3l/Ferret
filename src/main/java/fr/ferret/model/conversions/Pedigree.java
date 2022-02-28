@@ -1,4 +1,4 @@
-package fr.ferret.model;
+package fr.ferret.model.conversions;
 
 import javax.annotation.Nonnull;
 import com.opencsv.bean.CsvBindByName;
@@ -18,7 +18,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class PedigreeRecord {
+public class Pedigree {
     @CsvBindByName(column = "Family ID", required = true)
     private String familyId;
 
