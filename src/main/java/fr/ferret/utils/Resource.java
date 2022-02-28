@@ -18,12 +18,11 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import com.univocity.parsers.common.record.Record;
-import com.univocity.parsers.tsv.TsvParser;
-import com.univocity.parsers.tsv.TsvParserSettings;
+import com.opencsv.bean.CsvToBeanBuilder;
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.Phases1KG;
+import fr.ferret.model.PedigreeRecord;
 import fr.ferret.model.ZoneSelection;
 import lombok.experimental.UtilityClass;
 
@@ -133,13 +132,12 @@ public class Resource {
      * "Maternal ID", "Gender", "Phenotype", "Population", "Relationship", "Siblings", "Second
      * Order", "Third Order", "Children", "Other Comments"
      */
-    public Map<String, Record> getPedigrees() {
+    public Map<String, PedigreeRecord> getPedigrees() {
         var fin = getFileInputStream("pedigrees.txt");
-        var settings = new TsvParserSettings();
-        settings.getFormat().setLineSeparator("\n");
-        var parser = new TsvParser(settings);
-        return parser.parseAllRecords(fin).stream().collect(
-                Collectors.toMap(rec -> rec.getString("Individual ID"), Function.identity()));
+        var parser = new CsvToBeanBuilder<PedigreeRecord>(new InputStreamReader(fin))
+                .withType(PedigreeRecord.class).withSeparator('\t').build();
+        return parser.parse().stream()
+                .collect(Collectors.toMap(rec -> rec.getIndividualId(), Function.identity()));
     }
 
     public Set<String> getSamples(Phases1KG phase, ZoneSelection selection) throws IOException {

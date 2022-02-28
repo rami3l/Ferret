@@ -46,9 +46,8 @@ public class VcfConverter {
             ((VCFHeader) reader.getHeader()).getGenotypeSamples().stream().forEach(sample -> {
                 // The Record instance from the `pedigrees` table.
                 var r = pedigrees.get(sample);
-                var trio = ped.new PedTrio(r.getString("Family ID"), r.getString("Individual ID"),
-                        r.getString("Paternal ID"), r.getString("Maternal ID"),
-                        Sex.fromCode(r.getInt("Gender")), r.getInt("Phenotype"));
+                var trio = ped.new PedTrio(r.getFamilyId(), r.getIndividualId(), r.getPaternalId(),
+                        r.getMaternalId(), Sex.fromCode(r.getGender()), r.getPhenotype());
                 ped.add(trio);
             });
             ped.write(new File(outPath));
