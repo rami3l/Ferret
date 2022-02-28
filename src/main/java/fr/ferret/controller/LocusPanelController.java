@@ -105,7 +105,8 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
             logger.log(Level.INFO, "Starting gene research...");
             var isgrClient = IgsrClient.builder().chromosome(chr)
                 .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
-            var download = frame.getBottomPanel().addState("Starting download");
+            var download = frame.getBottomPanel()
+                .addState("Starting download", outFile);
             isgrClient.exportVCFFromSamples(outFile, start, end, populations)
                 .doOnComplete(download::complete)
                 .doOnError(e -> logger.log(Level.WARNING, "Error while downloading"))

@@ -19,6 +19,7 @@ import javax.swing.border.MatteBorder;
 
 import fr.ferret.controller.LocusPanelController;
 import fr.ferret.utils.Resource;
+import fr.ferret.view.utils.GuiUtils;
 import lombok.Setter;
 
 /**
@@ -31,16 +32,16 @@ public class LinkLabel extends JTextField implements MouseListener, FocusListene
     private URI target;
 
     // Colors need to be seen in dark and white mode
-    private Color standardColor = Resource.LINK_STANDARD_COLOR;
-    private Color hoverColor = Resource.LINK_HOVER_COLOR;
-    private Color activeColor = Resource.LINK_ACTIVE_COLOR;
-    private Color transparent = new Color(0, 0, 0, 0);
+    private static final Color standardColor = Resource.LINK_STANDARD_COLOR;
+    private static final Color hoverColor = Resource.LINK_HOVER_COLOR;
+    private static final Color activeColor = Resource.LINK_ACTIVE_COLOR;
+    private static final Color transparent = new Color(0, 0, 0, 0);
     @Setter
     private Color backgroundColor;
 
-    private Border activeBorder;
-    private Border hoverBorder;
-    private Border standardBorder;
+    private transient Border activeBorder;
+    private transient Border hoverBorder;
+    private transient Border standardBorder;
 
     public LinkLabel(String url) {
         this(url, url);
@@ -83,11 +84,7 @@ public class LinkLabel extends JTextField implements MouseListener, FocusListene
     public void browse() {
         setForeground(activeColor);
         setBorder(activeBorder);
-        try {
-            Desktop.getDesktop().browse(target);
-        } catch (Exception e) {
-            logger.log(Level.WARNING, String.format("Impossible to browse %s", target), e);
-        }
+        GuiUtils.browse(target);
         setForeground(standardColor);
         setBorder(standardBorder);
     }

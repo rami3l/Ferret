@@ -3,13 +3,19 @@ package fr.ferret.view.utils;
 import fr.ferret.utils.Resource;
 import lombok.experimental.UtilityClass;
 
-import java.awt.GridBagConstraints;
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 @UtilityClass
 public class GuiUtils {
+
+    private final Logger logger = Logger.getLogger(GuiUtils.class.getName());
 
     /**
      * Adds a component to a panel (which is a grid)
@@ -37,8 +43,34 @@ public class GuiUtils {
         saveFileChooser.setDialogTitle(Resource.getTextElement("run.save"));
         int returnVal = saveFileChooser.showSaveDialog(panel);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            return Optional.of(saveFileChooser.getSelectedFile());
+            return Optional.ofNullable(saveFileChooser.getSelectedFile());
         }
         return Optional.empty();
+    }
+
+    public void openFileLocation(File file) {
+        if(Desktop.isDesktopSupported()) {
+            var desktop = Desktop.getDesktop();
+            try {
+                if (desktop.isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
+                    desktop.browseFileDirectory(file);
+                } else if (desktop.isSupported(Desktop.Action.OPEN)) {
+                    Desktop.getDesktop().open(file.getParentFile());
+                }
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Failed to open file location", e);
+            }
+        } else {
+            logger.log(Level.WARNING, "Failed to open file location,"
+                + " because desktop actions are not supported on this platform");
+        }
+    }
+
+    public void browse(URI target) {
+        try {
+            Desktop.getDesktop().browse(target);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, String.format("Impossible to browse %s", target), e);
+        }
     }
 }

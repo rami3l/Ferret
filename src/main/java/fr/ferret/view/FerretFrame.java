@@ -1,6 +1,7 @@
 package fr.ferret.view;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,6 +80,7 @@ public class FerretFrame extends JFrame {
         // Creates the bottom panel
         bottomPanel = new BottomPanel(this);
         panel.add(bottomPanel);
+        bottomPanel.addState("testests", new File("/home/jean/abcdljfdklsjfksf")).complete();
 
         // Window settings
         setDefaultCloseOperation(EXIT_ON_CLOSE);

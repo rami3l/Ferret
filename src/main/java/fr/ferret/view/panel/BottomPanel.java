@@ -5,6 +5,7 @@ import fr.ferret.view.FerretFrame;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 
 import static fr.ferret.utils.Resource.BUTTON_COLOR;
@@ -51,8 +52,8 @@ public class BottomPanel extends JPanel {
     }
 
 
-    public StatePanel addState(String textElement) {
-        var statePanel = new StatePanel(textElement);
+    public StatePanel addState(String textElement, File downloadLocation) {
+        var statePanel = new StatePanel(textElement, downloadLocation);
         statesPanel.add(statePanel);
         return statePanel;
     }

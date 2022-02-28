@@ -1,12 +1,16 @@
 package fr.ferret.view.panel;
 
+import fr.ferret.view.utils.GuiUtils;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.time.Duration;
 
 import static fr.ferret.utils.Resource.getIcon;
@@ -29,8 +33,11 @@ public class StatePanel extends JPanel {
     private transient Disposable destroyAction = null;
     private boolean completed = false;
     private boolean canDestroy = true;
+    private final File downloadLocation;
 
-    public StatePanel(String text) {
+    public StatePanel(String text, File downloadLocation) {
+
+        this.downloadLocation = downloadLocation;
 
         stateLabel = new JLabel(text);
         spinner = new JLabel();
@@ -58,8 +65,8 @@ public class StatePanel extends JPanel {
         openButton.setToolTipText(getTextElement("tooltip.openDownload"));
         getIcon("/img/open-folder.png").ifPresentOrElse(openButton::setIcon,
             () -> openButton.setText(getTextElement("button.open")));
+        openButton.addActionListener(new ButtonListener());
         openButton.setVisible(true);
-        // TODO: add open download location implementation
         completed = true;
         if (canDestroy)
             destroyAction = startDestroyAction();
@@ -104,6 +111,12 @@ public class StatePanel extends JPanel {
             if (completed) {
                 destroyAction = startDestroyAction();
             }
+        }
+    }
+
+    private class ButtonListener implements ActionListener {
+        @Override public void actionPerformed(ActionEvent actionEvent) {
+            GuiUtils.openFileLocation(downloadLocation);
         }
     }
 }
