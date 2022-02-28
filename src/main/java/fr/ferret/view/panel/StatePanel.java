@@ -62,11 +62,12 @@ public class StatePanel extends JPanel {
     public void complete() {
         // When the download is complete, hides spinner and makes the open button visible
         spinner.setVisible(false);
-        openButton.setToolTipText(getTextElement("tooltip.openDownload"));
-        getIcon("/img/open-folder.png").ifPresentOrElse(openButton::setIcon,
-            () -> openButton.setText(getTextElement("button.open")));
-        openButton.addActionListener(new ButtonListener());
-        openButton.setVisible(true);
+        if(downloadLocation != null) {
+            openButton.setToolTipText(getTextElement("tooltip.openDownload"));
+            getIcon("/img/open-folder.png").ifPresentOrElse(openButton::setIcon, () -> openButton.setText(getTextElement("button.open")));
+            openButton.addActionListener(new ButtonListener());
+            openButton.setVisible(true);
+        }
         completed = true;
         if (canDestroy)
             destroyAction = startDestroyAction();

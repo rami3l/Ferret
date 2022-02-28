@@ -52,8 +52,8 @@ public class BottomPanel extends JPanel {
     }
 
 
-    public StatePanel addState(String textElement, File downloadLocation) {
-        var statePanel = new StatePanel(textElement, downloadLocation);
+    public StatePanel addState(String text, File downloadLocation) {
+        var statePanel = new StatePanel(text, downloadLocation);
         statesPanel.add(statePanel);
         return statePanel;
     }

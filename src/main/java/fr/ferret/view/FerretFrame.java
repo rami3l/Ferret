@@ -80,7 +80,6 @@ public class FerretFrame extends JFrame {
         // Creates the bottom panel
         bottomPanel = new BottomPanel(this);
         panel.add(bottomPanel);
-        bottomPanel.addState("testests", new File("/home/jean/abcdljfdklsjfksf")).complete();
 
         // Window settings
         setDefaultCloseOperation(EXIT_ON_CLOSE);

@@ -2,13 +2,12 @@ package fr.ferret.controller;
 
 import java.io.File;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.model.Region;
 import fr.ferret.model.ZoneSelection;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.AllArgsConstructor;
@@ -45,7 +44,7 @@ public abstract class InputPanelController<T extends JPanel> {
     }
 
     private void actionOnFileNotSelected() {
-        // TODO: alert if the user didn't selected a file ?
+        frame.getBottomPanel().addState(Resource.getTextElement("run.fileNotSelected"), null).complete();
         logger.info("File not selected...");
     }
 
