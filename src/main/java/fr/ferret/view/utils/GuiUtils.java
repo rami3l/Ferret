@@ -39,8 +39,11 @@ public class GuiUtils {
 
     public Optional<File> chooseFile(JPanel panel, boolean save) {
         JFileChooser saveFileChooser = new JFileChooser();
-        saveFileChooser.setFileSelectionMode(save ? JFileChooser.DIRECTORIES_ONLY : JFileChooser.FILES_ONLY);
-        saveFileChooser.setDialogTitle(Resource.getTextElement(save ? "run.save" : "gene.selectfile"));
+        saveFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        saveFileChooser
+                .setDialogTitle(Resource.getTextElement(save ? "run.save" : "gene.selectfile"));
+        UIManager.put("FileChooser.saveButtonText",
+                Resource.getTextElement(save ? "run.saveButtonText" : "gene.openButtonText"));
         int returnVal = saveFileChooser.showSaveDialog(panel);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             return Optional.ofNullable(saveFileChooser.getSelectedFile());
@@ -49,7 +52,7 @@ public class GuiUtils {
     }
 
     public void openFileLocation(File file) {
-        if(Desktop.isDesktopSupported()) {
+        if (Desktop.isDesktopSupported()) {
             var desktop = Desktop.getDesktop();
             try {
                 if (desktop.isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
@@ -62,7 +65,7 @@ public class GuiUtils {
             }
         } else {
             logger.log(Level.WARNING, "Failed to open file location,"
-                + " because desktop actions are not supported on this platform");
+                    + " because desktop actions are not supported on this platform");
         }
     }
 
