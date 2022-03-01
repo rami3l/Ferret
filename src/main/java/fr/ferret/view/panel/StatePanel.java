@@ -1,6 +1,7 @@
 package fr.ferret.view.panel;
 
 import fr.ferret.view.utils.GuiUtils;
+import lombok.AllArgsConstructor;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
@@ -52,7 +53,8 @@ public class StatePanel extends JPanel {
         this.add(spinner);
         this.add(openButton);
 
-        addMouseListener(new MousePanelListener());
+        addMouseListener(new MousePanelListener(this));
+        openButton.addMouseListener(new MousePanelListener(this));
     }
 
     public void setState(String text) {
@@ -97,9 +99,13 @@ public class StatePanel extends JPanel {
         return new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
     }
 
+    @AllArgsConstructor
     private class MousePanelListener extends MouseAdapter {
+
+        private final JPanel panel;
+
         @Override public void mouseEntered(MouseEvent e) {
-            // TODO: highlight the panel
+            panel.setBackground(panel.getBackground().darker());
             canDestroy = false;
             if (destroyAction != null) {
                 destroyAction.dispose();
@@ -108,7 +114,7 @@ public class StatePanel extends JPanel {
         }
 
         @Override public void mouseExited(MouseEvent e) {
-            // TODO: unhighlight the panel
+            panel.setBackground(panel.getBackground().brighter());
             if (completed) {
                 destroyAction = startDestroyAction();
             }
