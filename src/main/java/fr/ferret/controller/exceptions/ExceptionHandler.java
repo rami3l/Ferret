@@ -25,7 +25,12 @@ public class ExceptionHandler {
 
     public void vcfStreamingError(Throwable throwable) {
         logger.log(Level.WARNING, "VCF streaming error", throwable);
-        new Error(f).append("error.vcfstreaming").show();
+        new Error(f).append("error.vcfStreaming").show();
+    }
+
+    public void fileWritingError(Throwable throwable) {
+        logger.log(Level.WARNING, "File writing error", throwable);
+        new Error(f).append("error.fileWriting").show();
     }
 
     public void ressourceAccessError(Throwable throwable) {

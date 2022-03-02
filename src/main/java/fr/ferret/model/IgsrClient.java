@@ -2,6 +2,7 @@ package fr.ferret.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -141,8 +142,10 @@ public class IgsrClient {
                         state.complete();
                         reader.close();
 
-                        // We catch exception which could happen with the use of the reader
-                        // TODO: catch FileSystemException
+                        // We catch exceptions which could have happened
+                    } catch (FileSystemException e) {
+                        ExceptionHandler.fileWritingError(e);
+                        state.error(e);
                     } catch (IOException e) {
                         ExceptionHandler.vcfStreamingError(e);
                         state.error(e);

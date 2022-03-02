@@ -2,6 +2,7 @@ package fr.ferret.view.panel;
 
 import fr.ferret.controller.RunButtonListener;
 import fr.ferret.view.FerretFrame;
+import lombok.Getter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +13,9 @@ import static fr.ferret.utils.Resource.BUTTON_COLOR;
 import static fr.ferret.utils.Resource.getTextElement;
 
 public class BottomPanel extends JPanel {
+
+    @Getter
+    private final JButton runButton;
 
     /** The panel containing the states of current downloads */
     private final JPanel statesPanel;
@@ -25,7 +29,7 @@ public class BottomPanel extends JPanel {
         this.setLayout(layout);
 
         // Button to launch Ferret action
-        var runButton = generateRunButton();
+        runButton = generateRunButton();
         new RunButtonListener(frame, runButton);
 
         // the states panel

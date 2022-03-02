@@ -1,8 +1,8 @@
 package fr.ferret.view.utils;
 
-import fr.ferret.utils.Resource;
 import lombok.experimental.UtilityClass;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,8 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.*;
+
+import static fr.ferret.utils.Resource.getTextElement;
 
 @UtilityClass
 public class GuiUtils {
@@ -36,17 +37,44 @@ public class GuiUtils {
         panel.add(componentToAdd, c);
     }
 
+    /**
+     * Creates a file chooser which confirms the will to overwrite the selected file
+     * if it already exists
+     *
+     * @return The file chooser created
+     */
+    private JFileChooser getFileChooserCheckingOverwriting() {
+        return new JFileChooser(){
+            @Override
+            public void approveSelection(){
+                if(getSelectedFile().exists()){
+                    // If the file exists, we open a confirmation dialog
+                    int result = JOptionPane.showConfirmDialog(this,
+                        getTextElement("run.fileExistingMsg"),
+                        getTextElement("run.fileExistingTitle"),
+                        JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (result == JOptionPane.YES_OPTION) {
+                        super.approveSelection();
+                    } else if (result == JOptionPane.CANCEL_OPTION) {
+                        cancelSelection();
+                    }
+                    return;
+                }
+                super.approveSelection();
+            }
+        };
+    }
 
-    public Optional<File> chooseFile(JPanel panel, boolean save) {
-        JFileChooser saveFileChooser = new JFileChooser();
-        saveFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        saveFileChooser
-                .setDialogTitle(Resource.getTextElement(save ? "run.save" : "gene.selectfile"));
-        UIManager.put("FileChooser.saveButtonText",
-                Resource.getTextElement(save ? "run.saveButtonText" : "gene.openButtonText"));
-        int returnVal = saveFileChooser.showSaveDialog(panel);
+    // TODO: when opening a file, checking if file exists (and if this is not a folder ?)
+
+    public Optional<File> chooseFile(Component parent, boolean save) {
+        var fileChooser = save ? getFileChooserCheckingOverwriting() : new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setDialogTitle(getTextElement(save ? "run.save" : "gene.selectfile"));
+        int returnVal = fileChooser.showDialog(parent,
+            getTextElement(save ? "run.saveButtonText" : "gene.openButtonText"));
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            return Optional.ofNullable(saveFileChooser.getSelectedFile());
+            return Optional.ofNullable(fileChooser.getSelectedFile());
         }
         return Optional.empty();
     }
