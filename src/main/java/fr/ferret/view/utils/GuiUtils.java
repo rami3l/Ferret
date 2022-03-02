@@ -21,11 +21,11 @@ public class GuiUtils {
     /**
      * Adds a component to a panel (which is a grid)
      * 
-     * @param panel : the panel to add the component to
-     * @param componentToAdd : the component to add to the panel
-     * @param weightx : the width of the component in the panel
-     * @param gridx : the x position of the component in the panel
-     * @param gridy : the y position of the component in the panel
+     * @param panel The panel to add the component to
+     * @param componentToAdd The component to add to the panel
+     * @param weightx The width of the component in the panel
+     * @param gridx The x position of the component in the panel
+     * @param gridy The y position of the component in the panel
      */
     public static void addToPanel(JPanel panel, JComponent componentToAdd, double weightx,
             int gridx, int gridy) {
@@ -38,37 +38,14 @@ public class GuiUtils {
     }
 
     /**
-     * Creates a file chooser which confirms the will to overwrite the selected file
-     * if it already exists
+     * Open a popup to let the user choose a file
      *
-     * @return The file chooser created
+     * @param parent The parent {@link Component} of the popup
+     * @param save   The selection mode (true → save, false → open)
+     * @return An {@link Optional} {@link File} (empty if no file selected)
      */
-    private JFileChooser getFileChooserCheckingOverwriting() {
-        return new JFileChooser(){
-            @Override
-            public void approveSelection(){
-                if(getSelectedFile().exists()){
-                    // If the file exists, we open a confirmation dialog
-                    int result = JOptionPane.showConfirmDialog(this,
-                        getTextElement("run.fileExistingMsg"),
-                        getTextElement("run.fileExistingTitle"),
-                        JOptionPane.YES_NO_CANCEL_OPTION);
-                    if (result == JOptionPane.YES_OPTION) {
-                        super.approveSelection();
-                    } else if (result == JOptionPane.CANCEL_OPTION) {
-                        cancelSelection();
-                    }
-                    return;
-                }
-                super.approveSelection();
-            }
-        };
-    }
-
-    // TODO: when opening a file, checking if file exists (and if this is not a folder ?)
-
     public Optional<File> chooseFile(Component parent, boolean save) {
-        var fileChooser = save ? getFileChooserCheckingOverwriting() : new JFileChooser();
+        var fileChooser = save ? new SaveFileChooser() : new OpenFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle(getTextElement(save ? "run.save" : "gene.selectfile"));
         int returnVal = fileChooser.showDialog(parent,
@@ -79,6 +56,12 @@ public class GuiUtils {
         return Optional.empty();
     }
 
+    /**
+     * Opens the location of the given file in the file explorer. Selects the file in the explorer
+     * if that option is supported
+     *
+     * @param file The file to open the location of
+     */
     public void openFileLocation(File file) {
         if (Desktop.isDesktopSupported()) {
             var desktop = Desktop.getDesktop();
@@ -97,11 +80,50 @@ public class GuiUtils {
         }
     }
 
+    /**
+     * Browses the given target
+     *
+     * @param target The URI to browse
+     */
     public void browse(URI target) {
         try {
             Desktop.getDesktop().browse(target);
         } catch (Exception e) {
             logger.log(Level.WARNING, String.format("Impossible to browse %s", target), e);
+        }
+    }
+
+    /**
+     * FileChooser which confirms the will to overwrite the selected file if it already exists
+     */
+    private static class SaveFileChooser extends JFileChooser {
+        @Override public void approveSelection() {
+            if(getSelectedFile() == null) return;
+            if(getSelectedFile().exists()){
+                // If the file exists, we open a confirmation dialog
+                int result = JOptionPane.showConfirmDialog(this,
+                    getTextElement("run.fileExistingMsg"),
+                    getTextElement("run.fileExistingTitle"),
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    super.approveSelection();
+                } else if (result == JOptionPane.CANCEL_OPTION) {
+                    cancelSelection();
+                }
+                return;
+            }
+            super.approveSelection();
+        }
+    }
+
+
+    /**
+     * File chooser which checks if the selected file exists
+     */
+    private static class OpenFileChooser extends JFileChooser {
+        @Override public void approveSelection() {
+            if (getSelectedFile() != null && getSelectedFile().isFile())
+                super.approveSelection();
         }
     }
 }
