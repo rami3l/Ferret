@@ -16,22 +16,9 @@ public class XmlParse {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String URLID =
-            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=gene&id=";
-    public static final String RETMODEID = "&retmode=xml";
-
     public static final String URLNAME =
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&term=";
     public static final String ENDURLNAME = "[GENE]%20AND%20human[ORGN]&retmode=xml";
-
-    public static String getURLFromIds(List<String> idsGenes) {
-
-        StringBuilder idsString = new StringBuilder();
-        for (String id : idsGenes) {
-            idsString.append(id + ",");
-        }
-        return URLID + idsString.substring(0, idsString.length() - 1) + RETMODEID;
-    }
 
 
     /**
@@ -170,7 +157,7 @@ public class XmlParse {
         dbf.setCoalescing(false);
         try {
             docBldr = dbf.newDocumentBuilder();
-            pause(500);
+            pause(400);
             return docBldr.parse(xmlGeneURL);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             System.out.println("Parsing du XML donnant les locus à partir des ids de gène échoué");
