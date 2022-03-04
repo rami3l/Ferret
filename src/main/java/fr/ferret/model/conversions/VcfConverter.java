@@ -1,16 +1,11 @@
 package fr.ferret.model.conversions;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import fr.ferret.utils.Resource;
 import htsjdk.tribble.TabixFeatureReader;
 import htsjdk.variant.vcf.VCFCodec;
-import htsjdk.variant.vcf.VCFHeader;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
-import picard.pedigree.PedFile;
-import picard.pedigree.Sex;
 
 /**
  * The util class to convert `.vcf` files.
@@ -41,17 +36,15 @@ public class VcfConverter {
      */
     public static String toPed(String vcfPath, String outPath) throws IOException {
         try (var reader = new TabixFeatureReader<>(vcfPath, new VCFCodec())) {
-            // A `distilled` VCF file should have for its header all the samples in question.
-            var ped = new PedFile(true);
-            var pedigrees = Resource.getPedigrees();
-            ((VCFHeader) reader.getHeader()).getGenotypeSamples().stream().forEach(sample -> {
-                // A pedigree record from the `pedigrees` table.
-                var r = pedigrees.get(sample);
-                var trio = ped.new PedTrio(r.getFamilyId(), r.getIndividualId(), r.getPaternalId(),
-                        r.getMaternalId(), Sex.fromCode(r.getGender()), r.getPhenotype());
-                ped.add(trio);
-            });
-            ped.write(new File(outPath));
+            /*
+             * // A `distilled` VCF file should have for its header all the samples in question. var
+             * ped = new PedFile(true); var pedigrees = Resource.getPedigrees(); ((VCFHeader)
+             * reader.getHeader()).getGenotypeSamples().stream().forEach(sample -> { // A pedigree
+             * record from the `pedigrees` table. var r = pedigrees.get(sample); var trio = ped.new
+             * PedTrio(r.getFamilyId(), r.getIndividualId(), r.getPaternalId(), r.getMaternalId(),
+             * Sex.fromCode(r.getGender()), r.getPhenotype()); ped.add(trio); }); ped.write(new
+             * File(outPath));
+             */
             return outPath;
         }
     }

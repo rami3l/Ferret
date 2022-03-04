@@ -133,7 +133,7 @@ public class Resource {
      * Order", "Third Order", "Children", "Other Comments"
      */
     public Map<String, Pedigree> getPedigrees() {
-        var fin = getFileInputStream("pedigrees.txt");
+        var fin = getFileInputStream("samples/pedigrees.txt");
         var parser = new CsvToBeanBuilder<Pedigree>(new InputStreamReader(fin))
                 .withType(Pedigree.class).withSeparator('\t').build();
         return parser.parse().stream()

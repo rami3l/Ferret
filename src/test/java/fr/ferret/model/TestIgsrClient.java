@@ -52,7 +52,10 @@ class TestIgsrClient {
 
                     // The INFO field contains some key-value pairs...
                     // eg. "AF" for Allele Frequency...
-                    () -> assertEquals(0.000399361, fields.getAttributeAsDouble("AF", 0)));
+                    () -> assertEquals(0.000399361, fields.getAttributeAsDouble("AF", 0)),
+
+                    // This is how you get the info of an individual...
+                    () -> assertEquals("T|T", fields.getGenotype("HG00189").getGenotypeString()));
         }
     }
 

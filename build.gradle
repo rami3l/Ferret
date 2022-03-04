@@ -59,8 +59,6 @@ dependencies {
     implementation 'com.github.samtools:htsjdk:2.24.1'
     // https://mvnrepository.com/artifact/com.opencsv/opencsv
     implementation 'com.opencsv:opencsv:5.6'
-    // https://mvnrepository.com/artifact/com.github.broadinstitute/picard
-    implementation 'com.github.broadinstitute:picard:2.26.11'
 }
 
 tasks.named('test') {
