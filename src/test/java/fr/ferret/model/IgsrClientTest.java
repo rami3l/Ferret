@@ -78,7 +78,7 @@ class IgsrClientTest {
             var tempVcf = tempVcfPath.toFile();
             FileWriter.writeVCF(tempVcf, header, variants.stream());
 
-            try (var tempReader = new VCFFileReader(tempVcfPath.toFile())) {
+            try (var tempReader = new VCFFileReader(tempVcfPath.toFile(), false)) {
                 assertAll(() -> assertTrue(Files.exists(tempVcfPath)),
                         // The new header is truncated, the size of which equals to that of the
                         // samples.
