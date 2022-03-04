@@ -1,53 +1,104 @@
 package fr.ferret.model;
 
-import com.jayway.jsonpath.JsonPath;
-import lombok.AllArgsConstructor;
+import fr.ferret.model.utils.GeneConverter;
+import fr.ferret.utils.Conversion;
 
-import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@AllArgsConstructor public class LocusBuilder {
+public class LocusBuilder {
 
-    // Here are the json path to find the information inside the file
-    private static final String chromosomePath = "$.result.%s.chromosome";
-    private static final String locationHistPath = "$.result.%s.locationhist[*]";
+    // TODO: move these URL templates to a resource file
+    private static final String ID_URL_TEMPLATE =
+        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=%s&format=json";
 
-    // Here are the json attribute names to find the information inside the file
-    private static final String ASS_ACC_VER = "assemblyaccver";
-    private static final String CHR_START = "chrstart";
-    private static final String CHR_STOP = "chrstop";
+    private static final String NAME_URL_TEMPLATE =
+        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&term=%s[GENE]%20AND%20human[ORGN]&retmode=json";
 
     /**
      * The selected <i>assembly accession version</i>
      */
     private final String assemblyAccVer;
 
+    private JsonExtractor locusExtractor;
+
+    private final List<String> genesNotFound = new ArrayList<>();
+
     /**
-     * Gets a Locus from a gene id and a gene esummary json file from ncbi server.<br>Here is
-     * <a href="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=1234&format=
-     * json">an example of ncbi gene esummary file</a>
-     *
-     * @param id   The id of the gene to find the {@link Locus locus} of
-     * @param json An {@link InputStream} pointing to the gene esummary json file
-     * @return An {@link Optional optional} {@link Locus locus}
+     * @param assemblyAccVer The <i>assembly access version</i> to use for getting start and end positions
      */
-    public Optional<Locus> from(String id, InputStream json) {
-        // We parse the json file
-        var document = JsonPath.parse(json);
+    public LocusBuilder(String assemblyAccVer) {
+        this.assemblyAccVer = assemblyAccVer;
+    }
 
-        // We read the chromosome
-        String chr = document.read(String.format(chromosomePath, id));
+    /**
+     * Converts the found gene names/ids to locus.
+     * TODO: show a popup containing names/ids of genes not if there are any
+     * TODO: show an error popup in case of error (invalid url, network error)
+     *
+     * @param idsOrNames A {@link List list} of gene names/ids
+     * @return A {@link Stream stream} containing the locus for found genes. This stream is empty
+     * in case of error.
+     */
+    public Stream<Locus> buildFrom(List<String> idsOrNames) {
+        var ids = idsOrNames.stream().filter(Conversion::isInteger);
+        var names = idsOrNames.stream().filter(Predicate.not(Conversion::isInteger));
+        var allIds = Stream.concat(ids, fromNames(names)).collect(Collectors.toSet());
+        try {
+            var jsonUrl = new URL(String.format(ID_URL_TEMPLATE, String.join(",", allIds)));
+            locusExtractor = new JsonExtractor(jsonUrl.openStream());
+        } catch (Exception e) {
+            // TODO: error popup (ExceptionHandler)
+            return Stream.empty();
+        }
+        var locusStream = fromIds(allIds.stream());
+        if(!genesNotFound.isEmpty()) {
+            // TODO: alert popup with genes not converted to locus
+        }
+        return locusStream;
+    }
 
-        // We get the list of locations (in the locationhist part)
-        List<Map<String, Object>> locations = document.read(String.format(locationHistPath, id));
+    /**
+     * Converts the found names to ids and adds the other to the {@link List list} _genesNoFound_
+     * TODO: show an error popup in case of error (invalid url, network error)
+     *
+     * @param names A {@link Stream stream} containing all the names to convert to ids
+     * @return A {@link Stream stream} containing the ids for found names
+     */
+    private Stream<String> fromNames(Stream<String> names) {
+        // TODO: we should url encode names
+        Stream<Optional<String>> stream = names.map(name -> {
+            try {
+                var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
+                return GeneConverter.fromName(name, new JsonExtractor(json)).or(() -> {
+                    genesNotFound.add(name);
+                    return Optional.empty();
+                });
+            } catch (Exception e) {
+                // TODO: error popup (ExceptionHandler)
+                genesNotFound.add(name);
+                return Optional.empty();
+            }
+        });
+        return stream.flatMap(Optional::stream);
+    }
 
-        // We get the first location of which assemblyaccver is the selected one
-        var location =
-            locations.stream().filter(l -> assemblyAccVer.equals(l.get(ASS_ACC_VER))).findFirst();
-
-        // We return a Locus created from the chromosome and the start and stop positions
-        return location.map(l -> new Locus(chr, (int) l.get(CHR_START), (int) l.get(CHR_STOP)));
+    /**
+     * Converts the found ids to locus and adds the other to the {@link List list} _genesNotFound_
+     *
+     * @param ids A {@link Stream stream} containing all the ids to convert to locus
+     * @return A {@link Stream stream} containing the {@link Locus locus} for found ids
+     */
+    private Stream<Locus> fromIds(Stream<String> ids) {
+        // TODO: we should url encode ids
+        return ids.map(id -> GeneConverter.fromId(id, assemblyAccVer, locusExtractor).or(() -> {
+            genesNotFound.add(id);
+            return Optional.empty();
+        })).flatMap(Optional::stream);
     }
 }

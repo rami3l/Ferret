@@ -1,18 +1,21 @@
 package fr.ferret.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+
 /**
  * A locus is a zone of a given chromosome (from start to end).
  * We can get the locus of a gene with a {@link LocusBuilder}.
  *
- * @param chromosome The chromosome
- * @param start      The start position of the locus in the chromosome
- * @param end        The end position of the locus in the chromosome
  */
-public record Locus(String chromosome, int start, int end) {
+@AllArgsConstructor
+@Getter
+@ToString
+public final class Locus {
 
-    @Override
-    public String toString() {
-        return "Locus{" + "chromosome='" + chromosome + '\'' + ", start=" + start + ", end=" + end
-            + '}';
-    }
+    private final String chromosome;
+    private final int start;
+    private final int end;
+
 }
