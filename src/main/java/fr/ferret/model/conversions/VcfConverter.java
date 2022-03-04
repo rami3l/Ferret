@@ -1,9 +1,17 @@
 package fr.ferret.model.conversions;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
-import htsjdk.tribble.TabixFeatureReader;
+import fr.ferret.utils.Resource;
+import htsjdk.tribble.FeatureReader;
+import htsjdk.tribble.TribbleIndexedFeatureReader;
+import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFCodec;
+import htsjdk.variant.vcf.VCFHeader;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
@@ -35,17 +43,30 @@ public class VcfConverter {
      * @param outPath path ti the output file.
      */
     public static String toPed(String vcfPath, String outPath) throws IOException {
-        try (var reader = new TabixFeatureReader<>(vcfPath, new VCFCodec())) {
-            /*
-             * // A `distilled` VCF file should have for its header all the samples in question. var
-             * ped = new PedFile(true); var pedigrees = Resource.getPedigrees(); ((VCFHeader)
-             * reader.getHeader()).getGenotypeSamples().stream().forEach(sample -> { // A pedigree
-             * record from the `pedigrees` table. var r = pedigrees.get(sample); var trio = ped.new
-             * PedTrio(r.getFamilyId(), r.getIndividualId(), r.getPaternalId(), r.getMaternalId(),
-             * Sex.fromCode(r.getGender()), r.getPhenotype()); ped.add(trio); }); ped.write(new
-             * File(outPath));
-             */
+        try (var writer = Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+                FeatureReader<VariantContext> reader =
+                        new TribbleIndexedFeatureReader<>(vcfPath, new VCFCodec(), false)) {
+            // A `distilled` VCF file should have for its header all the samples in question.
+            var pedigrees = Resource.getPedigrees();
+            ((VCFHeader) reader.getHeader()).getGenotypeSamples().stream().forEach(sample -> {
+                try {
+                    // A pedigree record from the `pedigrees` table.
+                    var pedigree = pedigrees.get(sample);
+                    var variants = reader.iterator().stream()
+                            .map(ctx -> GenotypePair
+                                    .ofString(ctx.getGenotype(sample).getGenotypeString()))
+                            .toList();
+                    var pedRecord = new PedRecord(pedigree, variants);
+                    writer.write(pedRecord.toString());
+                    writer.newLine();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
             return outPath;
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
     }
 

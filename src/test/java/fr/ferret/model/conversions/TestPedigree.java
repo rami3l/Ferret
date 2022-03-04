@@ -1,15 +1,12 @@
-package fr.ferret.model;
+package fr.ferret.model.conversions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import fr.ferret.model.conversions.GenotypePair;
-import fr.ferret.model.conversions.PedRecord;
-import fr.ferret.model.conversions.Pedigree;
 import fr.ferret.utils.Resource;
 
-class TestPedigrees {
+class TestPedigree {
     @Test
     void testGetPedigrees() throws IOException {
         // Family ID Individual ID Paternal ID Maternal ID Gender Phenotype Population Relationship

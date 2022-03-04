@@ -138,7 +138,7 @@ public class RegionPanel extends JPanel {
                 boolean state = !checkBoxes[0].isSelected();
                 setCheckBoxesState(1, state);
 
-                // If we selected the All population checbkox, all others checkboxes are disabled
+                // If we selected the All population checkboxes, all others checkboxes are disabled
                 if (region == Resource.CONFIG.getSelectedVersion().getRegions()[0]) {
                     for (ZonesPanel panel : RegionPanel.this.regions) {
                         if (panel != this) {
