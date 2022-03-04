@@ -1,5 +1,10 @@
 package fr.ferret.model;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,8 +20,6 @@ import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 
 class IgsrClientTest {
 
@@ -25,8 +28,8 @@ class IgsrClientTest {
     private final int end = 196194913;
     private final Phases1KG phase = Phases1KG.V3;
     private final String vcfPath = "src/test/resources/chr1-africans-phase3.vcf.gz";
-    private final IgsrClient igsrClient = IgsrClient.builder().chromosome(chr)
-        .phase1KG(phase).urlTemplate(vcfPath).build();
+    private final IgsrClient igsrClient =
+            IgsrClient.builder().chromosome(chr).phase1KG(phase).urlTemplate(vcfPath).build();
 
     @Test
     void testBasicQuery() throws IOException {
@@ -40,25 +43,30 @@ class IgsrClientTest {
         reader.close();
 
 
-        // Fixed fields:
-        // #CHROM POS ID REF ALT QUAL FILTER INFO
-        // https://samtools.github.io/hts-specs/VCFv4.2.pdf
-        // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
+        assertAll(
+                // Fixed fields:
+                // #CHROM POS ID REF ALT QUAL FILTER INFO
+                // https://samtools.github.io/hts-specs/VCFv4.2.pdf
+                // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
+                () -> assertEquals(196187886, fields.getStart()),
+                () -> assertEquals(".", fields.getID()),
+                // REF: Allele 2 code (missing = 'N')
+                () -> assertEquals(Allele.REF_T, fields.getReference()),
+                // ALT: Allele 1 code (missing = '.')
+                // `<CN2>` means "Copy Number = 2"
+                // See: https://www.biostars.org/p/232205/
+                () -> assertEquals(List.of("<CN2>"),
+                        fields.getAlternateAlleles().stream().map(Allele::getDisplayString)
+                                .toList()),
+                // This position has passed all filters, so nothing fails.
+                () -> assertEquals(Set.of(), fields.getFilters()),
 
-        assertEquals(196187886, fields.getStart());
-        assertEquals(".", fields.getID());
-        assertEquals(Allele.REF_T, fields.getReference());
+                // The INFO field contains some key-value pairs...
+                // eg. "AF" for Allele Frequency...
+                () -> assertEquals(0.000399361, fields.getAttributeAsDouble("AF", 0)),
 
-        // TODO: What is "<CN2>"? It seems to disappear when downloading file to BLOCK_COMPRESSED_VCF format ?
-        assertEquals(List.of(), fields.getAlternateAlleles().stream().map(Allele::getDisplayString).toList());
-
-        // This position has passed all filters, so nothing fails.
-        assertEquals(Set.of(), fields.getFilters());
-
-        // The INFO field contains some key-value pairs...
-        // eg. "AF" for Allele Frequency...
-        assertEquals(0.000399361, fields.getAttributeAsDouble("AF", 0));
-
+                // This is how you get the info of an individual...
+                () -> assertEquals("T|T", fields.getGenotype("HG00189").getGenotypeString()));
     }
 
     @Test
@@ -91,7 +99,8 @@ class IgsrClientTest {
                             var oldContent = Files.readString(tempVcfPath);
                             var newTempVCFPath = tempDir.resolve("test2.vcf");
                             var newTempVCF = newTempVCFPath.toFile();
-                            igsrClient.exportVCFFromSamples(newTempVCF, start, end, selection).blockLast();
+                            igsrClient.exportVCFFromSamples(newTempVCF, start, end, selection)
+                                    .blockLast();
                             assertEquals(oldContent, Files.readString(newTempVCFPath));
                         });
             }

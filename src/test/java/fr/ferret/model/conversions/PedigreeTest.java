@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import fr.ferret.utils.Resource;
 
-class TestPedigree {
+class PedigreeTest {
     @Test
     void testGetPedigrees() throws IOException {
         // Family ID Individual ID Paternal ID Maternal ID Gender Phenotype Population Relationship

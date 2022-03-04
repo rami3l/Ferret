@@ -12,7 +12,7 @@ import fr.ferret.model.IgsrClient;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.utils.Resource;
 
-class TestVcfConverter {
+class VcfConverterTest {
     @Test
     void testToPed(@TempDir Path tempDir) throws IOException {
         var outPath = tempDir.resolve("test.ped");

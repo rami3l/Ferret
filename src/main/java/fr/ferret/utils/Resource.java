@@ -1,7 +1,5 @@
 package fr.ferret.utils;
 
-import static fr.ferret.utils.ResourceFile.getChrEndPositionsFile;
-import static fr.ferret.utils.ResourceFile.getResource;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
@@ -67,7 +65,7 @@ public class Resource {
      * @return an optional image
      */
     public static Optional<BufferedImage> getImage(String resourceFileName) {
-        return getResource(resourceFileName, ImageIO::read);
+        return ResourceFile.getResource(resourceFileName, ImageIO::read);
     }
 
     /**
@@ -75,7 +73,7 @@ public class Resource {
      * @return an optional icon
      */
     public static Optional<ImageIcon> getIcon(String resourceFileName) {
-        return getResource(resourceFileName, ImageIcon::new);
+        return ResourceFile.getResource(resourceFileName, ImageIcon::new);
     }
 
     /**
@@ -166,7 +164,8 @@ public class Resource {
      */
     public static Optional<Integer> getChrEndPosition(HumanGenomeVersions hgVersion,
             String chrName) {
-        try (var streamReader = new InputStreamReader(getChrEndPositionsFile(hgVersion));
+        try (var streamReader =
+                new InputStreamReader(ResourceFile.getChrEndPositionsFile(hgVersion));
                 var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
                     .filter(fields -> fields[0].equals(chrName)).map(fields -> fields[1])
