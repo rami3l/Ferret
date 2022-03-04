@@ -30,10 +30,10 @@ import lombok.Getter;
 public class SettingsFrame extends JFrame {
 
     @Getter
-    private final FerretConfig config;
+    private final transient FerretConfig config;
 
 
-    private JPanel settingsPanel;
+    private final JPanel settingsPanel;
 
     private JRadioButton allFilesButton;
     private JRadioButton freqFileButton;
@@ -54,7 +54,7 @@ public class SettingsFrame extends JFrame {
         super(Resource.getTextElement("settings.title"));
         this.config = config;
 
-        // Initialize the settings panel
+        // Initializes the settings panel
         settingsPanel = new JPanel();
         settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
         settingsPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -253,7 +253,7 @@ public class SettingsFrame extends JFrame {
         ButtonGroup hgVersionButtons = new ButtonGroup();
         for (int i = 0; i < humanVersionButtons.length; i++) {
             humanVersionButtons[i] = new JRadioButton(Resource
-                    .getTextElement("settings.hugen." + HumanGenomeVersions.values()[i].name()));
+                    .getTextElement("settings.hugen." + HumanGenomeVersions.values()[i]));
             hgVersionButtons.add(humanVersionButtons[i]);
             settingsPanel.add(humanVersionButtons[i]);
         }

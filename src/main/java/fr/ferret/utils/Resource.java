@@ -1,5 +1,7 @@
 package fr.ferret.utils;
 
+import static fr.ferret.utils.ResourceFile.getChrEndPositionsFile;
+import static fr.ferret.utils.ResourceFile.getResource;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
@@ -31,35 +33,30 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class Resource {
-    /**
-     * program settings
-     */
-    public final FerretConfig CONFIG = new FerretConfig();
 
-    private final Logger logger = Logger.getLogger(Resource.class.getName());
+    private static final Logger logger = Logger.getLogger(Resource.class.getName());
 
-    /**
-     * text elements for the interface
-     */
-    private final ResourceBundle textElements =
+    /** program settings */
+    public static final FerretConfig CONFIG = new FerretConfig();
+
+    /** text elements for the interface */
+    private static final ResourceBundle textElements =
             ResourceBundle.getBundle("ferret", Locale.getDefault());
 
-    /**
-     * application configuration
-     */
-    private final ResourceBundle serverConfig = ResourceBundle.getBundle("server");
+    /** application configuration */
+    private static final ResourceBundle serverConfig = ResourceBundle.getBundle("server");
 
-    public final Color TITLE_COLOR = new Color(18, 0, 150);
-    public final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
-    public final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
-    public final Color BUTTON_COLOR = new Color(201, 157, 240);
-    public final Color LINK_STANDARD_COLOR = new Color(40, 100, 255);
-    public final Color LINK_HOVER_COLOR = new Color(255, 0, 0);
-    public final Color LINK_ACTIVE_COLOR = new Color(128, 0, 128);
+    public static final Color TITLE_COLOR = new Color(18, 0, 150);
+    public static final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
+    public static final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
+    public static final Color BUTTON_COLOR = new Color(201, 157, 240);
+    public static final Color LINK_STANDARD_COLOR = new Color(40, 100, 255);
+    public static final Color LINK_HOVER_COLOR = new Color(255, 0, 0);
+    public static final Color LINK_ACTIVE_COLOR = new Color(128, 0, 128);
 
-    public final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
-    public final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
-    public final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
+    public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
+    public static final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
+    public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
 
     public InputStream getFileInputStream(String file) {
         return Resource.class.getClassLoader().getResourceAsStream(file);
@@ -69,34 +66,16 @@ public class Resource {
      * @param resourceFileName relative path of the resource image
      * @return an optional image
      */
-    public Optional<BufferedImage> getImage(String resourceFileName) {
-        BufferedImage img = null;
-        try {
-            // we try to read the image from the resource file
-            img = ImageIO.read(Resource.class.getResource(resourceFileName));
-        } catch (Exception e) {
-            logger.log(Level.WARNING,
-                    String.format("Failed to get resource image %s", resourceFileName), e);
-        }
-        // we return an optional image (with a null value if impossible to get the image)
-        return Optional.ofNullable(img);
+    public static Optional<BufferedImage> getImage(String resourceFileName) {
+        return getResource(resourceFileName, ImageIO::read);
     }
 
     /**
      * @param resourceFileName relative path of the resource icon
      * @return an optional icon
      */
-    public Optional<ImageIcon> getIcon(String resourceFileName) {
-        ImageIcon icon = null;
-        try {
-            // we try to read the icon from the resource file
-            icon = new ImageIcon(Resource.class.getResource(resourceFileName));
-        } catch (Exception e) {
-            logger.log(Level.WARNING,
-                    String.format("Failed to get resource image %s", resourceFileName), e);
-        }
-        // we return an optional icon (with a null value if impossible to get the icon)
-        return Optional.ofNullable(icon);
+    public static Optional<ImageIcon> getIcon(String resourceFileName) {
+        return getResource(resourceFileName, ImageIcon::new);
     }
 
     /**
@@ -104,11 +83,17 @@ public class Resource {
      *
      * @param element of text to get in the resources
      */
-    public String getTextElement(String element) {
-        return textElements.getString(element);
+    public static String getTextElement(String element) {
+        try {
+            return textElements.getString(element);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, String.format("Impossible to get text element: %s", element),
+                    e);
+            return "???";
+        }
     }
 
-    public String getServerConfig(String element) {
+    public static String getServerConfig(String element) {
         return serverConfig.getString(element);
     }
 
@@ -137,10 +122,19 @@ public class Resource {
         var parser = new CsvToBeanBuilder<Pedigree>(new InputStreamReader(fin))
                 .withType(Pedigree.class).withSeparator('\t').build();
         return parser.parse().stream()
-                .collect(Collectors.toMap(rec -> rec.getIndividualId(), Function.identity()));
+                .collect(Collectors.toMap(Pedigree::getIndividualId, Function.identity()));
     }
 
-    public Set<String> getSamples(Phases1KG phase, ZoneSelection selection) throws IOException {
+    /**
+     * Gets the list of people of the selected zones for the given phase
+     *
+     * @param phase the phase to get the sample from
+     * @param selection the zones and region to get the sample from
+     * @return the sample (a Set containing people ids)
+     * @throws IOException if an error occurred while reading the file
+     */
+    public static Set<String> getSamples(Phases1KG phase, ZoneSelection selection)
+            throws IOException {
         try (var streamReader = new InputStreamReader(getSampleFile(phase));
                 var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
@@ -149,19 +143,30 @@ public class Resource {
         }
     }
 
-    public String getHgVersion(HumanGenomeVersions hgVersion) {
-        return switch (hgVersion) {
-            case hg19 -> "hg19";
-            default -> "hg38";
-        };
+    /**
+     * Gets the VCF URL template for the given phase
+     *
+     * @param phase1KG the phase to use for getting VCF files
+     * @return the URL template
+     */
+    public static String getVcfUrlTemplate(Phases1KG phase1KG) {
+        String path = getServerConfig("1kg." + phase1KG + ".path");
+        String filenameTemplate = getServerConfig("1kg." + phase1KG + ".filename");
+        String host = getServerConfig("1kg.host");
+        return host + "/" + path + "/" + filenameTemplate;
     }
 
-    public InputStream getCharMapFile(HumanGenomeVersions hgVersion) {
-        return getFileInputStream("chrEndPositions/" + getHgVersion(hgVersion) + ".txt");
-    }
-
-    public Optional<Integer> getChrEndPosition(HumanGenomeVersions hgVersion, String chrName) {
-        try (var streamReader = new InputStreamReader(getCharMapFile(hgVersion));
+    /**
+     * Gets the end position for the given chromosome
+     *
+     * @param hgVersion the human genome version
+     * @param chrName the name of the chromosome. `1` for example.
+     * @return the end position (empty if chromosome not found in the file, or if an error occurred
+     *         while reading the file)
+     */
+    public static Optional<Integer> getChrEndPosition(HumanGenomeVersions hgVersion,
+            String chrName) {
+        try (var streamReader = new InputStreamReader(getChrEndPositionsFile(hgVersion));
                 var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
                     .filter(fields -> fields[0].equals(chrName)).map(fields -> fields[1])

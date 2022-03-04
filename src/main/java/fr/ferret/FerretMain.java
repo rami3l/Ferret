@@ -1,5 +1,6 @@
 package fr.ferret;
 
+import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.view.FerretFrame;
 
 /**
@@ -9,6 +10,7 @@ public class FerretMain {
 
     public static void main(String[] args) {
         FerretFrame frame = new FerretFrame(); // Show ferret frame
+        ExceptionHandler.setFrame(frame);
         frame.setVisible(true);
     }
 

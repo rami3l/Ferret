@@ -54,4 +54,13 @@ public enum Phases1KG {
          */
         @Getter
         private final Region[] regions;
+
+    @Override public String toString() {
+        return switch (this) {
+            case V1 -> "phase1";
+            case V3 -> "phase3";
+            default -> ""; // TODO: throw not implemented exception (phase NYGC_30X not implemented)
+            // ?
+        };
+    }
 }
