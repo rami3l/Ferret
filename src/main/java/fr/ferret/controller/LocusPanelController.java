@@ -1,55 +1,50 @@
 package fr.ferret.controller;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
-
 import fr.ferret.model.IgsrClient;
 import fr.ferret.model.ZoneSelection;
-import fr.ferret.model.utils.FileWriter;
-import fr.ferret.model.utils.VCFHeaderExt;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
-import htsjdk.variant.vcf.VCFHeader;
+import fr.ferret.view.utils.GuiUtils;
+
+import javax.swing.*;
+import java.io.File;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The {@link LocusPanel} controller
  */
-public class LocusPanelController extends InputPanelController {
+public class LocusPanelController extends InputPanelController<LocusPanel> {
 
     private static final Logger logger = Logger.getLogger(LocusPanelController.class.getName());
 
-    private final LocusPanel locusPanel;
-
-    public LocusPanelController(FerretFrame frame, LocusPanel locusPanel) {
-        super(frame);
-        this.locusPanel = locusPanel;
+    public LocusPanelController(FerretFrame frame) {
+        super(frame, frame.getLocusPanel());
     }
 
-    public void validateInfosAndRun(String fileNameAndPath) {
+    public void validateInfoAndRun() {
         // Reset borders
-        locusPanel.getChromosomeList().setBorder(null);
-        locusPanel.getInputStart().setBorder(null);
-        locusPanel.getInputEnd().setBorder(null);
+        panel.getChromosomeList().setBorder(null);
+        panel.getInputStart().setBorder(null);
+        panel.getInputEnd().setBorder(null);
 
         // Selected populations for the model
         var populations = getSelectedPopulations();
         boolean populationSelected = !populations.isEmpty();
 
         // Gets the selected chromosome
-        String chrSelected = (String) locusPanel.getChromosomeList().getSelectedItem();
+        String chrSelected = (String) panel.getChromosomeList().getSelectedItem();
         boolean isChrSelected = !" ".equals(chrSelected);
 
         // Gets the selected start position
-        String startPosition = locusPanel.getInputStart().getText();
+        String startPosition = panel.getInputStart().getText();
         boolean startSelected = !startPosition.isEmpty();
 
         // Gets the selected end position
-        String endPosition = locusPanel.getInputEnd().getText();
+        String endPosition = panel.getInputEnd().getText();
         boolean endSelected = !endPosition.isEmpty();
 
         boolean startEndValid = true;
@@ -78,12 +73,12 @@ public class LocusPanelController extends InputPanelController {
             startEndValid = (endPos >= startPos);
 
             // Checks that given end position is not greater than chromosome end position
-            if (startSelected && endSelected && startEndValid){
+            if (startSelected && endSelected && startEndValid) {
                 int validEnd = Resource
                         .getChrEndPosition(Resource.CONFIG.getSelectedHumanGenome(), chrSelected)
                         .orElseGet(() -> {
                             logger.log(Level.WARNING, "Impossible to get chromosome end position."
-                                + " Given end position may be invalid");
+                                    + " Given end position may be invalid");
                             return Integer.MAX_VALUE;
                         });
                 if (endPos > validEnd || startPos < 1) {
@@ -96,64 +91,57 @@ public class LocusPanelController extends InputPanelController {
         // Valid input
         if (isChrSelected && populationSelected && startSelected && endSelected && startEndValid
                 && withinRange) {
-            logger.log(Level.INFO, "Starting gene research...");
-            downloadVcf(fileNameAndPath, populations, chrSelected, startPos, endPos);
+            // Runs Ferret
+            downloadVcf(populations, chrSelected, startPos, endPos);
         } else { // Invalid input
             displayError(isChrSelected, populationSelected, startSelected, endSelected,
                     startEndValid, withinRange, chrSelected, chrEndBound);
-       }
+        }
     }
 
-    private void downloadVcf(String fileNameAndPath, ZoneSelection populations, String chr,
-            int start, int end) {
-        var isgrClient = IgsrClient.builder().chromosome(chr)
+    private void downloadVcf(ZoneSelection populations, String chr,
+        final int start, final int end) {
+        run(outFile -> {
+            logger.log(Level.INFO, "Starting gene research...");
+            var isgrClient = IgsrClient.builder().chromosome(chr)
                 .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
-        try (var reader = isgrClient.reader();
-                var lines = reader.query(chr, start, end)) {
-            var samples = Resource.getSamples(Resource.CONFIG.getSelectedVersion(), populations);
-            var variants = lines.stream().map(variant -> variant.subContextFromSamples(samples));
-            var header = VCFHeaderExt.subVCFHeaderFromSamples((VCFHeader) reader.getHeader(), samples);
-            FileWriter.writeVCF(fileNameAndPath, header, variants);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Impossible to get distant vcf file", e);
-        }
+            var download = frame.getBottomPanel()
+                .addState("Starting download", outFile);
+            isgrClient.exportVCFFromSamples(outFile, start, end, populations)
+                .doOnComplete(download::complete)
+                .doOnError(e -> logger.log(Level.WARNING, "Error while downloading"))
+                .subscribe(download::setState);
+        });
     }
 
     private void displayError(boolean isChrSelected, boolean populationSelected,
             boolean startSelected, boolean endSelected, boolean startEndValid, boolean withinRange,
             String chrSelected, int chrEndBound) {
-        var errorMessage = new StringBuilder(Resource.getTextElement("run.fixerrors"));
+
+        var startSelector = panel.getInputStart();
+        var endSelector = panel.getInputEnd();
+
+        var error = new Error(frame).append("run.fixerrors");
+
         if (!isChrSelected) {
-            errorMessage.append("\n ").append(Resource.getTextElement("run.selectchr"));
-            locusPanel.getChromosomeList()
-                .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            error.append("run.selectchr").highlight(panel.getChromosomeList());
         }
         if (!populationSelected) {
-            errorMessage.append("\n ").append(Resource.getTextElement("run.selectpop"));
-            getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            error.append("run.selectpop").highlight(frame.getRegionPanel());
         }
         if (!startSelected) {
-            errorMessage.append("\n ").append(Resource.getTextElement("run.startpos"));
-            locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            error.append("run.startpos").highlight(startSelector);
         }
         if (!endSelected) {
-            errorMessage.append("\n ").append(Resource.getTextElement("run.endpos"));
-            locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            error.append("run.endpos").highlight(endSelector);
         }
         if (!startEndValid) {
-            errorMessage.append("\n ").append(Resource.getTextElement("run.invalidstart"));
-            locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-            locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            error.append("run.invalidstart").highlight(startSelector, endSelector);
         }
         if (!withinRange) {
-            errorMessage.append("\n ").append(Resource.getTextElement("run.invalidpos.1"))
-                .append(" ").append(chrSelected).append(" ")
-                .append(Resource.getTextElement("run.invalidpos.2")).append(" ")
-                .append(chrEndBound);
-            locusPanel.getInputStart().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-            locusPanel.getInputEnd().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+            error.append("run.invalidpos", chrSelected, chrEndBound)
+                .highlight(startSelector, endSelector);
         }
-        JOptionPane.showMessageDialog(getFrame(), errorMessage,
-            Resource.getTextElement("run.error"), JOptionPane.ERROR_MESSAGE);
+        error.show();
     }
 }

@@ -1,45 +1,57 @@
 package fr.ferret.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.File;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import fr.ferret.model.Region;
 import fr.ferret.model.ZoneSelection;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.panel.RegionPanel;
+import fr.ferret.view.utils.GuiUtils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import javax.swing.*;
 
 /**
  * The base for input panel controllers (locus, gene and variant panel controllers)
  */
-public abstract class InputPanelController {
-    /**
-     * The main ferret frame
-     */
-    private final FerretFrame frame;
+@AllArgsConstructor
+public abstract class InputPanelController<T extends JPanel> {
 
-    protected InputPanelController(FerretFrame frame) {
-        this.frame = frame;
-    }
+    private static final Logger logger = Logger.getLogger(InputPanelController.class.getName());
 
-    public FerretFrame getFrame() {
-        return frame;
-    }
+    /** The main ferret frame */
+    @Getter
+    protected final FerretFrame frame;
+    /** The panel which is controlled by this {@link InputPanelController} */
+    protected final T panel;
 
     /**
      * Validates input and runs the program if it's valid
-     * 
-     * @param fileNameAndPath The "save to" file path
      */
-    public abstract void validateInfosAndRun(String fileNameAndPath);
+    public abstract void validateInfoAndRun();
+
+    /**
+     * Ask the user for a file and runs the given action if file selected
+     * @param action The action to execute with the selected file
+     */
+    protected void run(Consumer<? super File> action) {
+        GuiUtils.chooseFile(frame.getBottomPanel().getRunButton(), true)
+            .ifPresentOrElse(action, this::actionOnFileNotSelected);
+    }
+
+    private void actionOnFileNotSelected() {
+        frame.getBottomPanel().addState(Resource.getTextElement("run.fileNotSelected"), null).complete();
+        logger.info("File not selected...");
+    }
 
     /**
      * Resets the RegionPanel borders and gets all selected populations by zone
      *
-     * @return A list of the selected zones (using the zones codes of the
-     *         {@link Region} class)
+     * @return A list of the selected zones (using the zones codes of the {@link Region} class)
      */
     protected ZoneSelection getSelectedPopulations() {
         frame.getRegionPanel().setBorder(null);
@@ -48,7 +60,7 @@ public abstract class InputPanelController {
             for (int i = 0; i < region.getCheckBoxes().length; i++) {
                 if (region.getCheckBoxes()[i].isSelected()) {
                     // Adds the selected region to the populations list
-                    if(i==0) {
+                    if (i == 0) {
                         selection.add(region.getRegion().getAbbrev());
                     } else {
                         String zone = region.getRegion().getZones()[i];
@@ -59,4 +71,5 @@ public abstract class InputPanelController {
         });
         return selection;
     }
+
 }

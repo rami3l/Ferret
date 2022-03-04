@@ -1,172 +1,126 @@
 package fr.ferret.controller;
 
-import java.awt.Color;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.JOptionPane;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-import fr.ferret.utils.Resource;
+import fr.ferret.controller.exceptions.FileContentException;
+import fr.ferret.controller.exceptions.FileFormatException;
+import fr.ferret.model.utils.FileReader;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.GenePanel;
+
+import javax.swing.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Logger;
 
 /**
  * The {@link GenePanel} controller
  */
-public class GenePanelController extends InputPanelController {
+public class GenePanelController extends InputPanelController<GenePanel> {
 
     private static final Logger logger = Logger.getLogger(GenePanelController.class.getName());
 
-    private final GenePanel genePanel;
-
-    public GenePanelController(FerretFrame frame, GenePanel genePanel) {
-        super(frame);
-        this.genePanel = genePanel;
+    public GenePanelController(FerretFrame frame) {
+        super(frame, frame.getGenePanel());
     }
 
-    public void validateInfosAndRun(String fileNameAndPath) {
-        // Reset borders
-        genePanel.getInputField().setBorder(null);
-        genePanel.getFileSelector().getRunButton().setBorder(null);
+    public void validateInfoAndRun() {
+        // Reset the borders
+        panel.getInputField().setBorder(null);
+        panel.getFileSelector().getRunButton().setBorder(null);
 
-        // Traitement
-        JTextField geneNameField = genePanel.getInputField();
-        JRadioButton geneNameRadioButton = genePanel.getRdoName();
-        JRadioButton geneNCBIRadioButton = genePanel.getRdoID();
+        JTextField geneNameField = panel.getInputField();
+        JRadioButton geneNameRadioButton = panel.getRdoName();
 
         // Selected populations for the model
         var populations = getSelectedPopulations();
         boolean popSelected = !populations.isEmpty();
 
+        // List which will contain the genes (from field or file)
+        List<String> geneList = null;
+
         String geneString = geneNameField.getText();
-        String[] geneListArray = null;
+
+        // Did the user input a list of gene
         boolean geneListInputted = geneString.length() > 0;
-        String geneFileNameAndPath = genePanel.getFileSelector().getSelectedFile() == null ? null
-                : genePanel.getFileSelector().getSelectedFile().getAbsolutePath();
+        // Names or ids inputted ?
+        boolean geneNameInputted = geneNameRadioButton.isSelected();
+
+        // Did the user import a csv file
+        String geneFileNameAndPath = panel.getFileSelector().getSelectedFile() == null ? null
+                : panel.getFileSelector().getSelectedFile().getAbsolutePath();
         boolean geneFileImported = geneFileNameAndPath != null;
+
+        // Are they errors in imported file (impossible to read, invalid extension or invalid content)
         boolean geneFileError = false;
         boolean geneFileExtensionError = false;
         boolean invalidCharacter = false;
-        boolean geneNameInputted = geneNameRadioButton.isSelected();
-        // boolean fromNCBI = geneNCBIRadioButton.isSelected();
 
-        String invalidRegex;
-        if (geneNameInputted) {
-            invalidRegex = ".*[^a-zA-Z0-9\\-].*"; // This is everything except letters and numbers,
-                                                  // including underscore
-        } else {
-            invalidRegex = ".*\\D.*"; // This is everything except numbers
-        }
+        // invalid characters for the genes (inputted as a list or a file)
+        var invalidRegex = geneNameInputted
+            // This is everything except letters and numbers, including underscore
+            ? ".*[^a-zA-Z0-9\\-].*"
+            // This is everything except numbers
+            : ".*\\D.*";
+
 
         if (geneFileImported) {
-            if (geneFileNameAndPath.length() <= 4) {
-                geneFileError = true;
-            } else {
-                String fileType = geneFileNameAndPath.substring(geneFileNameAndPath.length() - 4);
-                String delimiter = null;
-                switch (fileType) {
-                    case ".csv":
-                        delimiter = ",";
-                        break;
-                    case ".tab", ".tsv":
-                        delimiter = "\\t";
-                        break;
-                    case ".txt":
-                        delimiter = " ";
-                        break;
-                    default:
-                        geneFileExtensionError = true;
-                        break;
-                }
-                ArrayList<String> geneListArrayList = new ArrayList<String>();
 
-                if (delimiter != null) {
-                    try (BufferedReader geneFileRead =
-                            new BufferedReader(new FileReader(geneFileNameAndPath));) {
-                        String geneStringToParse;
-                        while ((geneStringToParse = geneFileRead.readLine()) != null) {
-                            String[] text = geneStringToParse.split(delimiter);
-                            for (int i = 0; i < text.length; i++) {
-                                text[i] = text[i].replace(" ", "").toUpperCase(new Locale("all")); // remove
-                                                                                                   // spaces
-                                if (text[i].matches(invalidRegex)) { // identify invalid characters
-                                    invalidCharacter = true;
-                                    break;
-                                }
-                                if (text[i].length() > 0) {
-                                    geneListArrayList.add(text[i]);
-                                }
-                            }
-                        }
-                        geneListArray =
-                                geneListArrayList.toArray(new String[geneListArrayList.size()]);
-                    } catch (IOException e) {
-                        // e.printStackTrace();
-                        geneFileError = true;
-                    } catch (NullPointerException e) {
-                        // File is empty
-                        geneFileError = true;
-                    }
-                }
+            try {
+                geneList = FileReader.readCsvLike(geneFileNameAndPath, invalidRegex);
+            } catch (FileFormatException e) {
+                geneFileExtensionError = true;
+            } catch (FileContentException e) {
+                invalidCharacter = true;
+            } catch (IOException e) {
+                geneFileError = true;
             }
+
 
         } else if (geneListInputted) {
-            geneString = geneString.toUpperCase(new Locale("all"));
-            String geneList = geneString.replace(" ", "");
-            invalidCharacter = geneList.replace(",", "").matches(invalidRegex);
-            if (geneList.endsWith(",")) {
-                geneList = geneList.substring(0, geneList.length() - 1);
+            geneString = geneString.replace(" ", "");
+            invalidCharacter = geneString.replace(",", "").matches(invalidRegex);
+            if (geneString.endsWith(",")) {
+                geneString = geneString.substring(0, geneString.length() - 1);
             }
-            geneListArray = geneList.split(",");
+            geneList = Arrays.asList(geneString.split(","));
         }
 
+        // TODO: WUT IS THIS? (SHOULD PUT SAD PATH FIRST WITH EARLY EXIT, AND THEN HAPPY PATH)
         if ((geneListInputted || (geneFileImported && !geneFileError && !geneFileExtensionError))
                 && !invalidCharacter && popSelected) {
 
-            logger.log(Level.INFO, "Starting gene research...");
-            // TODO LINK WITH MODEL
+            // TODO: What is locale "all" ? Locale.ROOT ?
+            var locale = new Locale("all");
+            geneList = geneList.stream().map(text -> text.toUpperCase(locale)).toList();
+
+            // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
 
         } else {
-            StringBuffer errorMessage = new StringBuffer("Correct the following errors:");
+            JComponent inputField = panel.getInputField();
+            JComponent runButton = panel.getFileSelector().getRunButton();
+
+            var error = new Error(frame).append("run.fixerrors");
+
             if (!geneListInputted && !geneFileImported) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectgene"));
-                genePanel.getInputField().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                genePanel.getFileSelector().getRunButton()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                error.append("run.selectgene").highlight(inputField, runButton);
             }
             if (geneFileImported && geneFileError) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectgene.ferr"));
-                genePanel.getFileSelector().getRunButton()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                error.append("run.selectgene.ferr").highlight(runButton);
             }
             if (geneFileImported && geneFileExtensionError) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectgene.fext"));
-                genePanel.getFileSelector().getRunButton()
-                        .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                error.append("run.selectgene.fext").highlight(runButton);
             }
-            if ((geneListInputted || geneFileImported) && invalidCharacter) {
-                errorMessage.append("\n " + Resource.getTextElement("run.selectgene.cerr"));
-                if (geneListInputted) {
-                    genePanel.getInputField()
-                            .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                } else {
-                    genePanel.getFileSelector().getRunButton()
-                            .setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-                }
+            if (geneListInputted && invalidCharacter) {
+                error.append("run.selectgene.cerr").highlight(inputField);
+            }
+            if (geneFileImported && invalidCharacter) {
+                error.append("run.selectgene.cerr").highlight(runButton);
             }
             if (!popSelected) {
-                errorMessage.append("\n ").append(Resource.getTextElement("run.selectpop"));
-                getFrame().getRegionPanel().setBorder(BorderFactory.createLineBorder(Color.RED, 1));
+                error.append("run.selectpop").highlight(frame.getRegionPanel());
             }
-            JOptionPane.showMessageDialog(getFrame(), errorMessage,
-                    Resource.getTextElement("run.error"), JOptionPane.OK_OPTION);
+            error.show();
         }
     }
 }
