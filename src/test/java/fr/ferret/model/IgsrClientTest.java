@@ -22,9 +22,8 @@ import htsjdk.variant.vcf.VCFHeader;
 
 
 class IgsrClientTest {
-
     private final String chr = "1";
-    private final int start = 196194909;
+    private final int start = 114514;
     private final int end = 196194913;
     private final Phases1KG phase = Phases1KG.V3;
     private final String vcfPath = "src/test/resources/chr1-africans-phase3.vcf.gz";
@@ -47,7 +46,6 @@ class IgsrClientTest {
                 // Fixed fields:
                 // #CHROM POS ID REF ALT QUAL FILTER INFO
                 // https://samtools.github.io/hts-specs/VCFv4.2.pdf
-                // var expected = List.of("1", "196187886", ".", "T", "<CN2>", "100", "PASS");
                 () -> assertEquals(196187886, fields.getStart()),
                 () -> assertEquals(".", fields.getID()),
                 // REF: Allele 2 code (missing = 'N')
@@ -55,7 +53,7 @@ class IgsrClientTest {
                 // ALT: Allele 1 code (missing = '.')
                 // `<CN2>` means "Copy Number = 2"
                 // See: https://www.biostars.org/p/232205/
-                () -> assertEquals(List.of("<CN2>"),
+                () -> assertEquals(List.of(),
                         fields.getAlternateAlleles().stream().map(Allele::getDisplayString)
                                 .toList()),
                 // This position has passed all filters, so nothing fails.
@@ -66,7 +64,7 @@ class IgsrClientTest {
                 () -> assertEquals(0.000399361, fields.getAttributeAsDouble("AF", 0)),
 
                 // This is how you get the info of an individual...
-                () -> assertEquals("T|T", fields.getGenotype("HG00189").getGenotypeString()));
+                () -> assertEquals("T|T", fields.getGenotype("NA18523").getGenotypeString()));
     }
 
     @Test
