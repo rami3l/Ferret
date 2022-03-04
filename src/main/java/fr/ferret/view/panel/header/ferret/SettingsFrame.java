@@ -111,7 +111,7 @@ public class SettingsFrame extends JFrame {
         // we add buttons to the list and the group, and set their text
         for (int i = 0; i < phaseButtons.length; i++) {
             phaseButtons[i] = new JRadioButton(
-                    Resource.getTextElement("settings.phase." + Phases1KG.values()[i]));
+                    Resource.getTextElement("settings.phase." + Phases1KG.values()[i].name()));
             vcfRadioButtons.add(phaseButtons[i]);
             settingsPanel.add(phaseButtons[i]);
         }

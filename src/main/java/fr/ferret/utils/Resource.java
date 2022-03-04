@@ -75,7 +75,12 @@ public class Resource {
      * @param element of text to get in the resources
      */
     public static String getTextElement(String element) {
-        return textElements.getString(element);
+        try {
+            return textElements.getString(element);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, String.format("Impossible to get text element: %s", element), e);
+            return "???";
+        }
     }
 
     public static String getServerConfig(String element) {
