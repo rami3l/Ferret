@@ -7,6 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -24,6 +25,9 @@ public class LocusBuilder {
 
     private static final String NAME_URL_TEMPLATE =
         "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&term=%s[GENE]%%20AND%%20human[ORGN]&retmode=json";
+
+    /** Delay between requests, to avoid getting response code 429 from ncbi server */
+    private static final Duration DELAY = Duration.ofMillis(200);
 
     /**
      * The selected <i>assembly accession version</i>
@@ -51,10 +55,11 @@ public class LocusBuilder {
         var flux = Flux.fromIterable(idsOrNames);
         // ids are numeric
         var ids = flux.filter(Conversion::isInteger);
-        // names are non numeric
-        var names = flux.filter(Predicate.not(Conversion::isInteger));
+        // names are non-numeric. We delay them to avoid getting 429 code from ncbi server (ddos...)
+        var names =
+            flux.filter(Predicate.not(Conversion::isInteger)).delayElements(DELAY);
         // concat ids with names converted to ids
-        var allIds = ids.concatWith(names.flatMap(this::fromName));
+        var allIds = ids.concatWith(names.flatMap(this::fromName)).distinct();
         return fromIds(allIds);
     }
 
@@ -67,10 +72,12 @@ public class LocusBuilder {
      * @return A mono encapsulating the name of the gene (present if found)
      */
     public Mono<String> fromName(String name) {
+        logger.info(String.format("Getting id for gene [%s]", name));
         try {
             var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
             return GeneConverter.extractId(new JsonDocument(json)).or(notFound(name));
         } catch (Exception e) {
+            // TODO: retry n times in case of IOException (could be 429)
             // TODO: error popup (ExceptionHandler)
             logger.log(Level.WARNING, String.format("Error while getting id of [%s] gene", name),
                 e);
@@ -78,7 +85,7 @@ public class LocusBuilder {
         }
     }
 
-    public Mono<String> notFound(String name) {
+    private Mono<String> notFound(String name) {
         genesNotFound.add(name);
         return Mono.empty();
     }
@@ -91,20 +98,28 @@ public class LocusBuilder {
      */
     public Flux<Locus> fromIds(Flux<String> ids) {
         // TODO: we should url encode ids
-        return ids.collect(Collectors.joining(",")).flatMap(idString -> {
-            try {
-                var jsonUrl = new URL(String.format(ID_URL_TEMPLATE, idString));
-                return Mono.just(new JsonDocument(jsonUrl.openStream()));
-            } catch (Exception e) {
-                // TODO: error popup (ExceptionHandler)
-                logger.log(Level.WARNING,
-                    String.format("Error while requesting locus for ids %s", idString), e);
-                return Mono.empty();
-            }
-        }).flatMapMany(json -> ids.flatMap(
-            id -> GeneConverter.extractLocus(id, assemblyAccVer, json).or(Mono.defer(() -> {
-                genesNotFound.add(id);
-                return Mono.empty();
-            }))));
+        // We cache the ids because we need them twice (once for creating the url, and once for
+        // extracting locus from json) and we don't want to consume the flux twice (it would
+        // duplicate all previous actions, like getting ids from names)
+        var idsCached = ids.replay().autoConnect();
+        return idsCached.collect(Collectors.joining(",")).delayElement(DELAY)
+            .flatMap(idString -> {
+                try {
+                    logger.info(String.format("Getting locus for ids : %s", idString));
+                    var jsonUrl = new URL(String.format(ID_URL_TEMPLATE, idString));
+                    return Mono.just(new JsonDocument(jsonUrl.openStream()));
+                } catch (Exception e) {
+                    // TODO: retry n times in case of IOException (could be 429)
+                    // TODO: error popup (ExceptionHandler)
+                    logger.log(Level.WARNING,
+                        String.format("Error while requesting locus for ids %s", idString), e);
+                    return Mono.empty();
+                }
+            }).flatMapMany(json -> idsCached.flatMap(
+                id -> GeneConverter.extractLocus(id, assemblyAccVer, json).or(Mono.defer(() -> {
+                    genesNotFound.add(id);
+                    return Mono.empty();
+                }))
+            ));
     }
 }

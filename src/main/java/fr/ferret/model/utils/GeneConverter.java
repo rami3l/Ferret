@@ -65,7 +65,7 @@ import java.util.logging.Logger;
      */
     public static Mono<String> extractId(JsonDocument document) {
         return Mono.fromCallable(() -> (String) document.get(ID_PATH))
-            .doOnError(e -> logger.log(Level.INFO, "Cannot extract gene name", e))
+            .doOnError(e -> logger.log(Level.INFO, "Cannot extract gene id", e))
             .onErrorResume(e -> Mono.empty()).onErrorStop();
     }
 
