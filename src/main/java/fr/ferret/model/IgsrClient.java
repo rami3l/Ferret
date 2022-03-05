@@ -142,6 +142,9 @@ public class IgsrClient {
                     } catch (IOException e) {
                         ExceptionHandler.vcfStreamingError(e);
                         state.error(e);
+                    } catch (Exception e) {
+                        ExceptionHandler.unknownError(e);
+                        state.error(e);
                     }
                 }).doOnError(ExceptionHandler::connectionError)
                     .doOnError(state::error)

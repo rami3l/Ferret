@@ -1,5 +1,6 @@
 package fr.ferret.view.panel;
 
+import fr.ferret.utils.Resource;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.AllArgsConstructor;
 import reactor.core.Disposable;
@@ -61,10 +62,19 @@ public class StatePanel extends JPanel {
         stateLabel.setText(text);
     }
 
+    public void error() {
+        setState(Resource.getTextElement("error.toast"));
+        complete(false);
+    }
+
     public void complete() {
+        complete(true);
+    }
+
+    private void complete(boolean ok) {
         // When the download is complete, hides spinner and makes the open button visible
         spinner.setVisible(false);
-        if(downloadLocation != null) {
+        if(ok && downloadLocation != null) {
             openButton.setToolTipText(getTextElement("tooltip.openDownload"));
             getIcon("/img/open-folder.png").ifPresentOrElse(openButton::setIcon, () -> openButton.setText(getTextElement("button.open")));
             openButton.addActionListener(new ButtonListener());

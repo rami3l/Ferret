@@ -109,7 +109,10 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
                 .addState("Starting download", outFile);
             isgrClient.exportVCFFromSamples(outFile, start, end, populations)
                 .doOnComplete(download::complete)
-                .doOnError(e -> logger.log(Level.WARNING, "Error while downloading"))
+                .doOnError(e -> {
+                    logger.log(Level.WARNING, "Error while downloading or writing");
+                    download.error();
+                })
                 .subscribe(download::setState);
         });
     }
