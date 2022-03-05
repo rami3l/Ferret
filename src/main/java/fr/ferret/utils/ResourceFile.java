@@ -1,0 +1,60 @@
+package fr.ferret.utils;
+
+import fr.ferret.controller.settings.HumanGenomeVersions;
+import fr.ferret.controller.settings.Phases1KG;
+import lombok.experimental.UtilityClass;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+@UtilityClass
+class ResourceFile {
+
+    private final Logger logger = Logger.getLogger(ResourceFile.class.getName());
+
+    /**
+     * Get a resource
+     *
+     * @param filename The resource filename
+     * @param extractionMethod The methode to use to extract the resource
+     * @param <T> The type of the extracted resource
+     * @return The extracted resource
+     */
+    public <T> Optional<T> getResource(String filename, ThrowingFunction<URL, T> extractionMethod) {
+        T resource = null;
+        try {
+            // we try to read the resource from the resource file
+            resource = extractionMethod.apply(ResourceFile.class.getResource(filename));
+        } catch (Exception e) {
+            logger.log(Level.WARNING,
+                String.format("Failed to get resource file %s", filename), e);
+        }
+        return Optional.ofNullable(resource);
+    }
+
+    /**
+     *  Gets the file of population samples (people ids by regions and zones)
+     *
+     * @param phase the phase to get samples from
+     * @return the file of population samples
+     */
+    public InputStream getSampleFile(Phases1KG phase) {
+        String filename = "samples/" + phase + ".txt";
+        return Resource.class.getClassLoader().getResourceAsStream(filename);
+    }
+
+    /**
+     * Gets the file of chromosome ending positions for the selected hgVersion
+     *
+     * @param hgVersion the human genome version
+     * @return the file of ending positions
+     */
+    public InputStream getChrEndPositionsFile(HumanGenomeVersions hgVersion) {
+        String filename = "chrEndPositions/" + hgVersion + ".txt";
+        return Resource.class.getClassLoader().getResourceAsStream(filename);
+    }
+
+}

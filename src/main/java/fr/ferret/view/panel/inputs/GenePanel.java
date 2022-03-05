@@ -25,7 +25,7 @@ import lombok.Getter;
 public class GenePanel extends JPanel {
 
     private JTextField inputField;
-    private BrowseFileButtonListener fileSelector;
+    private transient BrowseFileButtonListener fileSelector;
     private JRadioButton rdoName;
     private JRadioButton rdoID;
 
