@@ -5,10 +5,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 import fr.ferret.utils.Resource;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.tribble.TribbleIndexedFeatureReader;
@@ -41,31 +40,22 @@ public class VcfConverter {
      * Calculates the {@code REF} allele frequency for some variants in respect of the given list of
      * samples.
      */
-    public static Map<VariantContext, Double> refFrequenciesFromSamples(
-            Stream<VariantContext> variants, List<String> samples) {
-        var frequencies = new HashMap<VariantContext, Double>();
-        variants.forEach(variant -> {
+    public static Map<VariantContext, RefFrequencyPair> refFrequencies(
+            Iterable<VariantContext> variants) {
+        // Here a `LinkedHashMap` is used to preserve insertion order.
+        var frequencies = new LinkedHashMap<VariantContext, RefFrequencyPair>();
+        for (var variant : variants) {
+            // The number of all samples.
+            var total = variant.getNSamples();
             // The 0|0 instances.
-            var homRef = 0;
+            var homRef = variant.getHomRefCount();
             // The 0|1 instances.
-            var het = 0;
+            var het = variant.getHetCount();
             // The 0|0, 0|1 and 1|1 instances. No '.' is allowed.
-            var called = 0;
-            for (var sample : samples) {
-                var gt = variant.getGenotype(sample);
-                if (gt.isHomRef()) {
-                    homRef++;
-                }
-                if (gt.isHet()) {
-                    het++;
-                }
-                if (gt.isCalled()) {
-                    called++;
-                }
-            }
-            var freq = (2 * homRef + het) / (2 * (double) called);
-            frequencies.put(variant, freq);
-        });
+            var called = total - variant.getNoCallCount();
+            var freq = called == 0 ? 0 : (2 * homRef + het) / (2 * (double) called);
+            frequencies.put(variant, new RefFrequencyPair(freq, called));
+        }
         return frequencies;
     }
 
@@ -74,9 +64,25 @@ public class VcfConverter {
      * 
      * @param vcfPath relative path to the VCF file we want to convert.
      */
-    public static String toFrq(String vcfPath) {
-        // TODO: complete this method
-        return vcfPath;
+    public static String toFrq(String vcfPath, String outPath) throws IOException {
+        try (var writer = Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+                FeatureReader<VariantContext> reader =
+                        new TribbleIndexedFeatureReader<>(vcfPath, new VCFCodec(), false)) {
+            var variants = refFrequencies(reader.iterator());
+            variants.forEach((variant, frequency) -> {
+                try {
+                    var r = new FrqRecord(variant, frequency);
+                    writer.write(r.toString());
+                    writer.newLine();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+            return outPath;
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
     /**
@@ -97,9 +103,7 @@ public class VcfConverter {
                     // A pedigree record from the `pedigrees` table.
                     var pedigree = pedigrees.get(sample);
                     var variants = reader.iterator().stream()
-                            .map(ctx -> GenotypePair
-                                    .ofString(ctx.getGenotype(sample).getGenotypeString()))
-                            .toList();
+                            .map(ctx -> GenotypePair.of(ctx, sample)).toList();
                     var pedRecord = new PedRecord(pedigree, variants);
                     writer.write(pedRecord.toString());
                     writer.newLine();
