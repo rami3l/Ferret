@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * A single record line in the `pedigrees.txt` file.
+ * A single record line in the {@code pedigrees.txt} file.
  */
 @Builder
 @Data

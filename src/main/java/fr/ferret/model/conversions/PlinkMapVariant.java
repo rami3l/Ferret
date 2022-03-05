@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * A single record line in a `.map` file.
+ * A single record line in a {@code .map} file.
  */
 @Builder
 @Data

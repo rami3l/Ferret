@@ -27,13 +27,21 @@ public class VcfConverter {
     private static final List<String> fileExtensions = List.of("vcf", "frq", "map", "ped", "info");
 
     /**
+     * Generate a new ID for a variant with an empty id {@code "."}. The generated ID will follow
+     * the {@code chromosome:position} format.
+     */
+    public static String generateVariantId(VariantContext ctx) {
+        return ctx.hasID() ? ctx.getID() : String.format("%s:%d", ctx.getContig(), ctx.getStart());
+    }
+
+    /**
      * Read the given VCF file and create the corresponding FRQ file, returning its relative path.
      * 
-     * @param vcfFilePath relative path to the VCF file we want to convert.
+     * @param vcfPath relative path to the VCF file we want to convert.
      */
-    public static String toFrq(String vcfFilePath) {
+    public static String toFrq(String vcfPath) {
         // TODO: complete this method
-        return vcfFilePath;
+        return vcfPath;
     }
 
     /**
@@ -73,20 +81,28 @@ public class VcfConverter {
     /**
      * Read the given VCF file and create the corresponding MAP file, returning their relative path.
      * 
-     * @param vcfFilePath relative path to the VCF file we want to convert.
+     * @param vcfPath relative path to the VCF file we want to convert.
      */
-    public static String toMap(String vcfFilePath) {
+    public static String toMap(String vcfPath) {
         // TODO: complete this method
-        return vcfFilePath;
+        return vcfPath;
     }
 
     /**
      * Read the given VCF file and create the corresponding INFO file, returning its relative path.
      * 
-     * @param vcfFilePath relative path to the VCF file we want to convert.
+     * @param vcfPath relative path to the VCF file we want to convert.
      */
-    public static String toInfo(String vcfFilePath) {
-        // TODO: complete this method
-        return vcfFilePath;
+    public static String toInfo(String vcfPath, String outPath) throws IOException {
+        try (var writer = Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+                FeatureReader<VariantContext> reader =
+                        new TribbleIndexedFeatureReader<>(vcfPath, new VCFCodec(), false)) {
+            for (var variant : reader.iterator()) {
+                writer.write(new InfoRecord(variant).toString());
+                writer.newLine();
+            }
+            return outPath;
+        }
     }
 }

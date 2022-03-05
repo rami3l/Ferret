@@ -25,19 +25,22 @@ public class ZoneSelection {
                         || selectedZones.get(region).contains(zone)));
     }
 
-    public void add(String region, List<String> zones) {
+    public ZoneSelection add(String region, List<String> zones) {
         selectedZones.computeIfAbsent(region, k -> new ArrayList<>()).addAll(zones);
+        return this;
     }
 
-    public void add(String region) {
+    public ZoneSelection add(String region) {
         if ("ALL".equals(region)) {
             selectAll();
         } else {
             selectedZones.put(region, new ArrayList<>());
         }
+        return this;
     }
 
-    public void selectAll() {
+    public ZoneSelection selectAll() {
         allSelected = true;
+        return this;
     }
 }
