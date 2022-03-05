@@ -37,4 +37,9 @@ public class ExceptionHandler {
         new Error(f).append("error.resource").show();
     }
 
+    public void unknownError(Throwable throwable) {
+        logger.log(Level.WARNING, "Unknown error", throwable);
+        new Error(f).append("error.unknown", throwable).show();
+    }
+
 }

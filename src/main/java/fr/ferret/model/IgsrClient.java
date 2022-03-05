@@ -14,7 +14,6 @@ import fr.ferret.utils.Resource;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.tribble.TabixFeatureReader;
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder.OutputType;
 import htsjdk.variant.vcf.VCFCodec;
 import htsjdk.variant.vcf.VCFHeader;
 import lombok.Builder;
@@ -27,7 +26,6 @@ import reactor.core.scheduler.Schedulers;
  */
 @Builder
 public class IgsrClient {
-
     private static final Logger logger = Logger.getLogger(IgsrClient.class.getName());
 
     /**
@@ -47,9 +45,6 @@ public class IgsrClient {
     @Builder.Default
     private final String urlTemplate =
             Resource.getVcfUrlTemplate(Resource.CONFIG.getSelectedVersion());
-
-    @Builder.Default
-    private final OutputType outputType = OutputType.VCF;
 
     // Attribute name starting with `$` to be excluded from the builder
     private FeatureReader<VariantContext> $reader;
@@ -135,7 +130,7 @@ public class IgsrClient {
                     // We write the VCF file
                     state.next(State.WRITING);
                     logger.info("Writing to disk...");
-                    FileWriter.writeVCF(outFile, header, variants, outputType);
+                    FileWriter.writeVCF(outFile, header, variants);
 
                     // The download is ok
                     state.next(String.format(State.WRITTEN, outFile.getName()));
@@ -149,6 +144,9 @@ public class IgsrClient {
                     state.error(e);
                 } catch (IOException e) {
                     ExceptionHandler.vcfStreamingError(e);
+                    state.error(e);
+                } catch (Exception e) {
+                    ExceptionHandler.unknownError(e);
                     state.error(e);
                 }
             }).doOnError(ExceptionHandler::connectionError).doOnError(state::error).onErrorStop()

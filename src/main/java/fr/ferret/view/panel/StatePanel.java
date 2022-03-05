@@ -18,7 +18,6 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 public class StatePanel extends JPanel {
-
     /**
      * the label describing the current state (downloading header, lines, etc.)
      */
@@ -62,10 +61,19 @@ public class StatePanel extends JPanel {
         stateLabel.setText(text);
     }
 
+    public void error() {
+        setState(Resource.getTextElement("error.toast"));
+        complete(false);
+    }
+
     public void complete() {
+        complete(true);
+    }
+
+    private void complete(boolean ok) {
         // When the download is complete, hides spinner and makes the open button visible
         spinner.setVisible(false);
-        if (downloadLocation != null) {
+        if (ok && downloadLocation != null) {
             openButton.setToolTipText(Resource.getTextElement("tooltip.openDownload"));
             Resource.getIcon("/img/open-folder.png").ifPresentOrElse(openButton::setIcon,
                     () -> openButton.setText(Resource.getTextElement("button.open")));
