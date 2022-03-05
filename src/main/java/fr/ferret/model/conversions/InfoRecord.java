@@ -5,7 +5,6 @@ import htsjdk.variant.variantcontext.VariantContext;
 
 /** A single line in a {@code .info} file. */
 public record InfoRecord(@Nonnull String variantId, int position) {
-
     public InfoRecord(VariantContext ctx) {
         this(VcfConverter.generateVariantId(ctx), ctx.getStart());
     }
