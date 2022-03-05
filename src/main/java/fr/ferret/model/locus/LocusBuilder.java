@@ -1,6 +1,7 @@
-package fr.ferret.model;
+package fr.ferret.model.locus;
 
 import fr.ferret.model.utils.GeneConverter;
+import fr.ferret.model.utils.JsonDocument;
 import fr.ferret.utils.Conversion;
 
 import java.net.URL;
@@ -25,7 +26,7 @@ public class LocusBuilder {
      */
     private final String assemblyAccVer;
 
-    private JsonExtractor locusExtractor;
+    private JsonDocument locusExtractor;
 
     private final List<String> genesNotFound = new ArrayList<>();
 
@@ -51,7 +52,7 @@ public class LocusBuilder {
         var allIds = Stream.concat(ids, fromNames(names)).collect(Collectors.toSet());
         try {
             var jsonUrl = new URL(String.format(ID_URL_TEMPLATE, String.join(",", allIds)));
-            locusExtractor = new JsonExtractor(jsonUrl.openStream());
+            locusExtractor = new JsonDocument(jsonUrl.openStream());
         } catch (Exception e) {
             // TODO: error popup (ExceptionHandler)
             return Stream.empty();
@@ -75,7 +76,7 @@ public class LocusBuilder {
         Stream<Optional<String>> stream = names.map(name -> {
             try {
                 var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
-                return GeneConverter.fromName(name, new JsonExtractor(json)).or(() -> {
+                return GeneConverter.extractId(new JsonDocument(json)).or(() -> {
                     genesNotFound.add(name);
                     return Optional.empty();
                 });
@@ -96,7 +97,7 @@ public class LocusBuilder {
      */
     private Stream<Locus> fromIds(Stream<String> ids) {
         // TODO: we should url encode ids
-        return ids.map(id -> GeneConverter.fromId(id, assemblyAccVer, locusExtractor).or(() -> {
+        return ids.map(id -> GeneConverter.extractLocus(id, assemblyAccVer, locusExtractor).or(() -> {
             genesNotFound.add(id);
             return Optional.empty();
         })).flatMap(Optional::stream);

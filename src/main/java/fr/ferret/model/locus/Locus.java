@@ -1,4 +1,4 @@
-package fr.ferret.model;
+package fr.ferret.model.locus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

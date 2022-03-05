@@ -1,6 +1,5 @@
 package fr.ferret.model.utils;
 
-import fr.ferret.model.JsonExtractor;
 import fr.ferret.utils.Resource;
 import org.junit.jupiter.api.Test;
 
@@ -19,10 +18,10 @@ class GeneConverterTest {
         // ARRANGE
         var id = "1234";
         var assemblyAccVer = "GCF_000001405.39";
-        var json = new JsonExtractor(getContent("gene-id-to-locus.json"));
+        var json = new JsonDocument(getContent("gene-id-to-locus.json"));
 
         // ACT
-        var locus = GeneConverter.fromId(id, assemblyAccVer, json);
+        var locus = GeneConverter.extractLocus(id, assemblyAccVer, json);
         locus.ifPresentOrElse(System.out::println, () -> System.out.println("Locus not found..."));
 
         // ASSERT
@@ -35,10 +34,10 @@ class GeneConverterTest {
     @Test void getIdFromFile_ShouldReturnGeneId() {
         // ARRANGE
         var name = "CR5";
-        var json = new JsonExtractor(getContent("gene-name-to-id.json"));
+        var json = new JsonDocument(getContent("gene-name-to-id.json"));
 
         // ACT
-        var id = GeneConverter.fromName(name, json);
+        var id = GeneConverter.extractId(json);
         id.ifPresentOrElse(System.out::println, () -> System.out.println("Id not found..."));
 
         // ASSERT
