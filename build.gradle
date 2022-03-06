@@ -7,17 +7,7 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
-    maven {
-        url = uri('https://repo.maven.apache.org/maven2/')
-    }
-
-    /*
-    jcenter()
-    maven {
-        url "https://broadinstitute.jfrog.io/broadinstitute/libs-snapshot/" // for gatk deps
-    }
-    */
+    mavenCentral()
 }
 
 group = 'fr.ferret'
@@ -33,46 +23,39 @@ publishing {
     }
 }
 
-apply plugin : "java" 
 ext {
-    versions = [
-            'junit': '5.8.2',
-            'htsjdk': '2.24.1',
-            'reactor': '3.4.15',
-            'awaitility': '4.1.1'
-    ]
     javaMainClass = "fr.ferret.FerretMain"
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-
+    // Stream adapters and advanced data structures.
     // https://mvnrepository.com/artifact/com.google.guava/guava
-    implementation 'com.google.guava:guava:31.0.1-jre'
+    implementation 'com.google.guava:guava:31.1-jre'
 
+    // Library used to deal with CSV/TSV files
     // https://mvnrepository.com/artifact/com.opencsv/opencsv
     implementation 'com.opencsv:opencsv:5.6'
 
-    // https://mvnrepository.com/artifact/com.codepoetics/protonpack
-    implementation 'com.codepoetics:protonpack:1.16'
-
-    // Library used to deal with vcf files
+    // Library used to deal with files in the 1000 Genomes Extended VCF Format
     // https://mvnrepository.com/artifact/com.github.samtools/htsjdk
-    implementation(group: 'com.github.samtools', name: 'htsjdk', version: versions['htsjdk'])
+    implementation 'com.github.samtools:htsjdk:2.24.1'
 
     // Use reactor for asynchronous operations
-    implementation(group: 'io.projectreactor', name: 'reactor-core', version: versions['reactor'])
+    // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
+    implementation 'io.projectreactor:reactor-core:3.4.15'
 
-    // Use JUnit Jupiter, reactor-test and awaitility for testing.
-    testImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter', version: versions['junit'])
-    testImplementation(group: 'io.projectreactor', name: 'reactor-test', version: versions['reactor'])
-    testImplementation(group: 'org.awaitility', name: 'awaitility', version: versions['awaitility'])
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+
+    // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
+    testImplementation 'io.projectreactor:reactor-test:3.4.15'
+
+    // https://mvnrepository.com/artifact/org.awaitility/awaitility
+    testImplementation 'org.awaitility:awaitility:4.2.0'
 }
 
 test {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+    useTestNG()
 }
 
 application {
