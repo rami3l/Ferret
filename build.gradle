@@ -53,15 +53,6 @@ ext {
     javaMainClass = "fr.ferret.FerretMain"
 }
 
-apply plugin: 'maven-publish'
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
-}
-
 application {
     mainClass = javaMainClass
 }
