@@ -26,8 +26,6 @@ public class GenePanel extends JPanel {
 
     private JTextField inputField;
     private transient BrowseFileButtonListener fileSelector;
-    private JRadioButton rdoName;
-    private JRadioButton rdoID;
 
     /**
      * Creates the gene panel
@@ -80,8 +78,6 @@ public class GenePanel extends JPanel {
         // Input gene
         inputField = new JTextField();
 
-        // Choice subpanel (Name / ID)
-        JPanel choice = generateChoicePanel();
 
         // Or Label
         JLabel labOr = new JLabel(Resource.getTextElement("gene.or"));
@@ -103,38 +99,9 @@ public class GenePanel extends JPanel {
         addToPanel(inputPanel, labOr, 0.3, 2, 1);
         addToPanel(inputPanel, browseButton, 0.3, 3, 1);
         addToPanel(inputPanel, selectedFile, 0.3, 3, 2);
-        addToPanel(inputPanel, choice, 0.8, 1, 2);
+        //addToPanel(inputPanel, choice, 0.8, 1, 2);
 
         return inputPanel;
-    }
-
-    /**
-     * Generates the choice part (checboxes) of the input panel
-     * 
-     * @return the choice part subpanel
-     */
-    private JPanel generateChoicePanel() {
-
-        JPanel choice = new JPanel(new GridBagLayout());
-
-        // Name radio button
-        rdoName = new JRadioButton(Resource.getTextElement("gene.name"), true);
-        rdoName.setFont(new Font(rdoName.getFont().getFontName(), Font.PLAIN, 16));
-
-        // ID radio button
-        rdoID = new JRadioButton(Resource.getTextElement("gene.ID"));
-        rdoID.setFont(new Font(rdoID.getFont().getFontName(), Font.PLAIN, 16));
-
-        // We group the to buttons (to let only one of them to be selected)
-        ButtonGroup buttonGroup = new ButtonGroup();
-        buttonGroup.add(rdoName);
-        buttonGroup.add(rdoID);
-
-        // Add the elements defined above to the input panel
-        addToPanel(choice, rdoName, 0.5, 1, 1);
-        addToPanel(choice, rdoID, 0.5, 2, 1);
-
-        return choice;
     }
 
 }

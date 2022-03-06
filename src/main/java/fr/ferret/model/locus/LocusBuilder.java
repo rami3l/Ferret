@@ -44,8 +44,8 @@ public class LocusBuilder {
     }
 
     /**
-     * Converts the found gene names/ids to locus.
-     * TODO: show a popup containing names/ids of genes not if there are any
+     * Converts the found gene names/ids to locus.<br>
+     * TODO: show a popup containing names/ids of genes not if there are any <br>
      * TODO: show an error popup in case of error (invalid url, network error)
      *
      * @param idsOrNames A {@link List list} of gene names/ids
@@ -65,7 +65,7 @@ public class LocusBuilder {
 
     /**
      * Makes a request to the ncbi server to get the id of the gene from its name.
-     * The id is returned if found, else the name is added to the _genesNoFound_ {@link List list}
+     * The id is returned if found, else the name is added to the _genesNoFound_ {@link List} <br>
      * TODO: show an error popup in case of error (invalid url, network error)
      *
      * @param name The name of the gene to find the id of
