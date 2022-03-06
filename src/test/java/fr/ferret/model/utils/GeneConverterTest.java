@@ -68,13 +68,13 @@ class GeneConverterTest {
         var builder = new LocusBuilder("GCF_000001405.39");
         var flux = Flux.fromIterable(names).delayElements(Duration.ofMillis(200))
             .flatMap(builder::fromName).doOnNext(System.out::println);
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
+        flux.blockLast();
+        flux.blockLast();
+        flux.blockLast();
+        flux.blockLast();
+        flux.blockLast();
+        flux.blockLast();
+        flux.blockLast();
     }
 
 }
