@@ -2,7 +2,21 @@ package fr.ferret.model.conversions;
 
 import htsjdk.variant.variantcontext.VariantContext;
 
-public record RefFrequencyPair(double frequency, int observations) {
+public record RefFrequencyPair(
+        /**
+         * The relative frequency of the {@code REF} allele of this variant among all its samples'
+         * genotypes.
+         */
+        double frequency,
+        /**
+         * The number of all completely called (without {@code '.'}) number of chromosomes
+         * ({@code alleles * 2}) of this variant among among all its samples' genotypes.
+         */
+        int observations) {
+    /**
+     * Generates a {@code RefFrequencyPair} from a {@code VariantContext} by iterating through all
+     * its samples.
+     */
     public static RefFrequencyPair of(VariantContext variant) {
         var samples = variant.getSampleNames();
         // The 0|0 instances.
@@ -23,7 +37,11 @@ public record RefFrequencyPair(double frequency, int observations) {
                 calledNonMixed++;
             }
         }
-        var freq = calledNonMixed == 0 ? 0 : (2 * homRef + hetRef) / (2 * (double) calledNonMixed);
+        var freq = calledNonMixed == 0
+                // Handle potential division by zero.
+                ? 0
+                // The real formula is here...
+                : (2 * homRef + hetRef) / (2 * (double) calledNonMixed);
         return new RefFrequencyPair(freq, calledNonMixed);
     }
 
