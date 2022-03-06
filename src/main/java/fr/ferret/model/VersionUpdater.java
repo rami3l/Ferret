@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import fr.ferret.model.utils.XmlParser;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import fr.ferret.controller.settings.HumanGenomeVersions;
@@ -24,7 +26,7 @@ public class VersionUpdater {
          */
         public Map<HumanGenomeVersions, Integer> getPatchesFromVersions(
                         List<HumanGenomeVersions> versionList) {
-                org.w3c.dom.Document xmlDocument = XmlParse.document(URLTEST);
+                org.w3c.dom.Document xmlDocument = XmlParser.document(URLTEST);
                 Node gNode = xmlDocument.getDocumentElement();
                 // Node containing the start and stop positions.
                 Node geneLocationHistoryNode = getXmlReleasesNode(gNode);
@@ -38,8 +40,8 @@ public class VersionUpdater {
          */
         private Node getXmlReleasesNode(Node currentGNode) {
                 // go down on the path :
-                return XmlParse.xmlCommentFinder(
-                                XmlParse.getNodeFromPath(currentGNode,
+                return XmlParser.xmlCommentFinder(
+                                XmlParser.getNodeFromPath(currentGNode,
                                                 Arrays.asList("Entrezgene", "Entrezgene_comments")),
                                 "254", "Gene Location History", "Gene-commentary_comment");
         }

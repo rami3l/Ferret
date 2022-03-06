@@ -1,20 +1,19 @@
-package fr.ferret.model;
+package fr.ferret.model.utils;
 
 import java.io.IOException;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import lombok.experimental.UtilityClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class XmlParse {
-
-    private XmlParse() {
-        throw new IllegalStateException("Utility class");
-    }
+@UtilityClass
+public class XmlParser {
 
     /**
      * @param parentNode
@@ -56,7 +55,6 @@ public class XmlParse {
      * nodes, this will search through the comments finding the one with matching type and matching
      * heading. It will return the specified node.
      * 
-     * @param test
      * @param typeDesired
      * @param headingDesired
      * @param nodeNameToRetrieve
@@ -152,7 +150,6 @@ public class XmlParse {
         dbf.setCoalescing(false);
         try {
             docBldr = dbf.newDocumentBuilder();
-            pause(400);
             return docBldr.parse(xmlGeneURL);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             System.out.println("Parsing du XML donnant les locus à partir des ids de gène échoué");
@@ -161,32 +158,4 @@ public class XmlParse {
         }
     }
 
-
-    /**
-     * @param time of pause
-     */
-    private static void pause(int time) {
-        try {
-            Thread.sleep(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
-     * @param strNum
-     * @return boolean : True if strNum is an integer
-     */
-    public static boolean isNumeric(String strNum) {
-        if (strNum == null) {
-            return false;
-        }
-        try {
-            Integer.parseInt(strNum);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
-    }
 }
