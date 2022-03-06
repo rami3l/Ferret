@@ -1,18 +1,12 @@
 package fr.ferret.controller;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import fr.ferret.model.IgsrClient;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
-import fr.ferret.view.utils.GuiUtils;
-
-import javax.swing.*;
-import java.io.File;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * The {@link LocusPanel} controller
@@ -99,21 +93,18 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
         }
     }
 
-    private void downloadVcf(ZoneSelection populations, String chr,
-        final int start, final int end) {
+    private void downloadVcf(ZoneSelection populations, String chr, final int start,
+            final int end) {
         run(outFile -> {
             logger.log(Level.INFO, "Starting gene research...");
             var isgrClient = IgsrClient.builder().chromosome(chr)
-                .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
-            var download = frame.getBottomPanel()
-                .addState("Starting download", outFile);
+                    .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
+            var download = frame.getBottomPanel().addState("Starting download", outFile);
             isgrClient.exportVCFFromSamples(outFile, start, end, populations)
-                .doOnComplete(download::complete)
-                .doOnError(e -> {
-                    logger.log(Level.WARNING, "Error while downloading or writing");
-                    download.error();
-                })
-                .subscribe(download::setState);
+                    .doOnComplete(download::complete).doOnError(e -> {
+                        logger.log(Level.WARNING, "Error while downloading or writing");
+                        download.error();
+                    }).subscribe(download::setState);
         });
     }
 
@@ -142,8 +133,8 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
             error.append("run.invalidstart").highlight(startSelector, endSelector);
         }
         if (!withinRange) {
-            error.append("run.invalidpos", chrSelected, chrEndBound)
-                .highlight(startSelector, endSelector);
+            error.append("run.invalidpos", chrSelected, chrEndBound).highlight(startSelector,
+                    endSelector);
         }
         error.show();
     }

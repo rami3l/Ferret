@@ -1,14 +1,14 @@
 package fr.ferret.utils;
 
-import fr.ferret.controller.settings.HumanGenomeVersions;
-import fr.ferret.controller.settings.Phases1KG;
-import lombok.experimental.UtilityClass;
-
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.pivovarit.function.ThrowingFunction;
+import fr.ferret.controller.settings.HumanGenomeVersions;
+import fr.ferret.controller.settings.Phases1KG;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 class ResourceFile {
@@ -23,20 +23,20 @@ class ResourceFile {
      * @param <T> The type of the extracted resource
      * @return The extracted resource
      */
-    public <T> Optional<T> getResource(String filename, ThrowingFunction<URL, T> extractionMethod) {
+    public <T> Optional<T> getResource(String filename,
+            ThrowingFunction<URL, T, Exception> extractionMethod) {
         T resource = null;
         try {
             // we try to read the resource from the resource file
             resource = extractionMethod.apply(ResourceFile.class.getResource(filename));
         } catch (Exception e) {
-            logger.log(Level.WARNING,
-                String.format("Failed to get resource file %s", filename), e);
+            logger.log(Level.WARNING, String.format("Failed to get resource file %s", filename), e);
         }
         return Optional.ofNullable(resource);
     }
 
     /**
-     *  Gets the file of population samples (people ids by regions and zones)
+     * Gets the file of population samples (people ids by regions and zones)
      *
      * @param phase the phase to get samples from
      * @return the file of population samples

@@ -1,16 +1,17 @@
 package fr.ferret.view.panel;
 
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
+import java.awt.LayoutManager;
+import java.io.File;
+import java.util.ArrayList;
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import fr.ferret.controller.RunButtonListener;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import lombok.Getter;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.File;
-import java.util.ArrayList;
-
-import static fr.ferret.utils.Resource.BUTTON_COLOR;
-import static fr.ferret.utils.Resource.getTextElement;
 
 public class BottomPanel extends JPanel {
 
@@ -40,9 +41,9 @@ public class BottomPanel extends JPanel {
     }
 
     private JButton generateRunButton() {
-        JButton runButton = new JButton(getTextElement("run.button"));
+        JButton runButton = new JButton(Resource.getTextElement("run.button"));
         runButton.setPreferredSize(new Dimension(300, 60));
-        runButton.setBackground(BUTTON_COLOR);
+        runButton.setBackground(Resource.BUTTON_COLOR);
         return runButton;
     }
 
@@ -51,7 +52,7 @@ public class BottomPanel extends JPanel {
         states.setLayout(new GridBagLayout());
         states.setAlignmentX(LEFT_ALIGNMENT);
         // TODO: find a way to add a scrollbar when there are too many downloads at the same time
-        //states.setAutoscrolls(true);
+        // states.setAutoscrolls(true);
         return states;
     }
 
@@ -66,5 +67,4 @@ public class BottomPanel extends JPanel {
     public void removeState(StatePanel panel) {
         statesPanel.remove(panel);
     }
-
 }

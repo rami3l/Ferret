@@ -1,6 +1,5 @@
 package fr.ferret.view.panel.inputs;
 
-import static fr.ferret.view.utils.GuiUtils.addToPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -14,6 +13,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import fr.ferret.controller.BrowseFileButtonListener;
 import fr.ferret.utils.Resource;
+import fr.ferret.view.utils.GuiUtils;
 import lombok.Getter;
 
 /**
@@ -100,11 +100,11 @@ public class VariantPanel extends JPanel {
         fileSelector = new BrowseFileButtonListener(this, browseButton, selectedFile);
 
         // Add the elements defined above to the input panel
-        addToPanel(inputPanel, variantIdField, 0.8, 1, 1);
-        addToPanel(inputPanel, orLabel, 0.2, 2, 1);
-        addToPanel(inputPanel, browseButton, 0.6, 3, 1);
-        addToPanel(inputPanel, selectedFile, 0.6, 3, 2);
-        addToPanel(inputPanel, includingVariantSubPanel, 0.7, 1, 2);
+        GuiUtils.addToPanel(inputPanel, variantIdField, 0.8, 1, 1);
+        GuiUtils.addToPanel(inputPanel, orLabel, 0.2, 2, 1);
+        GuiUtils.addToPanel(inputPanel, browseButton, 0.6, 3, 1);
+        GuiUtils.addToPanel(inputPanel, selectedFile, 0.6, 3, 2);
+        GuiUtils.addToPanel(inputPanel, includingVariantSubPanel, 0.7, 1, 2);
 
         return inputPanel;
     }
@@ -130,9 +130,9 @@ public class VariantPanel extends JPanel {
         bpLabel.setFont(new Font(bpLabel.getFont().getFontName(), Font.PLAIN, 13));
 
         // Add the elements defined above to the input panel
-        addToPanel(includingVariantSubPanel, checkbox, 0.002, 1, 1);
-        addToPanel(includingVariantSubPanel, bpField, 0.4, 2, 1);
-        addToPanel(includingVariantSubPanel, bpLabel, 0.3, 3, 1);
+        GuiUtils.addToPanel(includingVariantSubPanel, checkbox, 0.002, 1, 1);
+        GuiUtils.addToPanel(includingVariantSubPanel, bpField, 0.4, 2, 1);
+        GuiUtils.addToPanel(includingVariantSubPanel, bpLabel, 0.3, 3, 1);
 
         return includingVariantSubPanel;
     }

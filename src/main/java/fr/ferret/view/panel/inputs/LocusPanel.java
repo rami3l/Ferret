@@ -1,6 +1,5 @@
 package fr.ferret.view.panel.inputs;
 
-import static fr.ferret.view.utils.GuiUtils.addToPanel;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
@@ -11,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import fr.ferret.utils.Resource;
+import fr.ferret.view.utils.GuiUtils;
 import lombok.Getter;
 
 /**
@@ -58,8 +58,8 @@ public class LocusPanel extends JPanel {
      * @return the title label
      */
     private JLabel generateTitle() {
-        String text = Resource
-                .getTextElement("locus.input." + Resource.CONFIG.getSelectedHumanGenome());
+        String text =
+                Resource.getTextElement("locus.input." + Resource.CONFIG.getSelectedHumanGenome());
         JLabel title = new JLabel(text, SwingConstants.LEFT);
         title.setFont(Resource.TITLE_FONT);
         title.setForeground(Resource.TITLE_COLOR);
@@ -103,12 +103,12 @@ public class LocusPanel extends JPanel {
         inputEnd = new JTextField();
 
         // Add the elements defined above to the input panel
-        addToPanel(inputPanel, labChromosome, 0.3, 1, 2);
-        addToPanel(inputPanel, chromosomeList, 0.8, 2, 2);
-        addToPanel(inputPanel, labStart, 0.3, 1, 3);
-        addToPanel(inputPanel, labEnd, 0.3, 1, 4);
-        addToPanel(inputPanel, inputStart, 0.8, 2, 3);
-        addToPanel(inputPanel, inputEnd, 0.8, 2, 4);
+        GuiUtils.addToPanel(inputPanel, labChromosome, 0.3, 1, 2);
+        GuiUtils.addToPanel(inputPanel, chromosomeList, 0.8, 2, 2);
+        GuiUtils.addToPanel(inputPanel, labStart, 0.3, 1, 3);
+        GuiUtils.addToPanel(inputPanel, labEnd, 0.3, 1, 4);
+        GuiUtils.addToPanel(inputPanel, inputStart, 0.8, 2, 3);
+        GuiUtils.addToPanel(inputPanel, inputEnd, 0.8, 2, 4);
 
         return inputPanel;
     }
