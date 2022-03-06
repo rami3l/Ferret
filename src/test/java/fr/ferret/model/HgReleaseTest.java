@@ -14,12 +14,6 @@ import fr.ferret.controller.settings.HumanGenomeVersions;
 
 public class HgReleaseTest {
 
-    public static void main(String[] args) {
-        var theMap = VersionUpdater.getPatchesFromVersions(
-                Arrays.asList(HumanGenomeVersions.HG19, HumanGenomeVersions.HG38));
-        System.out.println(theMap.toString());;
-    }
-
     @Test
     void testOfWorks() {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
