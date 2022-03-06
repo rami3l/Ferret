@@ -45,16 +45,28 @@ public class VcfConverter {
         // Here a `LinkedHashMap` is used to preserve insertion order.
         var frequencies = new LinkedHashMap<VariantContext, RefFrequencyPair>();
         for (var variant : variants) {
-            // The number of all samples.
-            var total = variant.getNSamples();
+            var samples = variant.getSampleNames();
             // The 0|0 instances.
-            var homRef = variant.getHomRefCount();
-            // The 0|1 instances.
-            var het = variant.getHetCount();
-            // The 0|0, 0|1 and 1|1 instances. No '.' is allowed.
-            var called = total - variant.getNoCallCount();
-            var freq = called == 0 ? 0 : (2 * homRef + het) / (2 * (double) called);
-            frequencies.put(variant, new RefFrequencyPair(freq, called));
+            var homRef = 0;
+            // The 0|1, 0/2, ... instances.
+            var hetRef = 0;
+            // All instances without '.'.
+            var calledNonMixed = 0;
+            for (var sample : samples) {
+                var genotype = variant.getGenotype(sample);
+                if (genotype.isHomRef()) {
+                    homRef++;
+                }
+                if (genotype.isHet() && !genotype.isHetNonRef()) {
+                    hetRef++;
+                }
+                if (genotype.isCalled() && !genotype.isMixed()) {
+                    calledNonMixed++;
+                }
+            }
+            var freq =
+                    calledNonMixed == 0 ? 0 : (2 * homRef + hetRef) / (2 * (double) calledNonMixed);
+            frequencies.put(variant, new RefFrequencyPair(freq, calledNonMixed));
         }
         return frequencies;
     }

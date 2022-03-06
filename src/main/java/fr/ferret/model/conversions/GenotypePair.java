@@ -2,6 +2,8 @@ package fr.ferret.model.conversions;
 
 import java.security.InvalidParameterException;
 import java.util.List;
+import java.util.stream.Collectors;
+import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.VariantContext;
 
 public record GenotypePair(String reference, String alternates) {
@@ -21,10 +23,10 @@ public record GenotypePair(String reference, String alternates) {
 
     public static GenotypePair of(VariantContext ctx) {
         var ref = ctx.getReference().getBaseString();
-        // HACK: We suppose in this case that only the first ALT is useful.
         var alts = ctx.getAlternateAlleles();
-        var alt0 = alts.isEmpty() ? "." : alts.get(0).getBaseString();
-        return new GenotypePair(ref, alt0);
+        var altsStr = alts.isEmpty() ? "."
+                : alts.stream().map(Allele::getBaseString).collect(Collectors.joining(","));
+        return new GenotypePair(ref, altsStr);
     }
 
     public List<String> toListString() {
