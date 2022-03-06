@@ -13,6 +13,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.google.common.collect.Streams;
+import com.pivovarit.function.ThrowingBiConsumer;
+import com.pivovarit.function.ThrowingConsumer;
 import fr.ferret.utils.Resource;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.tribble.TribbleIndexedFeatureReader;
@@ -80,15 +82,11 @@ public class VcfConverter {
     public static String toFrq(String vcfPath, String outPath) throws IOException {
         try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
             var variants = refFrequencies(reader.iterator());
-            variants.forEach((variant, frequency) -> {
-                try {
-                    var r = new FrqRecord(variant, frequency);
-                    writer.write(r.toString());
-                    writer.newLine();
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
+            variants.forEach(ThrowingBiConsumer.unchecked((variant, frequency) -> {
+                var r = new FrqRecord(variant, frequency);
+                writer.write(r.toString());
+                writer.newLine();
+            }));
             return outPath;
         } catch (UncheckedIOException e) {
             throw e.getCause();
@@ -105,19 +103,16 @@ public class VcfConverter {
         try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
             // A `distilled` VCF file should have for its header all the samples in question.
             var pedigrees = Resource.getPedigrees();
-            ((VCFHeader) reader.getHeader()).getGenotypeSamples().stream().forEach(sample -> {
-                try {
-                    // A pedigree record from the `pedigrees` table.
-                    var pedigree = pedigrees.get(sample);
-                    var variants = reader.iterator().stream()
-                            .map(ctx -> GenotypePair.of(ctx, sample)).toList();
-                    var pedRecord = new PedRecord(pedigree, variants);
-                    writer.write(pedRecord.toString());
-                    writer.newLine();
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
+            ((VCFHeader) reader.getHeader()).getGenotypeSamples().stream()
+                    .forEach(ThrowingConsumer.unchecked(sample -> {
+                        // A pedigree record from the `pedigrees` table.
+                        var pedigree = pedigrees.get(sample);
+                        var variants = reader.iterator().stream()
+                                .map(ctx -> GenotypePair.of(ctx, sample)).toList();
+                        var pedRecord = new PedRecord(pedigree, variants);
+                        writer.write(pedRecord.toString());
+                        writer.newLine();
+                    }));
             return outPath;
         } catch (UncheckedIOException e) {
             throw e.getCause();
