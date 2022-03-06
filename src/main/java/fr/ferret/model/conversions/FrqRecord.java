@@ -7,9 +7,9 @@ import htsjdk.variant.variantcontext.VariantContext;
  */
 public record FrqRecord(String chromosome, String variantId, GenotypePair genotype,
         RefFrequencyPair refFrequency) {
-    public FrqRecord(VariantContext ctx, RefFrequencyPair refFrequency) {
+    public FrqRecord(VariantContext ctx) {
         this(ctx.getContig(), VcfConverter.generateVariantId(ctx), GenotypePair.of(ctx),
-                refFrequency);
+                RefFrequencyPair.of(ctx));
     }
 
     public String toString() {

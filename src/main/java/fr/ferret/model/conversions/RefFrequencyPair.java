@@ -2,6 +2,10 @@ package fr.ferret.model.conversions;
 
 import htsjdk.variant.variantcontext.VariantContext;
 
+/**
+ * The record of a variant's {@code REF} allele of this variant among all its samples' genotypes.
+ * See: {@link FrqRecord}.
+ */
 public record RefFrequencyPair(
         /**
          * The relative frequency of the {@code REF} allele of this variant among all its samples'
@@ -14,7 +18,7 @@ public record RefFrequencyPair(
          */
         int observations) {
     /**
-     * Generates a {@code RefFrequencyPair} from a {@code VariantContext} by iterating through all
+     * Generates a {@link RefFrequencyPair} from a {@link VariantContext} by iterating through all
      * its samples.
      */
     public static RefFrequencyPair of(VariantContext variant) {

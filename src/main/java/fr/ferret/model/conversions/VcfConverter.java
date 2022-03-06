@@ -6,14 +6,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import com.google.common.collect.Streams;
-import com.pivovarit.function.ThrowingBiConsumer;
 import com.pivovarit.function.ThrowingConsumer;
 import fr.ferret.utils.Resource;
 import htsjdk.tribble.FeatureReader;
@@ -54,37 +47,16 @@ public class VcfConverter {
     }
 
     /**
-     * Calculates the {@code REF} allele frequency for some variants in respect of the given list of
-     * samples.
-     */
-    public static Map<VariantContext, RefFrequencyPair> refFrequencies(
-            Iterable<VariantContext> variants) {
-        // Here a `LinkedHashMap` is used to preserve insertion order.
-        return refFrequencies(Streams.stream(variants));
-    }
-
-    /**
-     * Calculates the {@code REF} allele frequency for some variants in respect of the given list of
-     * samples.
-     */
-    public static Map<VariantContext, RefFrequencyPair> refFrequencies(
-            Stream<VariantContext> variants) {
-        // Here a `LinkedHashMap` is used to preserve insertion order.
-        return variants.collect(Collectors.toMap(Function.identity(), RefFrequencyPair::of,
-                (old, neu) -> neu, LinkedHashMap::new));
-    }
-
-    /**
      * Read the given VCF file and create the corresponding FRQ file, returning its relative path.
      * 
      * @param vcfPath relative path to the VCF file we want to convert.
      */
     public static String toFrq(String vcfPath, String outPath) throws IOException {
         try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
-            var variants = refFrequencies(reader.iterator());
-            variants.forEach(ThrowingBiConsumer.unchecked((variant, frequency) -> {
-                var r = new FrqRecord(variant, frequency);
-                writer.write(r.toString());
+            var variants = reader.iterator();
+            variants.forEach(ThrowingConsumer.unchecked(variant -> {
+                var rec = new FrqRecord(variant);
+                writer.write(rec.toString());
                 writer.newLine();
             }));
             return outPath;

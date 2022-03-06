@@ -3,7 +3,7 @@ package fr.ferret.model.conversions;
 import java.util.List;
 import java.util.stream.Stream;
 
-/** A single line in a {@code .ped} file. */
+/** A single line in a {@code .ped} file. See: https://www.cog-genomics.org/plink2/formats#ped */
 public record PedRecord(String familyId, String individualId, String paternalId, String maternalId,
         int sex, Number phenotype, List<GenotypePair> variants) {
 
