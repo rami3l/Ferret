@@ -6,25 +6,12 @@ plugins {
     id 'io.freefair.lombok' version '6.3.0'
 }
 
-repositories {
-    mavenCentral()
-}
-
 group = 'fr.ferret'
 version = '1.0-SNAPSHOT'
 description = 'NewFerret'
 
-apply plugin: 'maven-publish'
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
-}
-
-ext {
-    javaMainClass = "fr.ferret.FerretMain"
+repositories {
+    mavenCentral()
 }
 
 dependencies {
@@ -62,14 +49,24 @@ test {
     useTestNG()
 }
 
+ext {
+    javaMainClass = "fr.ferret.FerretMain"
+}
+
+apply plugin: 'maven-publish'
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
 application {
     mainClass = javaMainClass
 }
 
 java {
-    group = 'fr.ferret'
-    version = '1.0-SNAPSHOT'
-    description = 'NewFerret'
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
