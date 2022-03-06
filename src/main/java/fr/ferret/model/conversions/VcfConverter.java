@@ -1,5 +1,6 @@
 package fr.ferret.model.conversions;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -8,6 +9,10 @@ import java.nio.file.StandardOpenOption;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import com.google.common.collect.Streams;
 import fr.ferret.utils.Resource;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.tribble.TribbleIndexedFeatureReader;
@@ -36,6 +41,16 @@ public class VcfConverter {
         return ctx.hasID() ? ctx.getID() : String.format("%s:%d", ctx.getContig(), ctx.getStart());
     }
 
+    private static FeatureReader<VariantContext> vcfTribbleReader(String vcfPath)
+            throws IOException {
+        return new TribbleIndexedFeatureReader<>(vcfPath, new VCFCodec(), false);
+    }
+
+    private static BufferedWriter truncatingFileWriter(String outPath) throws IOException {
+        return Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
     /**
      * Calculates the {@code REF} allele frequency for some variants in respect of the given list of
      * samples.
@@ -43,32 +58,18 @@ public class VcfConverter {
     public static Map<VariantContext, RefFrequencyPair> refFrequencies(
             Iterable<VariantContext> variants) {
         // Here a `LinkedHashMap` is used to preserve insertion order.
-        var frequencies = new LinkedHashMap<VariantContext, RefFrequencyPair>();
-        for (var variant : variants) {
-            var samples = variant.getSampleNames();
-            // The 0|0 instances.
-            var homRef = 0;
-            // The 0|1, 0/2, ... instances.
-            var hetRef = 0;
-            // All instances without '.'.
-            var calledNonMixed = 0;
-            for (var sample : samples) {
-                var genotype = variant.getGenotype(sample);
-                if (genotype.isHomRef()) {
-                    homRef++;
-                }
-                if (genotype.isHet() && !genotype.isHetNonRef()) {
-                    hetRef++;
-                }
-                if (genotype.isCalled() && !genotype.isMixed()) {
-                    calledNonMixed++;
-                }
-            }
-            var freq =
-                    calledNonMixed == 0 ? 0 : (2 * homRef + hetRef) / (2 * (double) calledNonMixed);
-            frequencies.put(variant, new RefFrequencyPair(freq, calledNonMixed));
-        }
-        return frequencies;
+        return refFrequencies(Streams.stream(variants));
+    }
+
+    /**
+     * Calculates the {@code REF} allele frequency for some variants in respect of the given list of
+     * samples.
+     */
+    public static Map<VariantContext, RefFrequencyPair> refFrequencies(
+            Stream<VariantContext> variants) {
+        // Here a `LinkedHashMap` is used to preserve insertion order.
+        return variants.collect(Collectors.toMap(Function.identity(), RefFrequencyPair::of,
+                (old, neu) -> neu, LinkedHashMap::new));
     }
 
     /**
@@ -77,10 +78,7 @@ public class VcfConverter {
      * @param vcfPath relative path to the VCF file we want to convert.
      */
     public static String toFrq(String vcfPath, String outPath) throws IOException {
-        try (var writer = Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-                FeatureReader<VariantContext> reader =
-                        new TribbleIndexedFeatureReader<>(vcfPath, new VCFCodec(), false)) {
+        try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
             var variants = refFrequencies(reader.iterator());
             variants.forEach((variant, frequency) -> {
                 try {
@@ -104,10 +102,7 @@ public class VcfConverter {
      * @param outPath path ti the output file.
      */
     public static String toPed(String vcfPath, String outPath) throws IOException {
-        try (var writer = Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-                FeatureReader<VariantContext> reader =
-                        new TribbleIndexedFeatureReader<>(vcfPath, new VCFCodec(), false)) {
+        try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
             // A `distilled` VCF file should have for its header all the samples in question.
             var pedigrees = Resource.getPedigrees();
             ((VCFHeader) reader.getHeader()).getGenotypeSamples().stream().forEach(sample -> {
@@ -135,10 +130,7 @@ public class VcfConverter {
      * @param vcfPath relative path to the VCF file we want to convert.
      */
     public static String toMap(String vcfPath, String outPath) throws IOException {
-        try (var writer = Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-                FeatureReader<VariantContext> reader =
-                        new TribbleIndexedFeatureReader<>(vcfPath, new VCFCodec(), false)) {
+        try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
             for (var variant : reader.iterator()) {
                 writer.write(new MapRecord(variant).toString());
                 writer.newLine();
@@ -153,10 +145,7 @@ public class VcfConverter {
      * @param vcfPath relative path to the VCF file we want to convert.
      */
     public static String toInfo(String vcfPath, String outPath) throws IOException {
-        try (var writer = Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-                FeatureReader<VariantContext> reader =
-                        new TribbleIndexedFeatureReader<>(vcfPath, new VCFCodec(), false)) {
+        try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
             for (var variant : reader.iterator()) {
                 writer.write(new InfoRecord(variant).toString());
                 writer.newLine();
