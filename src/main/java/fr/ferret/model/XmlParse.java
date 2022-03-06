@@ -16,11 +16,6 @@ public class XmlParse {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String URLNAME =
-            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&term=";
-    public static final String ENDURLNAME = "[GENE]%20AND%20human[ORGN]&retmode=xml";
-
-
     /**
      * @param parentNode
      * @param childName
@@ -166,6 +161,10 @@ public class XmlParse {
         }
     }
 
+
+    /**
+     * @param time of pause
+     */
     private static void pause(int time) {
         try {
             Thread.sleep(time);
@@ -189,10 +188,5 @@ public class XmlParse {
             return false;
         }
         return true;
-    }
-
-
-    public static String getURLFromName(String name) {
-        return URLNAME + name + ENDURLNAME;
     }
 }

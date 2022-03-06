@@ -6,7 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 /**
- * Allow to have the release and the date of a specified node
+ * Allow to have the hgVersion and patch (ex : "GRCh38" and 13 for "GRCh38.p13") and the accession
+ * version (ex : 39 for "GCF_000001405.39")
  */
 @Getter
 @EqualsAndHashCode
@@ -23,6 +24,11 @@ public class HgRelease {
         this.assVersion = assVersion;
     }
 
+
+    /**
+     * @param node which may contains a release
+     * @return Optional<HgRelease> : exists if found ; Optional.empty() if not
+     */
     public static Optional<HgRelease> of(Node node) {
         String[] version = XmlParse.getNodeFromPath(node, "Gene-commentary_heading").getFirstChild()
                 .getNodeValue().split("\\.p");
