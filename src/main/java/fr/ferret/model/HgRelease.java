@@ -1,5 +1,6 @@
 package fr.ferret.model;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import fr.ferret.model.utils.XmlParser;
@@ -32,13 +33,15 @@ public class HgRelease {
      * @return Optional<HgRelease> : exists if found ; Optional.empty() if not
      */
     public static Optional<HgRelease> of(Node node) {
-        String[] version = XmlParser.getNodeFromPath(node, "Gene-commentary_heading").getFirstChild()
-                .getNodeValue().split("\\.p");
+        Node preciseNode = XmlParser.getNodeFromPath(node,
+                Arrays.asList("Gene-commentary_comment", "Gene-commentary"));
+        String[] version = XmlParser.getNodeFromPath(preciseNode, "Gene-commentary_heading")
+                .getFirstChild().getNodeValue().split("\\.p");
         try {
             int patch = Integer.parseInt(version[1]);
             String hgVersion = version[0];
-            int assVersion =
-                    Integer.parseInt(XmlParser.getNodeFromPath(node, "Gene-commentary_accession")
+            int assVersion = Integer
+                    .parseInt(XmlParser.getNodeFromPath(preciseNode, "Gene-commentary_version")
                             .getFirstChild().getNodeValue());
             return Optional.of(new HgRelease(hgVersion, patch, assVersion));
         } catch (Exception e) {

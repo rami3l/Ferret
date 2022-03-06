@@ -22,7 +22,7 @@ public class VersionUpdater {
 
         /**
          * @param currentGNode general node corresponding to an idGene
-         * @return Locus : Locus corresponding to an idGene (represented by a currentGNode)
+         * @return Map<HumanGenomeVersion> : key = version ; value = accessionVersion
          */
         public Map<HumanGenomeVersions, Integer> getPatchesFromVersions(
                         List<HumanGenomeVersions> versionList) {
@@ -36,7 +36,7 @@ public class VersionUpdater {
 
         /**
          * @param currentGNode general node corresponding to an idGene
-         * @return Node : contains the start and stop positions on 2 direct children
+         * @return Node : contains the nodes that have the information of the HgReleases
          */
         private Node getXmlReleasesNode(Node currentGNode) {
                 // go down on the path :
@@ -49,22 +49,21 @@ public class VersionUpdater {
 
 
         /**
-         * @param geneLocationHistoryNode
-         * @param versionList2
+         * @param geneCommentaryComments
+         * @param versionList
          * @return Node : has the highest release then date corresponding to the good version
          */
-        private Map<HumanGenomeVersions, Integer> extractPatches(Node geneLocationHistoryNode,
+        private Map<HumanGenomeVersions, Integer> extractPatches(Node geneCommentaryComments,
                         List<HumanGenomeVersions> versionList) {
 
-                NodeList annotationReleases = geneLocationHistoryNode.getChildNodes();
+                NodeList annotationReleases = geneCommentaryComments.getChildNodes();
                 var releaseList = IntStream.range(0, annotationReleases.getLength())
                                 .mapToObj(annotationReleases::item).map(HgRelease::of)
-                                .filter(Optional::isPresent).map(Optional::get).toList();
-
+                                .filter(Optional::isPresent).map(Optional::get).distinct().toList();
 
                 return versionList.stream().collect(Collectors.toMap(Function.identity(),
                                 version -> releaseList.stream()
-                                                .filter(release -> version.toString()
+                                                .filter(release -> version.toGRC()
                                                                 .equals(release.getHgVersion()))
                                                 .max(Comparator.comparing(HgRelease::getPatch))
                                                 .get().getAssVersion()));
