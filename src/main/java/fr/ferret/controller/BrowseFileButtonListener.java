@@ -4,10 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.JButton;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import fr.ferret.utils.Resource;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.Getter;
@@ -51,8 +49,8 @@ public class BrowseFileButtonListener implements ActionListener {
         var file = GuiUtils.chooseFile(runButton, false);
         file.ifPresent(f -> {
             selectedFile = f;
-            selectedFileLabel.setText(Resource.getTextElement("browse.selectedfile")
-                + f.getAbsolutePath());
+            selectedFileLabel
+                    .setText(Resource.getTextElement("browse.selectedfile") + f.getAbsolutePath());
         });
     }
 }

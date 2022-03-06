@@ -1,17 +1,20 @@
 package fr.ferret.view.utils;
 
-import lombok.experimental.UtilityClass;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.GridBagConstraints;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static fr.ferret.utils.Resource.getTextElement;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import fr.ferret.utils.Resource;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class GuiUtils {
@@ -41,15 +44,15 @@ public class GuiUtils {
      * Open a popup to let the user choose a file
      *
      * @param parent The parent {@link Component} of the popup
-     * @param save   The selection mode (true → save, false → open)
+     * @param save The selection mode (true → save, false → open)
      * @return An {@link Optional} {@link File} (empty if no file selected)
      */
     public Optional<File> chooseFile(Component parent, boolean save) {
         var fileChooser = save ? new SaveFileChooser() : new OpenFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setDialogTitle(getTextElement(save ? "run.save" : "gene.selectfile"));
+        fileChooser.setDialogTitle(Resource.getTextElement(save ? "run.save" : "gene.selectfile"));
         int returnVal = fileChooser.showDialog(parent,
-            getTextElement(save ? "run.saveButtonText" : "gene.openButtonText"));
+                Resource.getTextElement(save ? "run.saveButtonText" : "gene.openButtonText"));
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             return Optional.ofNullable(fileChooser.getSelectedFile());
         }
@@ -97,14 +100,16 @@ public class GuiUtils {
      * FileChooser which confirms the will to overwrite the selected file if it already exists
      */
     private static class SaveFileChooser extends JFileChooser {
-        @Override public void approveSelection() {
-            if(getSelectedFile() == null) return;
-            if(getSelectedFile().exists()){
+        @Override
+        public void approveSelection() {
+            if (getSelectedFile() == null)
+                return;
+            if (getSelectedFile().exists()) {
                 // If the file exists, we open a confirmation dialog
                 int result = JOptionPane.showConfirmDialog(this,
-                    getTextElement("run.fileExistingMsg"),
-                    getTextElement("run.fileExistingTitle"),
-                    JOptionPane.YES_NO_CANCEL_OPTION);
+                        Resource.getTextElement("run.fileExistingMsg"),
+                        Resource.getTextElement("run.fileExistingTitle"),
+                        JOptionPane.YES_NO_CANCEL_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     super.approveSelection();
                 } else if (result == JOptionPane.CANCEL_OPTION) {
@@ -121,7 +126,8 @@ public class GuiUtils {
      * File chooser which checks if the selected file exists
      */
     private static class OpenFileChooser extends JFileChooser {
-        @Override public void approveSelection() {
+        @Override
+        public void approveSelection() {
             if (getSelectedFile() != null && getSelectedFile().isFile())
                 super.approveSelection();
         }

@@ -3,11 +3,9 @@ package fr.ferret.controller;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
-
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
 import fr.ferret.model.utils.FileReader;
@@ -51,7 +49,8 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
                 : panel.getFileSelector().getSelectedFile().getAbsolutePath();
         boolean snpFileImported = snpFileNameAndPath != null;
 
-        // Are they errors in imported file (impossible to read, invalid extension or invalid content)
+        // Are they errors in imported file (impossible to read, invalid extension or invalid
+        // content)
         boolean snpFileError = false;
         boolean snpFileExtensionError = false;
         boolean invalidCharacter = false;
@@ -118,7 +117,8 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
                 error.append("run.selectvari.fext").highlight(runButton);
             }
             if ((snpListInputted || snpFileImported) && invalidCharacter) {
-                error.append("run.selectvari.cerr").highlight(snpListInputted ? idSelector : runButton);
+                error.append("run.selectvari.cerr")
+                        .highlight(snpListInputted ? idSelector : runButton);
             }
             if (!popSelected) {
                 error.append("run.selectpop").highlight(frame.getRegionPanel());

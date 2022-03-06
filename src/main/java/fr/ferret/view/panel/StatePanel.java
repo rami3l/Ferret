@@ -1,25 +1,23 @@
 package fr.ferret.view.panel;
 
-import fr.ferret.utils.Resource;
-import fr.ferret.view.utils.GuiUtils;
-import lombok.AllArgsConstructor;
-import reactor.core.Disposable;
-import reactor.core.publisher.Flux;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.time.Duration;
-
-import static fr.ferret.utils.Resource.getIcon;
-import static fr.ferret.utils.Resource.getTextElement;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import fr.ferret.utils.Resource;
+import fr.ferret.view.utils.GuiUtils;
+import lombok.AllArgsConstructor;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
 
 public class StatePanel extends JPanel {
-
     /**
      * the label describing the current state (downloading header, lines, etc.)
      */
@@ -43,8 +41,9 @@ public class StatePanel extends JPanel {
 
         stateLabel = new JLabel(text);
         spinner = new JLabel();
-        getIcon("/img/loading.gif").ifPresentOrElse(spinner::setIcon, () -> spinner.setText("..."));
-        spinner.setToolTipText(getTextElement("tooltip.downloading"));
+        Resource.getIcon("/img/loading.gif").ifPresentOrElse(spinner::setIcon,
+                () -> spinner.setText("..."));
+        spinner.setToolTipText(Resource.getTextElement("tooltip.downloading"));
 
         openButton = new JButton();
         openButton.setVisible(false);
@@ -74,25 +73,27 @@ public class StatePanel extends JPanel {
     private void complete(boolean ok) {
         // When the download is complete, hides spinner and makes the open button visible
         spinner.setVisible(false);
-        if(ok && downloadLocation != null) {
-            openButton.setToolTipText(getTextElement("tooltip.openDownload"));
-            getIcon("/img/open-folder.png").ifPresentOrElse(openButton::setIcon, () -> openButton.setText(getTextElement("button.open")));
+        if (ok && downloadLocation != null) {
+            openButton.setToolTipText(Resource.getTextElement("tooltip.openDownload"));
+            Resource.getIcon("/img/open-folder.png").ifPresentOrElse(openButton::setIcon,
+                    () -> openButton.setText(Resource.getTextElement("button.open")));
             openButton.addActionListener(new ButtonListener());
             openButton.setVisible(true);
         }
         completed = true;
         if (canDestroy)
             destroyAction = startDestroyAction();
-        //openButton.setBorder(null);
-        //openButton.setBorder(BorderFactory.createLineBorder(withOpacity(openButton.getBackground(), 1), 3));
+        // openButton.setBorder(null);
+        // openButton.setBorder(BorderFactory.createLineBorder(withOpacity(openButton.getBackground(),
+        // 1), 3));
     }
 
     // TODO: opacity change is not fluent
     private Disposable startDestroyAction() {
         return Flux.range(0, 26).delaySubscription(Duration.ofSeconds(3))
-            .delayElements(Duration.ofMillis(200))
-            .doOnNext(i -> setForegroundOpacity(stateLabel, 250 - 10 * i))
-            .doOnComplete(this::destroy).subscribe();
+                .delayElements(Duration.ofMillis(200))
+                .doOnNext(i -> setForegroundOpacity(stateLabel, 250 - 10 * i))
+                .doOnComplete(this::destroy).subscribe();
     }
 
     private void destroy() {
@@ -114,7 +115,8 @@ public class StatePanel extends JPanel {
 
         private final JPanel panel;
 
-        @Override public void mouseEntered(MouseEvent e) {
+        @Override
+        public void mouseEntered(MouseEvent e) {
             panel.setBackground(panel.getBackground().darker());
             canDestroy = false;
             if (destroyAction != null) {
@@ -123,7 +125,8 @@ public class StatePanel extends JPanel {
             }
         }
 
-        @Override public void mouseExited(MouseEvent e) {
+        @Override
+        public void mouseExited(MouseEvent e) {
             panel.setBackground(panel.getBackground().brighter());
             if (completed) {
                 destroyAction = startDestroyAction();
@@ -132,7 +135,8 @@ public class StatePanel extends JPanel {
     }
 
     private class ButtonListener implements ActionListener {
-        @Override public void actionPerformed(ActionEvent actionEvent) {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
             GuiUtils.openFileLocation(downloadLocation);
         }
     }

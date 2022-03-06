@@ -1,6 +1,5 @@
 package fr.ferret.view.panel.inputs;
 
-import static fr.ferret.view.utils.GuiUtils.addToPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -15,6 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import fr.ferret.controller.BrowseFileButtonListener;
 import fr.ferret.utils.Resource;
+import fr.ferret.view.utils.GuiUtils;
 import lombok.Getter;
 
 /**
@@ -99,11 +99,11 @@ public class GenePanel extends JPanel {
         fileSelector = new BrowseFileButtonListener(this, browseButton, selectedFile);
 
         // Add the elements defined above to the input panel
-        addToPanel(inputPanel, inputField, 0.8, 1, 1);
-        addToPanel(inputPanel, labOr, 0.3, 2, 1);
-        addToPanel(inputPanel, browseButton, 0.3, 3, 1);
-        addToPanel(inputPanel, selectedFile, 0.3, 3, 2);
-        addToPanel(inputPanel, choice, 0.8, 1, 2);
+        GuiUtils.addToPanel(inputPanel, inputField, 0.8, 1, 1);
+        GuiUtils.addToPanel(inputPanel, labOr, 0.3, 2, 1);
+        GuiUtils.addToPanel(inputPanel, browseButton, 0.3, 3, 1);
+        GuiUtils.addToPanel(inputPanel, selectedFile, 0.3, 3, 2);
+        GuiUtils.addToPanel(inputPanel, choice, 0.8, 1, 2);
 
         return inputPanel;
     }
@@ -131,8 +131,8 @@ public class GenePanel extends JPanel {
         buttonGroup.add(rdoID);
 
         // Add the elements defined above to the input panel
-        addToPanel(choice, rdoName, 0.5, 1, 1);
-        addToPanel(choice, rdoID, 0.5, 2, 1);
+        GuiUtils.addToPanel(choice, rdoName, 0.5, 1, 1);
+        GuiUtils.addToPanel(choice, rdoID, 0.5, 2, 1);
 
         return choice;
     }
