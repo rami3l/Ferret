@@ -38,7 +38,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         // List which will contain the genes (from field or file)
         List<String> geneList = null;
 
-        String geneString = geneField.getText();
+        String geneString = geneField.getText().replace(" ", "");
 
         // Did the user input a list of gene
         boolean geneListInputted = geneString.length() > 0;
@@ -71,7 +71,6 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             }
 
         } else if (geneListInputted) {
-            geneString = geneString.replace(" ", "");
             invalidCharacter = geneString.replace(",", "").matches(invalidRegex);
             if (geneString.endsWith(",")) {
                 geneString = geneString.substring(0, geneString.length() - 1);
