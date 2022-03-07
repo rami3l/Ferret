@@ -13,20 +13,29 @@ import org.xml.sax.SAXException;
 public class HgReleaseTest {
 
     @Test
-    void testOfWorks() {
+    void testOfWorks() throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder docBldr = dbf.newDocumentBuilder();
-            org.w3c.dom.Document xmlDocument =
-                    docBldr.parse("src.test.resources.hgReleaseTestFonctionne.xml");
-            Node node = xmlDocument.getDocumentElement();
-            var hgRelease = HgRelease.of(node).get();
-            assertEquals("GRCh38", hgRelease.getHgVersion());
-            assertEquals(13, hgRelease.getPatch());
-            assertEquals(39, hgRelease.getAssVersion());
-        } catch (ParserConfigurationException | SAXException | IOException e) {
-            assertTrue(false);
-            e.printStackTrace();
-        }
+        DocumentBuilder docBldr = dbf.newDocumentBuilder();
+        org.w3c.dom.Document xmlDocument =
+                docBldr.parse("src/test/resources/hgReleaseTestFonctionne.xml");
+        Node node = xmlDocument.getDocumentElement();
+        var hgReleaseOpt = HgRelease.of(node);
+        assertTrue(hgReleaseOpt.isPresent());
+        var hgRelease = hgReleaseOpt.get();
+        assertEquals("GRCh38", hgRelease.getHgVersion());
+        assertEquals(13, hgRelease.getPatch());
+        assertEquals(39, hgRelease.getAssVersion());
+    }
+
+    @Test
+    void testReleaseNotFound_ShouldReturnEmpty()
+            throws SAXException, IOException, ParserConfigurationException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBldr = dbf.newDocumentBuilder();
+        org.w3c.dom.Document xmlDocument =
+                docBldr.parse("src/test/resources/hgReleaseTestFonctionne.xml");
+        Node node = xmlDocument.getDocumentElement().getFirstChild();
+        var hgRelease = HgRelease.of(node);
+        assertTrue(hgRelease.isEmpty());
     }
 }

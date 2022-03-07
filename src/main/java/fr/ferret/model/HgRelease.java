@@ -33,11 +33,11 @@ public class HgRelease {
      * @return Optional<HgRelease> : exists if found ; Optional.empty() if not
      */
     public static Optional<HgRelease> of(Node node) {
-        Node preciseNode = XmlParser.getNodeFromPath(node,
-                Arrays.asList("Gene-commentary_comment", "Gene-commentary"));
-        String[] version = XmlParser.getNodeFromPath(preciseNode, "Gene-commentary_heading")
-                .getFirstChild().getNodeValue().split("\\.p");
         try {
+            Node preciseNode = XmlParser.getNodeFromPath(node,
+                    Arrays.asList("Gene-commentary_comment", "Gene-commentary"));
+            String[] version = XmlParser.getNodeFromPath(preciseNode, "Gene-commentary_heading")
+                    .getFirstChild().getNodeValue().split("\\.p");
             int patch = Integer.parseInt(version[1]);
             String hgVersion = version[0];
             int assVersion = Integer

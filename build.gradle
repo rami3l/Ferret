@@ -40,6 +40,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
 
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
     testImplementation 'io.projectreactor:reactor-test:3.4.15'
