@@ -31,12 +31,20 @@ dependencies {
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
     implementation 'io.projectreactor:reactor-core:3.4.15'
 
+    // Configuration managing lib
+    // https://mvnrepository.com/artifact/org.spongepowered/configurate-core
+    implementation 'org.spongepowered:configurate-core:4.1.2'
+
+    // HOCON loader for `configurate-core`
+    // https://mvnrepository.com/artifact/org.spongepowered/configurate-hocon
+    implementation 'org.spongepowered:configurate-hocon:4.1.2'
+
     // Convenient interfaces for throwing functions
     // https://mvnrepository.com/artifact/com.pivovarit/throwing-function
     implementation 'com.pivovarit:throwing-function:1.5.1'
 
-    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
 
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
     testImplementation 'io.projectreactor:reactor-test:3.4.15'
@@ -46,7 +54,7 @@ dependencies {
 }
 
 test {
-    useTestNG()
+    useJUnitPlatform()
 }
 
 ext {
