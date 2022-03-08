@@ -101,15 +101,13 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
             final int end) {
         run(outFile -> {
             logger.log(Level.INFO, "Starting gene research...");
-            var isgrClient = IgsrClient.builder()
-                    .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
             var download = frame.getBottomPanel().addState("Starting download", outFile);
             //isgrClient.exportVCFFromSamples(outFile, start, end, populations)
             //        .doOnComplete(download::complete).doOnError(e -> {
             //            logger.log(Level.WARNING, "Error while downloading or writing");
             //            download.error();
             //        }).subscribe(download::setState);
-            new VcfExport(Flux.just(new Locus(chr, start, end))).start(outFile)
+            new VcfExport(Flux.just(new Locus(chr, start, end))).setFilter(populations).start(outFile)
                     .doOnComplete(download::complete).doOnError(e -> {
                         logger.log(Level.WARNING, "Error while downloading or writing");
                         download.error();

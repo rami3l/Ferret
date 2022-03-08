@@ -29,8 +29,7 @@ class IgsrClientTest {
     private final int end = 196194913;
     private final Phases1KG phase = Phases1KG.V3;
     private final String vcfPath = "src/test/resources/chr1-africans-phase3.vcf.gz";
-    private final IgsrClient igsrClient =
-            IgsrClient.builder().phase1KG(phase).urlTemplate(vcfPath).build();
+    private final IgsrClient igsrClient = new IgsrClient(vcfPath);
 
     @Test
     void testBasicQuery() throws IOException {

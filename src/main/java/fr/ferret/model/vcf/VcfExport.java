@@ -1,27 +1,26 @@
 package fr.ferret.model.vcf;
 
-import com.google.errorprone.annotations.Var;
 import com.pivovarit.function.ThrowingFunction;
 import fr.ferret.controller.exceptions.ExceptionHandler;
-import fr.ferret.model.State;
+import fr.ferret.controller.settings.Phases1KG;
+import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.utils.FileWriter;
-import fr.ferret.model.utils.VCFHeaderExt;
-import htsjdk.samtools.util.CloseableIterator;
+import fr.ferret.utils.Resource;
 import htsjdk.samtools.util.MergingIterator;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFUtils;
+import lombok.Builder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -33,6 +32,12 @@ public class VcfExport {
 
     private final Flux<Locus> locusFlux;
     private FluxSink<String> state;
+    private Set<String> samples;
+
+    /**
+     * The phase to use for getting variants (default: selected version)
+     */
+    private final Phases1KG phase1KG = Resource.CONFIG.getSelectedVersion();
 
     public VcfExport(Flux<Locus> locusFlux) {
         this.locusFlux = locusFlux;
@@ -58,7 +63,8 @@ public class VcfExport {
 
     private Mono<FeatureReader<VariantContext>> getReader(String chromosome) {
         // TODO: each getReader call could get into an IOException Error
-        return IgsrClient.builder().build().getReader(chromosome)
+        return new IgsrClient(
+            Resource.getVcfUrlTemplate(phase1KG)).getReader(chromosome)
             .doOnSubscribe(s -> log(String.format("Downloading header of chr %s", chromosome)))
             .doOnError(e -> {
                 ExceptionHandler.connectionError(e);
@@ -69,33 +75,23 @@ public class VcfExport {
 
     private VcfObject merge(List<VcfObject> vcfObjects) {
 
-        var headers = vcfObjects.stream().map(VcfObject::header).toList();
-        //var iterators = vcfObjects.stream().map(VcfObject::variants).toList();
+        var headers = vcfObjects.stream().map(VcfObject::getHeader).toList();
 
-        Comparator<VariantContext> variantContextComparator = headers.get(0).getVCFRecordComparator();
+        var variantContextComparator = headers.get(0).getVCFRecordComparator();
         // TODO: should be compatible (isCompatible) with all others
 
-        var iteratorCollection = vcfObjects.stream().map(VcfObject::variants).toList();
-        // TODO: add all reader iterators
+        var iteratorCollection = vcfObjects.stream().map(VcfObject::getVariants).toList();
 
         var sampleList = headers.get(0).getSampleNamesInOrder();
         // TODO: all headers must have same sample entries ??
+        // TODO: is the order the same that in VariantContexts ?
 
+        // TODO: catch IllegalStateException
         var header = new VCFHeader(VCFUtils.smartMergeHeaders(headers, false), sampleList);
         final var mergingIterator =
             new MergingIterator<>(variantContextComparator, iteratorCollection);
 
         return new VcfObject(header, mergingIterator);
-
-        //final VariantContextWriter writer = builder.build();
-        //writer.writeHeader(header);
-        //while (mergingIterator.hasNext()) {
-        //    final VariantContext context = mergingIterator.next();
-        //    writer.add(context);
-        //}
-        //
-        //CloserUtil.close(mergingIterator);
-        //writer.close();
     }
 
     /**
@@ -108,14 +104,33 @@ public class VcfExport {
     public Flux<String> start(File outFile) {
         return Flux.create(s -> {
             state = s;
-            getVcf(locusFlux).collect(Collectors.toList()).map(this::merge).doOnNext(vcf -> {
-                log("Writing to disk...");
-                FileWriter.writeVCF(outFile, vcf.header(), vcf.variants().stream());
-            }).doOnError(FileSystemException.class, ExceptionHandler::fileWritingError)
-                .doOnError(ExceptionHandler::unknownError)
-                .subscribe();
+            getVcf(locusFlux).subscribeOn(Schedulers.boundedElastic()).collect(Collectors.toList())
+                .map(this::merge).doOnNext(vcf -> {
+                    if (samples != null) {
+                        log("Filetering by samples");
+                        vcf = vcf.filter(samples);
+                    }
+                    log("Writing to disk...");
+                    FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
+                }).doOnError(FileSystemException.class, ExceptionHandler::fileWritingError)
+                .doOnError(ExceptionHandler::unknownError).subscribe();
             // TODO: errors
         });
+    }
+
+    /**
+     * Set the sample filter for this {@link VcfExport export}
+     *
+     * @param selection the selected populations
+     * @return this {@link VcfExport}
+     */
+    public VcfExport setFilter(ZoneSelection selection) {
+        try {
+            samples = Resource.getSamples(phase1KG, selection);
+        } catch (IOException e) {
+            ExceptionHandler.ressourceAccessError(e);
+        }
+        return this;
     }
 
 
