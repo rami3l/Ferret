@@ -43,6 +43,18 @@ public class LocusBuilder {
         this.assemblyAccVer = assemblyAccVer;
     }
 
+    public Flux<Locus> buildFromVariant(List<String> ids) {
+        // TODO: create a flux from ids and delay elements
+        // TODO: map with a method which converts a variant id to a Locus and return this flux
+        return Flux.empty();
+    }
+
+    public Mono<Locus> fromVariant(String id) {
+        // TODO: creates a json input stream from url template and id
+        // TODO: call VariantConverter with this json and return
+        return Mono.empty();
+    }
+
     /**
      * Converts the found gene names/ids to locus.<br>
      * TODO: show a popup containing names/ids of genes not if there are any <br>
@@ -51,7 +63,7 @@ public class LocusBuilder {
      * @param idsOrNames A {@link List list} of gene names/ids
      * @return A {@link Flux} containing the locus for found genes (empty in case of error).
      */
-    public Flux<Locus> buildFrom(List<String> idsOrNames) {
+    public Flux<Locus> buildFromGene(List<String> idsOrNames) {
         var flux = Flux.fromIterable(idsOrNames);
         // ids are numeric
         var ids = flux.filter(Conversion::isInteger);
