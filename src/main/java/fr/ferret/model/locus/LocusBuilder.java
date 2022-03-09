@@ -65,14 +65,16 @@ public class LocusBuilder {
 
     /**
      * Makes a request to the ncbi server to get the id of the gene from its name.
-     * The id is returned if found, else the name is added to the _genesNoFound_ {@link List} <br>
+     * The id is returned if found, else the name is added to the <i>genesNoFound</i> {@link List}
+     * <br>
      * TODO: show an error popup in case of error (invalid url, network error)
      *
      * @param name The name of the gene to find the id of
      * @return A mono encapsulating the name of the gene (present if found)
      */
     public Mono<String> fromName(String name) {
-        logger.info(String.format("Getting id for gene [%s]", name));
+        // TODO: We should url encode the name
+        logger.log(Level.INFO, "Getting id for gene [{0}]", name);
         try {
             var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
             return GeneConverter.extractId(new JsonDocument(json)).or(notFound(name));
@@ -91,13 +93,14 @@ public class LocusBuilder {
     }
 
     /**
-     * Converts the found ids to locus and adds the other to the {@link List list} _genesNotFound_
+     * Converts the found ids to locus and adds the other to the {@link List list}
+     * <i>genesNotFound</i>
      *
      * @param ids A {@link Flux} containing all the ids to convert to locus
      * @return A {@link Flux} containing the {@link Locus locus} for found ids
      */
     public Flux<Locus> fromIds(Flux<String> ids) {
-        // TODO: we should url encode ids
+        // TODO: we should url encode the ids
         // We cache the ids because we need them twice (once for creating the url, and once for
         // extracting locus from json) and we don't want to consume the flux twice (it would
         // duplicate all previous actions, like getting ids from names)
