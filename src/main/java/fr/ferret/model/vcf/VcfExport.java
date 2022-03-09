@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
  */
 public class VcfExport {
 
+    // TODO: add a cancel option (Use the Disposable returned by the subscribe call at the end of the start method)
+    // TODO: add a warning while trying to close Ferret although an export is not finished -> keep somewhere the list of VcfExports
+
     private static final Logger logger = Logger.getLogger(VcfExport.class.getName());
 
     private final Flux<Locus> locusFlux;
@@ -127,7 +130,9 @@ public class VcfExport {
                     FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
                     state.next(new State(State.WRITTEN, outFile.getName(), null));
                     logger.info("File written");
-                }).doOnError(FileSystemException.class, ExceptionHandler::fileWritingError)
+                })
+                .doOnSuccess(r -> state.complete())
+                .doOnError(FileSystemException.class, ExceptionHandler::fileWritingError)
                 .doOnError(ExceptionHandler::unknownError).subscribe();
             // TODO: errors
         });

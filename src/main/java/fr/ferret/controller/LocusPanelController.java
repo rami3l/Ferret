@@ -101,7 +101,6 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
         run(outFile -> {
             logger.log(Level.INFO, "Starting gene research...");
             var download = frame.getBottomPanel().addState("Starting download", outFile);
-            // TODO: complete method seems to not be called
             new VcfExport(Flux.just(new Locus(chr, start, end))).setFilter(populations).start(outFile)
                     .doOnComplete(download::complete).doOnError(e -> {
                         logger.log(Level.WARNING, "Error while downloading or writing");
