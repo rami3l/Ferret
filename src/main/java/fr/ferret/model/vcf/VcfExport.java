@@ -76,7 +76,7 @@ public class VcfExport {
             Resource.getVcfUrlTemplate(phase1KG)).getReader(chromosome)
             .doOnSubscribe(s -> {
                 state.next(new State(State.DOWNLOADING_HEADER, chromosome, chromosome));
-                logger.info(String.format("Downloading header of chr %s", chromosome));
+                logger.info(String.format("Getting header of chr %s", chromosome));
             })
             .doOnError(e -> {
                 ExceptionHandler.connectionError(e);

@@ -4,7 +4,6 @@ import fr.ferret.model.locus.LocusBuilder;
 import fr.ferret.utils.Resource;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.io.InputStream;
 import java.time.Duration;

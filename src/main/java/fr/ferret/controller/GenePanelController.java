@@ -2,15 +2,21 @@ package fr.ferret.controller;
 
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
+import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.locus.Locus;
+import fr.ferret.model.locus.LocusBuilder;
 import fr.ferret.model.utils.FileReader;
+import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.GenePanel;
+import reactor.core.publisher.Flux;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -85,6 +91,8 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var locale = new Locale("all");
             geneList = geneList.stream().map(text -> text.toUpperCase(locale)).toList();
 
+            downloadVcf(populations, geneList);
+
             // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
 
         } else {
@@ -93,21 +101,20 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         }
     }
 
-
-    // private void downloadVcf(ZoneSelection populations, String chr,
-    // final int start, final int end) {
-    // run(outFile -> {
-    // logger.log(Level.INFO, "Starting gene research...");
-    // var isgrClient =
-    // IgsrClient.builder().chromosome(chr).phase1KG(Resource.CONFIG.getSelectedVersion()).build();
-    // var download = frame.getBottomPanel().addState("Starting download", outFile);
-    // isgrClient.exportVCFFromSamples(outFile, start, end, populations)
-    // .doOnComplete(download::complete).doOnError(e -> {
-    // logger.log(Level.WARNING, "Error while downloading or writing");
-    // download.error();
-    // }).subscribe(download::setState);
-    // });
-    // }
+    private void downloadVcf(ZoneSelection populations, List<String> geneList) {
+        run(outFile -> {
+            logger.log(Level.INFO, "Starting gene research...");
+            // TODO: get the current assemblyAccVer from Resource
+            var assemblyAccVer = "GCF_000001405.39";
+            var locusFlux = new LocusBuilder(assemblyAccVer).buildFrom(geneList);
+            var download = frame.getBottomPanel().addState("Starting download", outFile);
+            new VcfExport(locusFlux).setFilter(populations).start(outFile)
+                .doOnComplete(download::complete).doOnError(e -> {
+                    logger.log(Level.WARNING, "Error while downloading or writing");
+                    download.error();
+                }).subscribe(download::setState);
+        });
+    }
 
     private void displayError(boolean geneListInputted, boolean geneFileImported,
             boolean geneFileError, boolean geneFileExtensionError, boolean invalidCharacter,

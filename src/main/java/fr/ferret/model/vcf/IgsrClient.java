@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import htsjdk.tribble.FeatureReader;
@@ -50,7 +51,7 @@ public class IgsrClient {
      * @return a {@link TabixFeatureReader} instance pointing to the given file path
      */
     private FeatureReader<VariantContext> initReader(String chromosome) throws IOException {
-        logger.info("Initializing reader...");
+        logger.log(Level.INFO, "Downloader VCF header for chr {0}", chromosome);
         // If index path is not filePath + .tbi, we can add a parameter to TabixFetureReader
         readers.put(chromosome, new TabixFeatureReader<>(getFilePath(chromosome), new VCFCodec()));
         return readers.get(chromosome);
