@@ -4,6 +4,7 @@ import fr.ferret.model.locus.LocusBuilder;
 import fr.ferret.utils.Resource;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
+
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
@@ -70,13 +71,13 @@ class GeneConverterTest {
         var builder = new LocusBuilder("GCF_000001405.39");
         var flux = Flux.fromIterable(names).delayElements(Duration.ofMillis(200))
                 .flatMap(builder::fromName).doOnNext(System.out::println);
-        flux.blockLast();
-        flux.blockLast();
-        flux.blockLast();
-        flux.blockLast();
-        flux.blockLast();
-        flux.blockLast();
-        flux.blockLast();
+        //flux.blockLast();
+        //flux.blockLast();
+        //flux.blockLast();
+        //flux.blockLast();
+        //flux.blockLast();
+        //flux.blockLast();
+        //flux.blockLast();
     }
 
 }

@@ -3,6 +3,8 @@ package fr.ferret.controller.settings;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.File;
+
 /**
  * The global config of Ferret
  */
@@ -28,5 +30,13 @@ public class FerretConfig {
      * The Minor Allele Frequency
      */
     private double mafThreshold;
+
+    //public static void saveToFile(File config) {
+    //
+    //}
+    //
+    //public static FerretConfig loadFromFile(File config) {
+    //
+    //}
 
 }

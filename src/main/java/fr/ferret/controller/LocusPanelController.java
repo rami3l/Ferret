@@ -2,11 +2,14 @@ package fr.ferret.controller;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import fr.ferret.model.IgsrClient;
+
+import fr.ferret.model.locus.Locus;
 import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
+import reactor.core.publisher.Flux;
 
 /**
  * The {@link LocusPanel} controller
@@ -97,10 +100,8 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
             final int end) {
         run(outFile -> {
             logger.log(Level.INFO, "Starting gene research...");
-            var isgrClient = IgsrClient.builder().chromosome(chr)
-                    .phase1KG(Resource.CONFIG.getSelectedVersion()).build();
             var download = frame.getBottomPanel().addState("Starting download", outFile);
-            isgrClient.exportVCFFromSamples(outFile, start, end, populations)
+            new VcfExport(Flux.just(new Locus(chr, start, end))).setFilter(populations).start(outFile)
                     .doOnComplete(download::complete).doOnError(e -> {
                         logger.log(Level.WARNING, "Error while downloading or writing");
                         download.error();
