@@ -24,13 +24,12 @@ public class VersionUpdater {
          * @param currentGNode general node corresponding to an idGene
          * @return Map<HumanGenomeVersion> : key = version ; value = accessionVersion
          */
-        public Map<HumanGenomeVersions, Integer> getPatchesFromVersions(
+        public Optional<Map<HumanGenomeVersions, Integer>> getPatchesFromVersions(
                         List<HumanGenomeVersions> versionList) {
                 org.w3c.dom.Document xmlDocument = XmlParser.document(URLTEST);
                 Node gNode = xmlDocument.getDocumentElement();
-                // Node containing the start and stop positions.
-                Node geneLocationHistoryNode = getXmlReleasesNode(gNode);
-                return extractPatches(geneLocationHistoryNode, versionList);
+                return getXmlReleasesNode(gNode).map(
+                                locationHistory -> extractPatches(locationHistory, versionList));
         }
 
 
@@ -38,12 +37,14 @@ public class VersionUpdater {
          * @param currentGNode general node corresponding to an idGene
          * @return Node : contains the nodes that have the information of the HgReleases
          */
-        private Node getXmlReleasesNode(Node currentGNode) {
+        private Optional<Node> getXmlReleasesNode(Node currentGNode) {
                 // go down on the path :
-                return XmlParser.xmlCommentFinder(
-                                XmlParser.getNodeFromPath(currentGNode,
-                                                Arrays.asList("Entrezgene", "Entrezgene_comments")),
-                                "254", "Gene Location History", "Gene-commentary_comment");
+                return XmlParser.getNodeFromPath(currentGNode,
+                                Arrays.asList("Entrezgene", "Entrezgene_comments"))
+                                .map(nodeFromPath -> XmlParser.xmlCommentFinder(nodeFromPath, "254",
+                                                "Gene Location History",
+                                                "Gene-commentary_comment"));
+
         }
 
 

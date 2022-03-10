@@ -38,4 +38,15 @@ public class HgReleaseTest {
         var hgRelease = HgRelease.of(node);
         assertTrue(hgRelease.isEmpty());
     }
+
+    // @Test
+    // void testURL() {
+    // var theMap = VersionUpdater.getPatchesFromVersions(
+    // Arrays.asList(HumanGenomeVersions.HG19, HumanGenomeVersions.HG38));
+    // assertTrue(theMap.isPresent());
+    // var hg37 = theMap.get().get(HumanGenomeVersions.HG19);
+    // var hg38 = theMap.get().get(HumanGenomeVersions.HG38);
+    // assertEquals(25, hg37);
+    // assertEquals(39, hg38);
+    // }
 }

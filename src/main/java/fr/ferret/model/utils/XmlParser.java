@@ -2,6 +2,7 @@ package fr.ferret.model.utils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -20,16 +21,16 @@ public class XmlParser {
      * @param childName
      * @return Node : first child of the parentNode named childName
      */
-    public static Node getNodeFromPath(Node parentNode, String childName) {
+    public static Optional<Node> getNodeFromPath(Node parentNode, String childName) {
         NodeList childrenNodeList = parentNode.getChildNodes();
         int listLength = childrenNodeList.getLength();
         for (int i = 0; i < listLength; i++) { // Search into all children of parentNode
             if (childrenNodeList.item(i).getNodeName().equals(childName)) { // We select the first
                                                                             // one corresponding
-                return childrenNodeList.item(i);
+                return Optional.of(childrenNodeList.item(i));
             }
         }
-        return null;
+        return Optional.empty();
     }
 
 
@@ -39,14 +40,20 @@ public class XmlParser {
      * @return Node : child leaded by the path. the first childname of the list is the direct child
      *         of the parentNode
      */
-    public static Node getNodeFromPath(Node parentNode, List<String> childNames) {
-        if (childNames.size() == 1) { // There is only one child
-            return getNodeFromPath(parentNode, childNames.get(0));
+    public static Optional<Node> getNodeFromPath(Node parentNode, List<String> childNames) {
+        if (childNames.isEmpty()) { // There is no child
+            return Optional.of(parentNode);
         } else { // We get the first child named after childNames.get(0) and we go again with the
                  // same list without the first childName
             return getNodeFromPath(getNodeFromPath(parentNode, childNames.get(0)),
                     childNames.subList(1, childNames.size()));
         }
+    }
+
+
+    private static Optional<Node> getNodeFromPath(Optional<Node> nodeFromPathOpt,
+            List<String> subList) {
+        return nodeFromPathOpt.flatMap(nodeFromPath -> getNodeFromPath(nodeFromPath, subList));
     }
 
 

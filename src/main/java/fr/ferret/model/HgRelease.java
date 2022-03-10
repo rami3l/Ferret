@@ -33,19 +33,28 @@ public class HgRelease {
      * @return Optional<HgRelease> : exists if found ; Optional.empty() if not
      */
     public static Optional<HgRelease> of(Node node) {
-        try {
-            Node preciseNode = XmlParser.getNodeFromPath(node,
-                    Arrays.asList("Gene-commentary_comment", "Gene-commentary"));
-            String[] version = XmlParser.getNodeFromPath(preciseNode, "Gene-commentary_heading")
-                    .getFirstChild().getNodeValue().split("\\.p");
-            int patch = Integer.parseInt(version[1]);
-            String hgVersion = version[0];
-            int assVersion = Integer
-                    .parseInt(XmlParser.getNodeFromPath(preciseNode, "Gene-commentary_version")
-                            .getFirstChild().getNodeValue());
-            return Optional.of(new HgRelease(hgVersion, patch, assVersion));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        Optional<Node> preciseNode = XmlParser.getNodeFromPath(node,
+                Arrays.asList("Gene-commentary_comment", "Gene-commentary"));
+        var versionOpt = preciseNode
+                .flatMap(precise -> XmlParser.getNodeFromPath(precise, "Gene-commentary_heading"))
+                .flatMap(headingNode -> Optional.ofNullable(headingNode.getFirstChild()))
+                .map(lastNode -> lastNode.getNodeValue().split("\\.p"));
+
+        var assVersionOpt = preciseNode
+                .flatMap(precise -> XmlParser.getNodeFromPath(precise, "Gene-commentary_version"))
+                .flatMap(headingNode -> Optional.ofNullable(headingNode.getFirstChild()))
+                .map(lastNode -> Integer.parseInt(lastNode.getNodeValue()));
+
+        return versionOpt.flatMap(v -> assVersionOpt
+                .map(assVersion -> new HgRelease(v[0], Integer.parseInt(v[1]), assVersion)));
+
+        // XmlParser.getNodeFromPath(preciseNode.get(), "Gene-commentary_heading").get()
+        // .getFirstChild().getNodeValue().split("\\.p");
+        // int patch = Integer.parseInt(version[1]);
+        // String hgVersion = version[0];
+        // int assVersion = Integer.parseInt(
+        // XmlParser.getNodeFromPath(preciseNode.get(), "Gene-commentary_version").get()
+        // .getFirstChild().getNodeValue());
+        // return Optional.of(new HgRelease(hgVersion, patch, assVersion));
     }
 }
