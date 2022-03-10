@@ -3,13 +3,12 @@ package fr.ferret.controller;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
 import fr.ferret.model.ZoneSelection;
-import fr.ferret.model.locus.Locus;
-import fr.ferret.model.locus.LocusBuilder;
+import fr.ferret.model.locus.LocusBuilding;
+import fr.ferret.model.state.StatePublisher;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.GenePanel;
-import reactor.core.publisher.Flux;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -106,10 +105,20 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             logger.log(Level.INFO, "Starting gene research...");
             // TODO: get the current assemblyAccVer from Resource
             var assemblyAccVer = "GCF_000001405.39";
-            var locusFlux = new LocusBuilder(assemblyAccVer).buildFrom(geneList);
             var download = frame.getBottomPanel().addState("Starting download", outFile);
-            new VcfExport(locusFlux).setFilter(populations).start(outFile)
-                .doOnComplete(download::complete).doOnError(e -> {
+
+            // Inits the locus building processus and attaches it to the StatePublisher
+            var locusProcessing = new LocusBuilding(assemblyAccVer);
+            var statePublisher = new StatePublisher().attachTo(locusProcessing);
+            var locusFlux = locusProcessing.startWith(geneList);
+
+            // Inits the vcf export processus, attaches it to the StatePublisher, and starts it
+            var vcfProcessus = new VcfExport(locusFlux).setFilter(populations);
+            statePublisher.attachTo(vcfProcessus);
+            vcfProcessus.startTo(outFile);
+
+            // Subscribes to the state of the launched processus via the StatePublisher
+            statePublisher.getState().doOnComplete(download::complete).doOnError(e -> {
                     logger.log(Level.WARNING, "Error while downloading or writing");
                     download.error();
                 }).subscribe(download::setState);

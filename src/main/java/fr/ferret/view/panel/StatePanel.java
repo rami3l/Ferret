@@ -12,7 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import fr.ferret.model.State;
+import fr.ferret.model.state.State;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.AllArgsConstructor;

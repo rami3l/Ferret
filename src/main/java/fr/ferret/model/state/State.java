@@ -1,7 +1,11 @@
-package fr.ferret.model;
+package fr.ferret.model.state;
 
 import fr.ferret.utils.Resource;
 import lombok.Getter;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
+
+import java.util.function.Function;
 
 /**
  * An object representing the state of a processus (a download for example). It contains a text and
@@ -10,6 +14,8 @@ import lombok.Getter;
  * method.
  */
 @Getter public final class State {
+    public static final String GENE_NAME_TO_ID = "state.geneNameToId";
+    public static final String GENE_ID_TO_LOCUS = "state.geneIdToLocus";
     public static final String DOWNLOADING_HEADER = "state.downloadingHeader";
     public static final String DOWNLOADING_LINES = "state.downloadingLines";
     public static final String WRITING = "state.writingFile";

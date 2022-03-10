@@ -1,6 +1,6 @@
 package fr.ferret.model.utils;
 
-import fr.ferret.model.locus.LocusBuilder;
+import fr.ferret.model.locus.LocusBuilding;
 import fr.ferret.utils.Resource;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -59,8 +59,8 @@ class GeneConverterTest {
         var genes = List.of("KCNT2", "343450", "CCR5", "1234", "MICB", "4277", "IL6", "3569",
                 "APOL1", "8542", "4627", "MYH9");
         // var genes = List.of("CR5", "1234");
-        var builder = new LocusBuilder("GCF_000001405.39");
-        var locusFlux = builder.buildFrom(genes).doOnNext(System.out::println);
+        var builder = new LocusBuilding("GCF_000001405.39");
+        var locusFlux = builder.startWith(genes).doOnNext(System.out::println);
         locusFlux.blockLast();
     }
 
@@ -68,7 +68,7 @@ class GeneConverterTest {
     @Test
     void testFromNames() {
         var names = List.of("KCNT2", "CCR5", "MICB", "IL6", "APOL1", "MYH9");
-        var builder = new LocusBuilder("GCF_000001405.39");
+        var builder = new LocusBuilding("GCF_000001405.39");
         var flux = Flux.fromIterable(names).delayElements(Duration.ofMillis(200))
                 .flatMap(builder::fromName).doOnNext(System.out::println);
         //flux.blockLast();

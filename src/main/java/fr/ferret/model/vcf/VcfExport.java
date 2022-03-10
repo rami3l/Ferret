@@ -3,7 +3,8 @@ package fr.ferret.model.vcf;
 import com.pivovarit.function.ThrowingFunction;
 import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.settings.Phases1KG;
-import fr.ferret.model.State;
+import fr.ferret.model.state.State;
+import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.utils.FileWriter;
@@ -14,7 +15,6 @@ import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFUtils;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * set a {@link ZoneSelection population filter} with the <i>setFilter</i> method. We start the
  * export with the <i>start</i> method, passing it the {@link File outFile}
  */
-public class VcfExport {
+public class VcfExport extends PublishingStateProcessus {
 
     // TODO: add a cancel option (Use the Disposable returned by the subscribe call at the end of the start method)
     // TODO: add a warning while trying to close Ferret although an export is not finished -> keep somewhere the list of VcfExports
@@ -39,7 +39,6 @@ public class VcfExport {
     private static final Logger logger = Logger.getLogger(VcfExport.class.getName());
 
     private final Flux<Locus> locusFlux;
-    private FluxSink<State> state;
     private Set<String> samples;
 
     /**
@@ -61,7 +60,7 @@ public class VcfExport {
         // TODO: what if start > end (locus) ?
         return locus.flatMap(
             l -> getReader(l.getChromosome()).map(ThrowingFunction.unchecked(reader -> {
-                state.next(new State(State.DOWNLOADING_LINES, l.getChromosome(), l));
+                publishState(State.DOWNLOADING_LINES, l.getChromosome(), l);
                 logger.info(String.format("Downloading lines for locus %s", l));
                 var lines = reader.query(l.getChromosome(), l.getStart(), l.getEnd());
                 return new VcfObject((VCFHeader) reader.getHeader(), lines);
@@ -75,13 +74,13 @@ public class VcfExport {
         return new IgsrClient(
             Resource.getVcfUrlTemplate(phase1KG)).getReader(chromosome)
             .doOnSubscribe(s -> {
-                state.next(new State(State.DOWNLOADING_HEADER, chromosome, chromosome));
+                publishState(State.DOWNLOADING_HEADER, chromosome, chromosome);
                 logger.info(String.format("Getting header of chr %s", chromosome));
             })
             .doOnError(e -> {
                 ExceptionHandler.connectionError(e);
                 // TODO: error if one reader failed ? retry ?
-                state.error(e);
+                publishError(e);
             });
     }
 
@@ -114,28 +113,24 @@ public class VcfExport {
      *
      * @param outFile the output {@link File}
      * TODO: @param samples the sample names, e.g. {HG00096, HG0009}
-     * @return {@link Flux} of {@link String strings} indicating the progress of the treatment
      */
-    public Flux<State> start(File outFile) {
-        return Flux.create(s -> {
-            state = s;
-            getVcf(locusFlux).subscribeOn(Schedulers.boundedElastic()).collect(Collectors.toList())
-                .map(this::merge).doOnNext(vcf -> {
-                    if (samples != null) {
-                        logger.info("Filtering by samples");
-                        vcf = vcf.filter(samples);
-                    }
-                    state.next(new State(State.WRITING, outFile.getName(), null));
-                    logger.info("Writing to disk...");
-                    FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
-                    state.next(new State(State.WRITTEN, outFile.getName(), null));
-                    logger.info("File written");
-                })
-                .doOnSuccess(r -> state.complete())
-                .doOnError(FileSystemException.class, ExceptionHandler::fileWritingError)
-                .doOnError(ExceptionHandler::unknownError).subscribe();
-            // TODO: errors
-        });
+    public void startTo(File outFile) {
+        getVcf(locusFlux).subscribeOn(Schedulers.boundedElastic()).collect(Collectors.toList())
+            .map(this::merge).doOnNext(vcf -> {
+                if (samples != null) {
+                    logger.info("Filtering by samples");
+                    vcf = vcf.filter(samples);
+                }
+                publishState(State.WRITING, outFile.getName(), null);
+                logger.info("Writing to disk...");
+                FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
+                publishState(State.WRITTEN, outFile.getName(), null);
+                logger.info("File written");
+            })
+            .doOnSuccess(r -> publishComplete())
+            .doOnError(FileSystemException.class, ExceptionHandler::fileWritingError)
+            .doOnError(ExceptionHandler::unknownError).subscribe();
+        // TODO: errors
     }
 
     /**

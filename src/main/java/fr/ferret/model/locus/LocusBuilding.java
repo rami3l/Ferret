@@ -1,5 +1,7 @@
 package fr.ferret.model.locus;
 
+import fr.ferret.model.state.State;
+import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.utils.GeneConverter;
 import fr.ferret.model.utils.JsonDocument;
 import fr.ferret.utils.Conversion;
@@ -15,9 +17,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class LocusBuilder {
+public class LocusBuilding extends PublishingStateProcessus {
 
-    private static final Logger logger = Logger.getLogger(LocusBuilder.class.getName());
+    private static final Logger logger = Logger.getLogger(LocusBuilding.class.getName());
 
     // TODO: move these URL templates to a resource file
     private static final String ID_URL_TEMPLATE =
@@ -34,12 +36,13 @@ public class LocusBuilder {
      */
     private final String assemblyAccVer;
 
+    // TODO: use this list to display a message to the user
     private final List<String> genesNotFound = new ArrayList<>();
 
     /**
      * @param assemblyAccVer The <i>assembly access version</i> to use for getting start and end positions
      */
-    public LocusBuilder(String assemblyAccVer) {
+    public LocusBuilding(String assemblyAccVer) {
         this.assemblyAccVer = assemblyAccVer;
     }
 
@@ -51,7 +54,7 @@ public class LocusBuilder {
      * @param idsOrNames A {@link List list} of gene names/ids
      * @return A {@link Flux} containing the locus for found genes (empty in case of error).
      */
-    public Flux<Locus> buildFrom(List<String> idsOrNames) {
+    public Flux<Locus> startWith(List<String> idsOrNames) {
         var flux = Flux.fromIterable(idsOrNames);
         // ids are numeric
         var ids = flux.filter(Conversion::isInteger);
@@ -74,6 +77,7 @@ public class LocusBuilder {
      */
     public Mono<String> fromName(String name) {
         // TODO: We should url encode the name
+        publishState(State.GENE_NAME_TO_ID, name, name);
         logger.log(Level.INFO, "Getting id for gene [{0}]", name);
         try {
             var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
@@ -107,6 +111,7 @@ public class LocusBuilder {
         var idsCached = ids.replay().autoConnect();
         return idsCached.collect(Collectors.joining(",")).delayElement(DELAY)
             .flatMap(idString -> {
+                publishState(State.GENE_ID_TO_LOCUS, idString, idString);
                 try {
                     logger.info(String.format("Getting locus for ids : %s", idString));
                     var jsonUrl = new URL(String.format(ID_URL_TEMPLATE, idString));
