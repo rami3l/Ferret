@@ -1,4 +1,4 @@
-package fr.ferret.model;
+package fr.ferret.model.hgversion;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -20,13 +20,11 @@ public class HgRelease {
     private final int assVersion;
 
 
-
     private HgRelease(String hgVersion, int patch, int assVersion) {
         this.hgVersion = hgVersion;
         this.patch = patch;
         this.assVersion = assVersion;
     }
-
 
     /**
      * @param node which may contains a release
@@ -36,25 +34,17 @@ public class HgRelease {
         Optional<Node> preciseNode = XmlParser.getNodeFromPath(node,
                 Arrays.asList("Gene-commentary_comment", "Gene-commentary"));
         var versionOpt = preciseNode
-                .flatMap(precise -> XmlParser.getNodeFromPath(precise, "Gene-commentary_heading"))
+                .flatMap(precise -> XmlParser.getChildByName(precise, "Gene-commentary_heading"))
                 .flatMap(headingNode -> Optional.ofNullable(headingNode.getFirstChild()))
                 .map(lastNode -> lastNode.getNodeValue().split("\\.p"));
 
         var assVersionOpt = preciseNode
-                .flatMap(precise -> XmlParser.getNodeFromPath(precise, "Gene-commentary_version"))
+                .flatMap(precise -> XmlParser.getChildByName(precise, "Gene-commentary_version"))
                 .flatMap(headingNode -> Optional.ofNullable(headingNode.getFirstChild()))
                 .map(lastNode -> Integer.parseInt(lastNode.getNodeValue()));
 
         return versionOpt.flatMap(v -> assVersionOpt
                 .map(assVersion -> new HgRelease(v[0], Integer.parseInt(v[1]), assVersion)));
 
-        // XmlParser.getNodeFromPath(preciseNode.get(), "Gene-commentary_heading").get()
-        // .getFirstChild().getNodeValue().split("\\.p");
-        // int patch = Integer.parseInt(version[1]);
-        // String hgVersion = version[0];
-        // int assVersion = Integer.parseInt(
-        // XmlParser.getNodeFromPath(preciseNode.get(), "Gene-commentary_version").get()
-        // .getFirstChild().getNodeValue());
-        // return Optional.of(new HgRelease(hgVersion, patch, assVersion));
     }
 }

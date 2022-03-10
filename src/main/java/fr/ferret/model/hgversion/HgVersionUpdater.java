@@ -1,4 +1,4 @@
-package fr.ferret.model;
+package fr.ferret.model.hgversion;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -16,7 +16,9 @@ import fr.ferret.controller.settings.HumanGenomeVersions;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class VersionUpdater {
+public class HgVersionUpdater {
+
+        // TODO: move to the resources
         private static final String URLTEST =
                         "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=gene&id=1234&retmode=xml";
 
@@ -32,7 +34,6 @@ public class VersionUpdater {
                                 locationHistory -> extractPatches(locationHistory, versionList));
         }
 
-
         /**
          * @param currentGNode general node corresponding to an idGene
          * @return Node : contains the nodes that have the information of the HgReleases
@@ -46,8 +47,6 @@ public class VersionUpdater {
                                                 "Gene-commentary_comment"));
 
         }
-
-
 
         /**
          * @param geneCommentaryComments

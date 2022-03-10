@@ -3,10 +3,12 @@ package fr.ferret.model.utils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import lombok.experimental.UtilityClass;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -16,23 +18,18 @@ import org.xml.sax.SAXException;
 @UtilityClass
 public class XmlParser {
 
-    /**
-     * @param parentNode
-     * @param childName
-     * @return Node : first child of the parentNode named childName
-     */
-    public static Optional<Node> getNodeFromPath(Node parentNode, String childName) {
-        NodeList childrenNodeList = parentNode.getChildNodes();
-        int listLength = childrenNodeList.getLength();
-        for (int i = 0; i < listLength; i++) { // Search into all children of parentNode
-            if (childrenNodeList.item(i).getNodeName().equals(childName)) { // We select the first
-                                                                            // one corresponding
-                return Optional.of(childrenNodeList.item(i));
-            }
-        }
-        return Optional.empty();
-    }
+    private static final Logger logger = Logger.getLogger(XmlParser.class.getName());
 
+    /**
+     * @param parentNode The {@link Node} to search a child node of
+     * @param childName The name of the child {@link Node} searched
+     * @return The first child {@link Node} (optional) named childName
+     */
+    public static Optional<Node> getChildByName(Node parentNode, String childName) {
+        NodeList childrenNodeList = parentNode.getChildNodes();
+        return IntStream.range(0, childrenNodeList.getLength()).mapToObj(childrenNodeList::item)
+            .filter(node -> node.getNodeName().equals(childName)).findFirst();
+    }
 
     /**
      * @param parentNode
@@ -45,17 +42,10 @@ public class XmlParser {
             return Optional.of(parentNode);
         } else { // We get the first child named after childNames.get(0) and we go again with the
                  // same list without the first childName
-            return getNodeFromPath(getNodeFromPath(parentNode, childNames.get(0)),
-                    childNames.subList(1, childNames.size()));
+            return getChildByName(parentNode, childNames.get(0))
+                .flatMap(child -> getNodeFromPath(child, childNames.subList(1, childNames.size())));
         }
     }
-
-
-    private static Optional<Node> getNodeFromPath(Optional<Node> nodeFromPathOpt,
-            List<String> subList) {
-        return nodeFromPathOpt.flatMap(nodeFromPath -> getNodeFromPath(nodeFromPath, subList));
-    }
-
 
     /**
      * Each comment has a commentary type and commentary heading. Given a parentNode of comment
@@ -94,7 +84,6 @@ public class XmlParser {
         return toReturn;
     }
 
-
     /**
      * taken from ferret v2
      * 
@@ -118,31 +107,30 @@ public class XmlParser {
         for (int j = 0; j < commentLength; j++) {
             String commentString = commentTagList.item(j).getNodeName();
             switch (commentString) {
-                case "Gene-commentary_type":
+                case "Gene-commentary_type" -> {
                     NodeList geneCommentaryType = commentTagList.item(j).getChildNodes();
                     for (int k = 0; k < geneCommentaryType.getLength(); k++) {
                         if (geneCommentaryType.item(k).getNodeType() == Node.TEXT_NODE) {
                             typeMatch =
-                                    geneCommentaryType.item(k).getNodeValue().equals(typeDesired);
+                                geneCommentaryType.item(k).getNodeValue().equals(typeDesired);
                         }
                     }
-                    break;
-                case "Gene-commentary_heading":
+                }
+                case "Gene-commentary_heading" -> {
                     NodeList geneCommentaryHeading = commentTagList.item(j).getChildNodes();
                     for (int k = 0; k < geneCommentaryHeading.getLength(); k++) {
                         if (geneCommentaryHeading.item(k).getNodeType() == Node.TEXT_NODE) {
-                            headingMatch = geneCommentaryHeading.item(k).getNodeValue()
-                                    .equals(headingDesired);
+                            headingMatch =
+                                geneCommentaryHeading.item(k).getNodeValue().equals(headingDesired);
                         }
                     }
-                    break;
-                default:
-                    break;
+                }
+                default -> {
+                }
             }
         }
         return typeMatch && headingMatch;
     }
-
 
     /**
      * @param xmlGeneURL
@@ -150,6 +138,7 @@ public class XmlParser {
      */
     public static Document document(String xmlGeneURL) {
         DocumentBuilder docBldr;
+        // TODO: disable access to external entities (cf XXE)
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         dbf.setIgnoringComments(true);
@@ -159,8 +148,8 @@ public class XmlParser {
             docBldr = dbf.newDocumentBuilder();
             return docBldr.parse(xmlGeneURL);
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            System.out.println("Parsing du XML donnant les locus à partir des ids de gène échoué");
-            e.printStackTrace();
+            // TODO: call ExceptionHandler to show a popup
+            logger.log(Level.WARNING, "Parsing du XML donnant les locus à partir des ids de gène échoué", e);
             return null;
         }
     }
