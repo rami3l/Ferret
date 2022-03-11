@@ -39,6 +39,9 @@ public class HgReleaseTest {
         assertTrue(hgRelease.isEmpty());
     }
 
+
+    // This test must be changed because it reaches the server
+
     // @Test
     // void testURL() {
     // var theMap = VersionUpdater.getPatchesFromVersions(

@@ -39,7 +39,7 @@ public class XmlParser {
      * @param xmlGeneURL
      * @return Document
      */
-    public static Document parse(String xmlGeneURL) {
+    public static Optional<Document> parse(String xmlGeneURL) {
         DocumentBuilder docBldr;
         // TODO: disable access to external entities (cf XXE)
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -49,11 +49,11 @@ public class XmlParser {
         dbf.setCoalescing(false);
         try {
             docBldr = dbf.newDocumentBuilder();
-            return docBldr.parse(xmlGeneURL);
+            return Optional.of(docBldr.parse(xmlGeneURL));
         } catch (ParserConfigurationException | SAXException | IOException e) {
             // TODO: call ExceptionHandler to show a popup
             logger.log(Level.WARNING, "Parsing du XML donnant les locus à partir des ids de gène échoué", e);
-            return null;
+            return Optional.empty();
         }
     }
 
