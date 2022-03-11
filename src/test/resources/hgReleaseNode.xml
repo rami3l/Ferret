@@ -1,0 +1,48 @@
+<Gene-commentary>
+    <Gene-commentary_type value="comment">254</Gene-commentary_type>
+    <Gene-commentary_heading>Homo sapiens Updated Annotation Release 109.20191205
+    </Gene-commentary_heading>
+    <Gene-commentary_comment>
+        <Gene-commentary>
+            <Gene-commentary_type value="assembly">24</Gene-commentary_type>
+            <Gene-commentary_heading>GRCh38.p13</Gene-commentary_heading>
+            <Gene-commentary_label>Reference</Gene-commentary_label>
+            <Gene-commentary_accession>GCF_000001405</Gene-commentary_accession>
+            <Gene-commentary_version>39</Gene-commentary_version>
+            <Gene-commentary_comment>
+                <Gene-commentary>
+                    <Gene-commentary_type value="assembly-unit">25</Gene-commentary_type>
+                    <Gene-commentary_heading>Primary Assembly</Gene-commentary_heading>
+                    <Gene-commentary_accession>GCF_000001305</Gene-commentary_accession>
+                    <Gene-commentary_version>15</Gene-commentary_version>
+                    <Gene-commentary_comment>
+                        <Gene-commentary>
+                            <Gene-commentary_type value="genomic">1</Gene-commentary_type>
+                            <Gene-commentary_label>Chromosome 3</Gene-commentary_label>
+                            <Gene-commentary_accession>NC_000003</Gene-commentary_accession>
+                            <Gene-commentary_version>12</Gene-commentary_version>
+                            <Gene-commentary_seqs>
+                                <Seq-loc>
+                                    <Seq-loc_int>
+                                        <Seq-interval>
+                                            <Seq-interval_from>46370141</Seq-interval_from>
+                                            <Seq-interval_to>46376205</Seq-interval_to>
+                                            <Seq-interval_strand>
+                                                <Na-strand value="plus" />
+                                            </Seq-interval_strand>
+                                            <Seq-interval_id>
+                                                <Seq-id>
+                                                    <Seq-id_gi>568815595</Seq-id_gi>
+                                                </Seq-id>
+                                            </Seq-interval_id>
+                                        </Seq-interval>
+                                    </Seq-loc_int>
+                                </Seq-loc>
+                            </Gene-commentary_seqs>
+                        </Gene-commentary>
+                    </Gene-commentary_comment>
+                </Gene-commentary>
+            </Gene-commentary_comment>
+        </Gene-commentary>
+    </Gene-commentary_comment>
+</Gene-commentary>

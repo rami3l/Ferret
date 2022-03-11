@@ -25,6 +25,15 @@ public class XmlParser {
     private static final XPath xPath = XPathFactory.newInstance().newXPath();
 
 
+    /**
+     * Gets an {@link Optional} {@link Node} from a parent XML {@link Node} using the path parameter
+     *
+     * @param parent The parent {@link Node} to start the search from
+     * @param path The rules used to search the {@link Node}. See <a href="https://docs.oracle.com/
+     *             javase/7/docs/api/javax/xml/xpath/package-summary.html">XPath Expressions</a>
+     *             for more information
+     * @return An {@link Optional} {@link Node}, empty if no {@link Node} found
+     */
     public static Optional<Node> getNodeByPath(Node parent, String path) {
         try {
             var nodeList = (NodeList) xPath.compile(path).evaluate(parent, XPathConstants.NODESET);
@@ -36,8 +45,8 @@ public class XmlParser {
     }
 
     /**
-     * @param xmlGeneURL
-     * @return Document
+     * @param xmlGeneURL The URL of the XML document to parse
+     * @return An {@link Optional} {@link Document}, empty if an error occurred during parsing
      */
     public static Optional<Document> parse(String xmlGeneURL) {
         DocumentBuilder docBldr;

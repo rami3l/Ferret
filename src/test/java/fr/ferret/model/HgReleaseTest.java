@@ -7,17 +7,25 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-public class HgReleaseTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class HgReleaseTest {
 
-    @Test
-    void testOfWorks() throws SAXException, IOException, ParserConfigurationException {
+    Document xmlDocument;
+
+    @BeforeAll
+    void init() throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBldr = dbf.newDocumentBuilder();
-        org.w3c.dom.Document xmlDocument =
-                docBldr.parse("src/test/resources/hgReleaseTestFonctionne.xml");
+        xmlDocument = docBldr.parse("src/test/resources/hgReleaseNode.xml");
+    }
+
+    @Test
+    void testHgRelease_shouldBeExtractedFromAValidHgReleaseNode() {
         Node node = xmlDocument.getDocumentElement();
         var hgReleaseOpt = HgRelease.of(node);
         assertTrue(hgReleaseOpt.isPresent());
@@ -28,12 +36,7 @@ public class HgReleaseTest {
     }
 
     @Test
-    void testReleaseNotFound_ShouldReturnEmpty()
-            throws SAXException, IOException, ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBldr = dbf.newDocumentBuilder();
-        org.w3c.dom.Document xmlDocument =
-                docBldr.parse("src/test/resources/hgReleaseTestFonctionne.xml");
+    void testHgReleaseNotFound_ShouldReturnEmpty() {
         Node node = xmlDocument.getDocumentElement().getFirstChild();
         var hgRelease = HgRelease.of(node);
         assertTrue(hgRelease.isEmpty());

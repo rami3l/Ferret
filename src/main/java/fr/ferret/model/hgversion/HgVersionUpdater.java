@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import fr.ferret.model.utils.XmlParser;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import fr.ferret.controller.settings.HumanGenomeVersions;
@@ -19,49 +18,43 @@ import lombok.experimental.UtilityClass;
 public class HgVersionUpdater {
 
     // TODO: move to the resources
-    private static final String URLTEST =
+    private static final String XML_DOC_URL =
         "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=gene&id=1234&retmode=xml";
 
-    private static final String path =
+    private static final String HG_RELEASES_PATH =
         "/Entrezgene-Set/Entrezgene/Entrezgene_comments/Gene-commentary[Gene-commentary_heading/text() = 'Gene Location History']/Gene-commentary_comment";
 
-
     /**
-     * @param currentGNode general node corresponding to an idGene
-     * @return Map<HumanGenomeVersion> : key = version ; value = accessionVersion
+     * @param versions The {@link List} of {@link HumanGenomeVersions} to get the assembly accession
+     *                 versions for
+     * @return A {@link Map} containing an {@link Optional} {@link Integer} corresponding to the
+     * latest assembly accession version, for each HG version passed in parameter
      */
-    public Map<HumanGenomeVersions, Optional<Integer>> getPatchesFromVersions(
+    public Map<HumanGenomeVersions, Optional<Integer>> getAssemblyAccessVersions(
         List<HumanGenomeVersions> versions) {
-        var releases = XmlParser.parse(URLTEST).flatMap(HgVersionUpdater::getXmlReleasesNode);
-        return releases.map(locationHistory -> extractPatches(locationHistory, versions)).orElse(
-            versions.stream()
+        var releases = XmlParser.parse(XML_DOC_URL)
+            .flatMap(document -> XmlParser.getNodeByPath(document, HG_RELEASES_PATH));
+        return releases.map(locationHistory -> extractAssAccVersions(locationHistory, versions))
+            .orElse(versions.stream()
                 .collect(Collectors.toMap(Function.identity(), v -> Optional.empty())));
     }
 
     /**
-     * @param currentGNode general node corresponding to an idGene
-     * @return Node : contains the nodes that have the information of the HgReleases
+     * @param locationHistoryNode The XML {@link Node} which contains the historic locations of the
+     *                            gene, and by the way all the HG releases
+     * @param versions            The HG versions to get the assembly accession version for
+     * @return The {@link Map} containing an {@link Optional} assembly accession version for each
+     * HG version passed in parameter
      */
-    private Optional<Node> getXmlReleasesNode(Document document) {
-        // go down on the path :
-        return XmlParser.getNodeByPath(document, path);
+    private Map<HumanGenomeVersions, Optional<Integer>> extractAssAccVersions(
+        Node locationHistoryNode, List<HumanGenomeVersions> versions) {
 
-    }
-
-    /**
-     * @param geneCommentaryComments
-     * @param versionList
-     * @return Node : has the highest release then date corresponding to the good version
-     */
-    private Map<HumanGenomeVersions, Optional<Integer>> extractPatches(Node geneCommentaryComments,
-        List<HumanGenomeVersions> versionList) {
-
-        NodeList annotationReleases = geneCommentaryComments.getChildNodes();
+        NodeList annotationReleases = locationHistoryNode.getChildNodes();
         var releaseList =
             IntStream.range(0, annotationReleases.getLength()).mapToObj(annotationReleases::item)
                 .map(HgRelease::of).flatMap(Optional::stream).distinct().toList();
 
-        return versionList.stream().collect(Collectors.toMap(Function.identity(),
+        return versions.stream().collect(Collectors.toMap(Function.identity(),
             version -> releaseList.stream()
                 .filter(release -> version.toGRC().equals(release.getHgVersion()))
                 .max(Comparator.comparing(HgRelease::getPatch)).map(HgRelease::getAssVersion)));
