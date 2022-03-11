@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import fr.ferret.model.utils.XmlParser;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import fr.ferret.controller.settings.HumanGenomeVersions;
@@ -22,6 +23,10 @@ public class HgVersionUpdater {
         private static final String URLTEST =
                         "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=gene&id=1234&retmode=xml";
 
+        private static final String path =
+            "/Entrezgene-Set/Entrezgene/Entrezgene_comments/Gene-commentary[Gene-commentary_heading/text() = 'Gene Location History']/Gene-commentary_comment";
+
+
         /**
          * @param currentGNode general node corresponding to an idGene
          * @return Map<HumanGenomeVersion> : key = version ; value = accessionVersion
@@ -29,8 +34,7 @@ public class HgVersionUpdater {
         public Optional<Map<HumanGenomeVersions, Integer>> getPatchesFromVersions(
                         List<HumanGenomeVersions> versionList) {
                 org.w3c.dom.Document xmlDocument = XmlParser.document(URLTEST);
-                Node gNode = xmlDocument.getDocumentElement();
-                return getXmlReleasesNode(gNode).map(
+                return getXmlReleasesNode(xmlDocument).map(
                                 locationHistory -> extractPatches(locationHistory, versionList));
         }
 
@@ -38,13 +42,9 @@ public class HgVersionUpdater {
          * @param currentGNode general node corresponding to an idGene
          * @return Node : contains the nodes that have the information of the HgReleases
          */
-        private Optional<Node> getXmlReleasesNode(Node currentGNode) {
+        private Optional<Node> getXmlReleasesNode(Document document) {
                 // go down on the path :
-                return XmlParser.getNodeFromPath(currentGNode,
-                                Arrays.asList("Entrezgene", "Entrezgene_comments"))
-                                .map(nodeFromPath -> XmlParser.xmlCommentFinder(nodeFromPath, "254",
-                                                "Gene Location History",
-                                                "Gene-commentary_comment"));
+                return XmlParser.getNodeByPath(document, path);
 
         }
 
