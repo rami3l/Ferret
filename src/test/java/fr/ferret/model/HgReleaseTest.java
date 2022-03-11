@@ -43,7 +43,7 @@ class HgReleaseTest {
     }
 
 
-    // This test must be changed because it reaches the server
+    // TODO: This test must be changed because it reaches the server
 
     // @Test
     // void testURL() {

@@ -73,7 +73,7 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
             // Checks that given end position is not greater than chromosome end position
             if (startSelected && endSelected && startEndValid) {
                 int validEnd = Resource
-                        .getChrEndPosition(Resource.CONFIG.getSelectedHumanGenome(), chrSelected)
+                        .getChrEndPosition(Resource.config().getSelectedHumanGenome(), chrSelected)
                         .orElseGet(() -> {
                             logger.log(Level.WARNING, "Impossible to get chromosome end position."
                                     + " Given end position may be invalid");

@@ -30,7 +30,7 @@ public class HgVersionUpdater {
      * @return A {@link Map} containing an {@link Optional} {@link Integer} corresponding to the
      * latest assembly accession version, for each HG version passed in parameter
      */
-    public Map<HumanGenomeVersions, Optional<Integer>> getAssemblyAccessVersions(
+    public Map<HumanGenomeVersions, Optional<Integer>> getLatestAssemblyAccessVersions(
         List<HumanGenomeVersions> versions) {
         var releases = XmlParser.parse(XML_DOC_URL)
             .flatMap(document -> XmlParser.getNodeByPath(document, HG_RELEASES_PATH));

@@ -25,9 +25,10 @@ import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.conversions.Pedigree;
 import lombok.experimental.UtilityClass;
+import org.spongepowered.configurate.ConfigurateException;
 
 /**
- * Util class to deal with resouce files
+ * Utility class to deal with resource files
  */
 @UtilityClass
 public class Resource {
@@ -35,7 +36,7 @@ public class Resource {
     private static final Logger logger = Logger.getLogger(Resource.class.getName());
 
     /** program settings */
-    public static final FerretConfig CONFIG = new FerretConfig();
+    private static FerretConfig config = new FerretConfig();
 
     /** text elements for the interface */
     private static final ResourceBundle textElements =
@@ -44,7 +45,7 @@ public class Resource {
     /** application configuration */
     private static final ResourceBundle serverConfig = ResourceBundle.getBundle("server");
 
-    public static final Color TITLE_COLOR = new Color(18, 0, 150);
+    public static final Color TITLE_COLOR = new Color(12, 28, 134);
     public static final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
     public static final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
     public static final Color BUTTON_COLOR = new Color(201, 157, 240);
@@ -56,8 +57,16 @@ public class Resource {
     public static final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
     public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
 
-    public InputStream getFileInputStream(String file) {
-        return Resource.class.getClassLoader().getResourceAsStream(file);
+    public static FerretConfig config() {
+        return config;
+    }
+
+    public static void loadConfig() {
+        try {
+            config = FerretConfig.load();
+        } catch (ConfigurateException e) {
+            logger.log(Level.INFO, "Impossible to load config. Using default one", e);
+        }
     }
 
     /**
@@ -95,18 +104,6 @@ public class Resource {
         return serverConfig.getString(element);
     }
 
-    public String getPhase(Phases1KG phase1KG) {
-        return switch (phase1KG) {
-            case V1 -> "phase1";
-            case V3 -> "phase3";
-            default -> ""; // TODO: throw not implemented exception (phase NYGC_30X not implemented)
-            // ?
-        };
-    }
-
-    public InputStream getSampleFile(Phases1KG phase) {
-        return getFileInputStream("samples/" + getPhase(phase) + ".txt");
-    }
 
     /**
      * Returns the mapping from individual ID to a record in the pedigrees file.
@@ -116,7 +113,7 @@ public class Resource {
      * Order", "Third Order", "Children", "Other Comments"
      */
     public Map<String, Pedigree> getPedigrees() {
-        var fin = getFileInputStream("samples/pedigrees.txt");
+        var fin = ResourceFile.getFileInputStream("samples/pedigrees.txt");
         var parser = new CsvToBeanBuilder<Pedigree>(new InputStreamReader(fin))
                 .withType(Pedigree.class).withSeparator('\t').build();
         return parser.parse().stream()
@@ -133,7 +130,7 @@ public class Resource {
      */
     public static Set<String> getSamples(Phases1KG phase, ZoneSelection selection)
             throws IOException {
-        try (var streamReader = new InputStreamReader(getSampleFile(phase));
+        try (var streamReader = new InputStreamReader(ResourceFile.getSampleFile(phase));
                 var reader = new BufferedReader(streamReader)) {
             return reader.lines().map(line -> line.split("\t"))
                     .filter(fields -> selection.isSelected(fields[2], fields[1]))

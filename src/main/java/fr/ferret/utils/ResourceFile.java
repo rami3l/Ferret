@@ -35,6 +35,10 @@ class ResourceFile {
         return Optional.ofNullable(resource);
     }
 
+    public InputStream getFileInputStream(String file) {
+        return Resource.class.getClassLoader().getResourceAsStream(file);
+    }
+
     /**
      * Gets the file of population samples (people ids by regions and zones)
      *
@@ -42,8 +46,7 @@ class ResourceFile {
      * @return the file of population samples
      */
     public InputStream getSampleFile(Phases1KG phase) {
-        String filename = "samples/" + phase + ".txt";
-        return Resource.class.getClassLoader().getResourceAsStream(filename);
+        return getFileInputStream("samples/" + phase + ".txt");
     }
 
     /**
@@ -53,8 +56,7 @@ class ResourceFile {
      * @return the file of ending positions
      */
     public InputStream getChrEndPositionsFile(HumanGenomeVersions hgVersion) {
-        String filename = "chrEndPositions/" + hgVersion + ".txt";
-        return Resource.class.getClassLoader().getResourceAsStream(filename);
+        return getFileInputStream("chrEndPositions/" + hgVersion + ".txt");
     }
 
 }

@@ -2,6 +2,8 @@ package fr.ferret.controller.settings;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
+
 import org.apache.commons.lang3.SystemUtils;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -42,6 +44,14 @@ public class FerretConfig {
      * The Minor Allele Frequency
      */
     private double mafThreshold;
+
+    /**
+     * The correspondence between the HG versions and the latest assembly accession versions
+     */
+    @Builder.Default
+    Map<HumanGenomeVersions, Integer> assemblyAccessVersions =
+            Map.of(HumanGenomeVersions.HG19, 25, HumanGenomeVersions.HG38, 39);
+
 
     public static final Path DEFAULT_DIR = Paths.get(SystemUtils.USER_HOME, ".config", "ferret");
     public static final String DEFAULT_FILENAME = "ferret.conf";

@@ -49,17 +49,16 @@ public class XmlParser {
      * @return An {@link Optional} {@link Document}, empty if an error occurred during parsing
      */
     public static Optional<Document> parse(String xmlGeneURL) {
-        DocumentBuilder docBldr;
-        // TODO: disable access to external entities (cf XXE)
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setIgnoringComments(true);
-        dbf.setIgnoringElementContentWhitespace(true);
-        dbf.setCoalescing(false);
         try {
-            docBldr = dbf.newDocumentBuilder();
-            return Optional.of(docBldr.parse(xmlGeneURL));
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setIgnoringComments(true);
+            dbf.setIgnoringElementContentWhitespace(true);
+            // Access to external entities disabled to avoid XXE vulnerability
+            dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+            return Optional.of(docBuilder.parse(xmlGeneURL));
+        } catch (ParserConfigurationException | SAXException | IOException | RuntimeException e) {
             // TODO: call ExceptionHandler to show a popup
             logger.log(Level.WARNING, "Parsing du XML donnant les locus à partir des ids de gène échoué", e);
             return Optional.empty();

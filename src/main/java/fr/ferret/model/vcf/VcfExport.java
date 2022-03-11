@@ -44,7 +44,7 @@ public class VcfExport extends PublishingStateProcessus {
     /**
      * The phase to use for getting variants (default: selected version)
      */
-    private final Phases1KG phase1KG = Resource.CONFIG.getSelectedVersion();
+    private final Phases1KG phase1KG = Resource.config().getSelectedVersion();
 
     /**
      * Constructs a {@link VcfExport}.
