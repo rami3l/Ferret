@@ -31,15 +31,15 @@ public class HgRelease {
      * @return Optional<HgRelease> : exists if found ; Optional.empty() if not
      */
     public static Optional<HgRelease> of(Node node) {
-        Optional<Node> preciseNode = XmlParser.getNodeFromPath(node,
-                Arrays.asList("Gene-commentary_comment", "Gene-commentary"));
+        Optional<Node> preciseNode =
+                XmlParser.getNodeByPath(node,"Gene-commentary_comment/Gene-commentary");
         var versionOpt = preciseNode
-                .flatMap(precise -> XmlParser.getChildByName(precise, "Gene-commentary_heading"))
+                .flatMap(precise -> XmlParser.getNodeByPath(precise, "Gene-commentary_heading"))
                 .flatMap(headingNode -> Optional.ofNullable(headingNode.getFirstChild()))
                 .map(lastNode -> lastNode.getNodeValue().split("\\.p"));
 
         var assVersionOpt = preciseNode
-                .flatMap(precise -> XmlParser.getChildByName(precise, "Gene-commentary_version"))
+                .flatMap(precise -> XmlParser.getNodeByPath(precise, "Gene-commentary_version"))
                 .flatMap(headingNode -> Optional.ofNullable(headingNode.getFirstChild()))
                 .map(lastNode -> Integer.parseInt(lastNode.getNodeValue()));
 

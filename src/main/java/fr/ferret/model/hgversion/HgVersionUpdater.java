@@ -1,6 +1,5 @@
 package fr.ferret.model.hgversion;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,7 @@ public class HgVersionUpdater {
          */
         public Optional<Map<HumanGenomeVersions, Integer>> getPatchesFromVersions(
                         List<HumanGenomeVersions> versionList) {
-                org.w3c.dom.Document xmlDocument = XmlParser.document(URLTEST);
+                org.w3c.dom.Document xmlDocument = XmlParser.parse(URLTEST);
                 return getXmlReleasesNode(xmlDocument).map(
                                 locationHistory -> extractPatches(locationHistory, versionList));
         }
