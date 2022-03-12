@@ -1,5 +1,6 @@
 package fr.ferret.model.locus;
 
+import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.model.state.State;
 import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.utils.GeneConverter;
@@ -9,6 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +65,13 @@ public class LocusBuilding extends PublishingStateProcessus {
             flux.filter(Predicate.not(Conversion::isInteger)).delayElements(DELAY);
         // concat ids with names converted to ids
         var allIds = ids.concatWith(names.flatMap(this::fromName)).distinct();
-        return fromIds(allIds);
+        return fromIds(allIds)
+            .doOnError(UnknownHostException.class, ExceptionHandler::connectionError)
+            .doOnError(UnknownHostException.class, this::publishError)
+            .onErrorResume(UnknownHostException.class, e -> Flux.empty())
+            .doOnError(ExceptionHandler::unknownError)
+            .doOnError(this::publishError)
+            .onErrorResume(e -> Flux.empty());
     }
 
     /**
@@ -118,10 +126,9 @@ public class LocusBuilding extends PublishingStateProcessus {
                     return Mono.just(new JsonDocument(jsonUrl.openStream()));
                 } catch (Exception e) {
                     // TODO: retry n times in case of IOException (could be 429)
-                    // TODO: error popup (ExceptionHandler)
                     logger.log(Level.WARNING,
                         String.format("Error while requesting locus for ids %s", idString), e);
-                    return Mono.empty();
+                    return Mono.error(e);
                 }
             }).flatMapMany(json -> idsCached.flatMap(
                 id -> GeneConverter.extractLocus(id, assemblyAccVer, json).or(Mono.defer(() -> {

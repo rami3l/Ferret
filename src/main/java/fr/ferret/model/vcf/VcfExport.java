@@ -12,6 +12,7 @@ import fr.ferret.utils.Resource;
 import htsjdk.samtools.util.MergingIterator;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.variantcontext.VariantContextComparator;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFUtils;
 import reactor.core.publisher.Flux;
@@ -21,6 +22,7 @@ import reactor.core.scheduler.Schedulers;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -55,9 +57,7 @@ public class VcfExport extends PublishingStateProcessus {
         this.locusFlux = locusFlux;
     }
 
-    //TODO: do also this method for 1 Locus only
     private Flux<VcfObject> getVcf(Flux<Locus> locus) {
-        // TODO: what if start > end (locus) ?
         return locus.flatMap(
             l -> getReader(l.getChromosome()).map(ThrowingFunction.unchecked(reader -> {
                 publishState(State.DOWNLOADING_LINES, l.getChromosome(), l);
@@ -87,12 +87,23 @@ public class VcfExport extends PublishingStateProcessus {
     /**
      * Merges all {@link VcfObject VcfObjects} from the {@link List} in one {@link VcfObject}
      */
-    private VcfObject merge(List<VcfObject> vcfObjects) {
+    private Mono<VcfObject> merge(List<VcfObject> vcfObjects) {
+
+        if(vcfObjects.isEmpty())
+            return Mono.empty();
+        if(vcfObjects.size() == 1)
+            return Mono.just(vcfObjects.get(0));
 
         var headers = vcfObjects.stream().map(VcfObject::getHeader).toList();
 
-        var variantContextComparator = headers.get(0).getVCFRecordComparator();
-        // TODO: should be compatible (isCompatible) with all others
+        Comparator<VariantContext> variantContextComparator;
+        try {
+            variantContextComparator = headers.get(0).getVCFRecordComparator();
+            // TODO: should be compatible (isCompatible) with all others
+        } catch (Exception e) {
+            variantContextComparator = Comparator.comparingInt(VariantContext::getStart);
+            logger.info("Using variant start position as comparator for merging");
+        }
 
         var iteratorCollection = vcfObjects.stream().map(VcfObject::getVariants).toList();
 
@@ -105,7 +116,7 @@ public class VcfExport extends PublishingStateProcessus {
         final var mergingIterator =
             new MergingIterator<>(variantContextComparator, iteratorCollection);
 
-        return new VcfObject(header, mergingIterator);
+        return Mono.just(new VcfObject(header, mergingIterator));
     }
 
     /**
@@ -116,7 +127,7 @@ public class VcfExport extends PublishingStateProcessus {
      */
     public void startTo(File outFile) {
         getVcf(locusFlux).subscribeOn(Schedulers.boundedElastic()).collect(Collectors.toList())
-            .map(this::merge).doOnNext(vcf -> {
+            .flatMap(this::merge).doOnNext(vcf -> {
                 if (samples != null) {
                     logger.info("Filtering by samples");
                     vcf = vcf.filter(samples);
@@ -129,7 +140,8 @@ public class VcfExport extends PublishingStateProcessus {
             })
             .doOnSuccess(r -> publishComplete())
             .doOnError(FileSystemException.class, ExceptionHandler::fileWritingError)
-            .doOnError(ExceptionHandler::unknownError).subscribe();
+            .doOnError(ExceptionHandler::unknownError)
+            .doOnError(this::publishError).subscribe();
         // TODO: errors
     }
 

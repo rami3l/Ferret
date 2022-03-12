@@ -45,10 +45,10 @@ public class XmlParser {
     }
 
     /**
-     * @param xmlGeneURL The URL of the XML document to parse
+     * @param xmlURI The URI of the XML document to parse
      * @return An {@link Optional} {@link Document}, empty if an error occurred during parsing
      */
-    public static Optional<Document> parse(String xmlGeneURL) {
+    public static Optional<Document> parse(String xmlURI) {
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             dbf.setIgnoringComments(true);
@@ -57,10 +57,10 @@ public class XmlParser {
             dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
             dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-            return Optional.of(docBuilder.parse(xmlGeneURL));
+            return Optional.of(docBuilder.parse(xmlURI));
         } catch (ParserConfigurationException | SAXException | IOException | RuntimeException e) {
             // TODO: call ExceptionHandler to show a popup
-            logger.log(Level.WARNING, "Parsing du XML donnant les locus à partir des ids de gène échoué", e);
+            logger.log(Level.WARNING, "Failed to parse XML", e);
             return Optional.empty();
         }
     }
