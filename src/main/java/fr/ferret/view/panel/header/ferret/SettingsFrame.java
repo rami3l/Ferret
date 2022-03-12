@@ -16,22 +16,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
-import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.controller.settings.SettingsFrameController;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import lombok.Getter;
 
 /**
  * The ferret settings frame
  */
 public class SettingsFrame extends JFrame {
-
-    @Getter
-    private final transient FerretConfig config;
-
 
     private final JPanel settingsPanel;
 
@@ -49,10 +43,9 @@ public class SettingsFrame extends JFrame {
 
 
 
-    public SettingsFrame(FerretFrame ferretFrame, FerretConfig config) {
+    public SettingsFrame(FerretFrame ferretFrame) {
 
         super(Resource.getTextElement("settings.title"));
-        this.config = config;
 
         // Initializes the settings panel
         settingsPanel = new JPanel();
@@ -117,7 +110,7 @@ public class SettingsFrame extends JFrame {
         }
 
         // Default button
-        phaseButtons[config.getSelectedVersion().ordinal()].setSelected(true);
+        phaseButtons[Resource.config().getSelectedVersion().ordinal()].setSelected(true);
 
         // Disable NYGC : not implemented
         phaseButtons[Phases1KG.NYGC_30X.ordinal()].setEnabled(false);
@@ -151,7 +144,7 @@ public class SettingsFrame extends JFrame {
         mafValueField.setMaximumSize(mafValueField.getPreferredSize());
 
         // we set the value to the actual setting
-        mafValueField.setValue(config.getMafThreshold());
+        mafValueField.setValue(Resource.config().getMafThreshold());
 
         // Label and field added to the panel
         mafPanel.add(mafThresholdLabel);
@@ -226,7 +219,7 @@ public class SettingsFrame extends JFrame {
         fileOutputButtons.add(vcfFileButton);
 
         // selects the button corresponding to actual settings
-        switch (config.getSelectedOutputType()) {
+        switch (Resource.config().getSelectedOutputType()) {
             case ALL -> allFilesButton.setSelected(true);
             case FRQ -> freqFileButton.setSelected(true);
             case VCF -> vcfFileButton.setSelected(true);
@@ -258,7 +251,7 @@ public class SettingsFrame extends JFrame {
             settingsPanel.add(humanVersionButtons[i]);
         }
         // Selects the button corresponding to actual settings
-        humanVersionButtons[config.getSelectedHumanGenome().ordinal()].setSelected(true); // Default
+        humanVersionButtons[Resource.config().getSelectedHumanGenome().ordinal()].setSelected(true); // Default
     }
 
     /**

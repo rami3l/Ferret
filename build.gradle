@@ -19,22 +19,25 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.guava/guava
     implementation 'com.google.guava:guava:31.1-jre'
 
+    /** PARSING **/
     // Library used to deal with CSV/TSV files
     // https://mvnrepository.com/artifact/com.opencsv/opencsv
     implementation 'com.opencsv:opencsv:5.6'
+    // Library used to parse json
+    implementation 'com.jayway.jsonpath:json-path:2.7.0'
 
     // Library used to deal with files in the 1000 Genomes Extended VCF Format
     // https://mvnrepository.com/artifact/com.github.samtools/htsjdk
     implementation 'com.github.samtools:htsjdk:2.24.1'
 
-    // Use reactor for asynchronous operations
+    // Library used for asynchronous operations
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
     implementation 'io.projectreactor:reactor-core:3.4.15'
 
+    /** CONFIGURATION PERSISTENCE **/
     // Configuration managing lib
     // https://mvnrepository.com/artifact/org.spongepowered/configurate-core
     implementation 'org.spongepowered:configurate-core:4.1.2'
-
     // HOCON loader for `configurate-core`
     // https://mvnrepository.com/artifact/org.spongepowered/configurate-hocon
     implementation 'org.spongepowered:configurate-hocon:4.1.2'
@@ -43,12 +46,12 @@ dependencies {
     // https://mvnrepository.com/artifact/com.pivovarit/throwing-function
     implementation 'com.pivovarit:throwing-function:1.5.1'
 
+
+    /** TESTS */
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-test
     testImplementation 'io.projectreactor:reactor-test:3.4.15'
-
     // https://mvnrepository.com/artifact/org.awaitility/awaitility
     testImplementation 'org.awaitility:awaitility:4.2.0'
 }

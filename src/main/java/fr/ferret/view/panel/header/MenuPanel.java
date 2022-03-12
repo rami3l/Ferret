@@ -48,7 +48,7 @@ public class MenuPanel extends JMenuBar {
 
         // Settings window
         settingsMenuItem.addActionListener(event -> {
-            SettingsFrame settingsFrame = new SettingsFrame(ferretFrame, Resource.CONFIG);
+            SettingsFrame settingsFrame = new SettingsFrame(ferretFrame);
             settingsFrame.setLocationRelativeTo(ferretFrame);
             settingsFrame.setVisible(true);
         });

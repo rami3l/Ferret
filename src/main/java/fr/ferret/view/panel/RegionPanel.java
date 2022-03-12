@@ -62,7 +62,7 @@ public class RegionPanel extends JPanel {
         // Container for zone selection panels
         JPanel container = new JPanel(new GridLayout(2, 3));
 
-        Region[] ferretRegions = Resource.CONFIG.getSelectedVersion().getRegions();
+        Region[] ferretRegions = Resource.config().getSelectedVersion().getRegions();
         for (int i = 0; i < ferretRegions.length; i++) {
             ZonesPanel panel = new ZonesPanel(ferretRegions[i], i >= 3 ? 7 : 9);
             regions.add(panel);
@@ -139,7 +139,7 @@ public class RegionPanel extends JPanel {
                 setCheckBoxesState(1, state);
 
                 // If we selected the All population checkboxes, all others checkboxes are disabled
-                if (region == Resource.CONFIG.getSelectedVersion().getRegions()[0]) {
+                if (region == Resource.config().getSelectedVersion().getRegions()[0]) {
                     for (ZonesPanel panel : RegionPanel.this.regions) {
                         if (panel != this) {
                             panel.setCheckBoxesState(0, state);

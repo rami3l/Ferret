@@ -11,6 +11,8 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import fr.ferret.model.state.State;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.AllArgsConstructor;
@@ -53,16 +55,21 @@ public class StatePanel extends JPanel {
         this.add(spinner);
         this.add(openButton);
 
-        addMouseListener(new MousePanelListener(this));
-        openButton.addMouseListener(new MousePanelListener(this));
+        var mouseListener = new MousePanelListener(this);
+        addMouseListener(mouseListener);
+        stateLabel.addMouseListener(mouseListener);
+        spinner.addMouseListener(mouseListener);
+        openButton.addMouseListener(mouseListener);
     }
 
-    public void setState(String text) {
-        stateLabel.setText(text);
+    public void setState(State state) {
+        stateLabel.setText(state.getText());
+        stateLabel.setToolTipText(state.getTooltip());
+        this.setToolTipText(state.getTooltip());
     }
 
     public void error() {
-        setState(Resource.getTextElement("error.toast"));
+        setState(new State("error.toast", null, null));
         complete(false);
     }
 
@@ -83,9 +90,6 @@ public class StatePanel extends JPanel {
         completed = true;
         if (canDestroy)
             destroyAction = startDestroyAction();
-        // openButton.setBorder(null);
-        // openButton.setBorder(BorderFactory.createLineBorder(withOpacity(openButton.getBackground(),
-        // 1), 3));
     }
 
     // TODO: opacity change is not fluent

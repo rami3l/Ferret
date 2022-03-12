@@ -16,8 +16,8 @@ public enum HumanGenomeVersions {
 
     public String toGRC() {
         return switch (this) {
-            case HG19 -> "hg37";
-            case HG38 -> "hg38";
+            case HG19 -> "GRCh37";
+            case HG38 -> "GRCh38";
         };
     }
 }

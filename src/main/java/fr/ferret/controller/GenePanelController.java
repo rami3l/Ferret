@@ -2,7 +2,12 @@ package fr.ferret.controller;
 
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
+import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.locus.LocusBuilding;
+import fr.ferret.model.state.StatePublisher;
 import fr.ferret.model.utils.FileReader;
+import fr.ferret.model.vcf.VcfExport;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.GenePanel;
 
@@ -11,6 +16,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -29,8 +35,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         panel.getInputField().setBorder(null);
         panel.getFileSelector().getRunButton().setBorder(null);
 
-        JTextField geneNameField = panel.getInputField();
-        JRadioButton geneNameRadioButton = panel.getRdoName();
+        JTextField geneField = panel.getInputField();
 
         // Selected populations for the model
         var populations = getSelectedPopulations();
@@ -39,30 +44,25 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         // List which will contain the genes (from field or file)
         List<String> geneList = null;
 
-        String geneString = geneNameField.getText();
+        String geneString = geneField.getText().replace(" ", "");
 
         // Did the user input a list of gene
         boolean geneListInputted = geneString.length() > 0;
-        // Names or ids inputted ?
-        boolean geneNameInputted = geneNameRadioButton.isSelected();
 
         // Did the user import a csv file
         String geneFileNameAndPath = panel.getFileSelector().getSelectedFile() == null ? null
                 : panel.getFileSelector().getSelectedFile().getAbsolutePath();
         boolean geneFileImported = geneFileNameAndPath != null;
 
-        // Are they errors in imported file (impossible to read, invalid extension or invalid content)
+        // Are they errors in imported file (impossible to read, invalid extension or invalid
+        // content)
         boolean geneFileError = false;
         boolean geneFileExtensionError = false;
         boolean invalidCharacter = false;
 
-        // invalid characters for the genes (inputted as a list or a file)
-        var invalidRegex = geneNameInputted
-            // This is everything except letters and numbers, including underscore
-            ? ".*[^a-zA-Z0-9\\-].*"
-            // This is everything except numbers
-            : ".*\\D.*";
-
+        // Invalid characters for the genes names/ids (inputted as a list or a file)
+        // This is everything except letters and numbers, including underscore
+        var invalidRegex = ".*[^a-zA-Z0-9\\-].*";
 
         if (geneFileImported) {
 
@@ -76,9 +76,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
                 geneFileError = true;
             }
 
-
         } else if (geneListInputted) {
-            geneString = geneString.replace(" ", "");
             invalidCharacter = geneString.replace(",", "").matches(invalidRegex);
             if (geneString.endsWith(",")) {
                 geneString = geneString.substring(0, geneString.length() - 1);
@@ -86,7 +84,6 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             geneList = Arrays.asList(geneString.split(","));
         }
 
-        // TODO: WUT IS THIS? (SHOULD PUT SAD PATH FIRST WITH EARLY EXIT, AND THEN HAPPY PATH)
         if ((geneListInputted || (geneFileImported && !geneFileError && !geneFileExtensionError))
                 && !invalidCharacter && popSelected) {
 
@@ -94,33 +91,67 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var locale = new Locale("all");
             geneList = geneList.stream().map(text -> text.toUpperCase(locale)).toList();
 
+            downloadVcf(populations, geneList);
+
             // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
 
         } else {
-            JComponent inputField = panel.getInputField();
-            JComponent runButton = panel.getFileSelector().getRunButton();
-
-            var error = new Error(frame).append("run.fixerrors");
-
-            if (!geneListInputted && !geneFileImported) {
-                error.append("run.selectgene").highlight(inputField, runButton);
-            }
-            if (geneFileImported && geneFileError) {
-                error.append("run.selectgene.ferr").highlight(runButton);
-            }
-            if (geneFileImported && geneFileExtensionError) {
-                error.append("run.selectgene.fext").highlight(runButton);
-            }
-            if (geneListInputted && invalidCharacter) {
-                error.append("run.selectgene.cerr").highlight(inputField);
-            }
-            if (geneFileImported && invalidCharacter) {
-                error.append("run.selectgene.cerr").highlight(runButton);
-            }
-            if (!popSelected) {
-                error.append("run.selectpop").highlight(frame.getRegionPanel());
-            }
-            error.show();
+            displayError(geneListInputted, geneFileImported, geneFileError, geneFileExtensionError,
+                    invalidCharacter, popSelected);
         }
+    }
+
+    private void downloadVcf(ZoneSelection populations, List<String> geneList) {
+        run(outFile -> {
+            var assemblyAccVer = Resource.getAssemblyAccessVersion();
+            logger.log(Level.INFO, "Starting gene research using {0} assembly accession version...", assemblyAccVer);
+            var download = frame.getBottomPanel().addState("Starting download", outFile);
+
+            // Inits the locus building processus and attaches it to the StatePublisher
+            var locusProcessing = new LocusBuilding(assemblyAccVer);
+            var statePublisher = new StatePublisher().attachTo(locusProcessing);
+            var locusFlux = locusProcessing.startWith(geneList);
+
+            // Inits the vcf export processus, attaches it to the StatePublisher, and starts it
+            var vcfProcessus = new VcfExport(locusFlux).setFilter(populations);
+            statePublisher.attachTo(vcfProcessus);
+            vcfProcessus.startTo(outFile);
+
+            // Subscribes to the state of the launched processus via the StatePublisher
+            statePublisher.getState().doOnComplete(download::complete).doOnError(e -> {
+                    logger.log(Level.WARNING, "Error while downloading or writing");
+                    download.error();
+                }).subscribe(download::setState);
+        });
+    }
+
+    private void displayError(boolean geneListInputted, boolean geneFileImported,
+            boolean geneFileError, boolean geneFileExtensionError, boolean invalidCharacter,
+            boolean popSelected) {
+
+        JComponent inputField = panel.getInputField();
+        JComponent runButton = panel.getFileSelector().getRunButton();
+
+        var error = new Error(frame).append("run.fixerrors");
+
+        if (!geneListInputted && !geneFileImported) {
+            error.append("run.selectgene").highlight(inputField, runButton);
+        }
+        if (geneFileImported && geneFileError) {
+            error.append("run.selectgene.ferr").highlight(runButton);
+        }
+        if (geneFileImported && geneFileExtensionError) {
+            error.append("run.selectgene.fext").highlight(runButton);
+        }
+        if (geneListInputted && invalidCharacter) {
+            error.append("run.selectgene.cerr").highlight(inputField);
+        }
+        if (geneFileImported && invalidCharacter) {
+            error.append("run.selectgene.cerr").highlight(runButton);
+        }
+        if (!popSelected) {
+            error.append("run.selectpop").highlight(frame.getRegionPanel());
+        }
+        error.show();
     }
 }

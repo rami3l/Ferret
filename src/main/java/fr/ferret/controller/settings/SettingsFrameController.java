@@ -60,15 +60,15 @@ public class SettingsFrameController {
             if (selected == null) {
                 throw new IllegalStateException("No phases selected");
             }
-            settingsFrame.getConfig().setSelectedVersion(selected);
+            Resource.config().setSelectedVersion(selected);
 
-            settingsFrame.getConfig().setMafThreshold(((Number) mafText.getValue()).doubleValue());
+            Resource.config().setMafThreshold(((Number) mafText.getValue()).doubleValue());
             if (allFilesButton.isSelected()) {
-                settingsFrame.getConfig().setSelectedOutputType(FileOutputType.ALL);
+                Resource.config().setSelectedOutputType(FileOutputType.ALL);
             } else if (freqFileButton.isSelected()) {
-                settingsFrame.getConfig().setSelectedOutputType(FileOutputType.FRQ);
+                Resource.config().setSelectedOutputType(FileOutputType.FRQ);
             } else if (vcfFileButton.isSelected()) {
-                settingsFrame.getConfig().setSelectedOutputType(FileOutputType.VCF);
+                Resource.config().setSelectedOutputType(FileOutputType.VCF);
             }
 
             HumanGenomeVersions selectedv = null;
@@ -82,12 +82,13 @@ public class SettingsFrameController {
             if (selectedv == null) {
                 throw new IllegalStateException("No human gene version selected");
             }
-            settingsFrame.getConfig().setSelectedHumanGenome(selectedv);
+            Resource.config().setSelectedHumanGenome(selectedv);
 
             ferretFrame.getLocusPanel().getTitleLabel().setText(Resource.getTextElement(
-                    "locus.input." + Resource.CONFIG.getSelectedHumanGenome()));
+                    "locus.input." + Resource.config().getSelectedHumanGenome()));
             ferretFrame.getRegionPanel().reloadPanel();
             settingsFrame.dispose();
+            Resource.saveConfig();
         }
     }
 
