@@ -14,6 +14,7 @@ public class FerretMain {
         ExceptionHandler.setFrame(frame);
         frame.setVisible(true);
         Resource.loadConfig();
+        Resource.updateAssemblyAccessVersions();
     }
 
 }

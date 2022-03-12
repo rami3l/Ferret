@@ -7,11 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +22,8 @@ import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.conversions.Pedigree;
 import lombok.experimental.UtilityClass;
 import org.spongepowered.configurate.ConfigurateException;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Utility class to deal with resource files
@@ -67,6 +65,16 @@ public class Resource {
         } catch (ConfigurateException e) {
             logger.log(Level.INFO, "Impossible to load config. Using default one", e);
         }
+    }
+
+    public static void updateAssemblyAccessVersions() {
+        var versions = List.of(HumanGenomeVersions.HG19, HumanGenomeVersions.HG38);
+        Mono.fromRunnable(() -> config.updateAssemblyAccessVersions(versions))
+            .subscribeOn(Schedulers.boundedElastic())
+            .doOnSubscribe(o -> logger.info("Starting assembly accession versions update"))
+            .doOnSuccess(o -> logger.info("Assembly accession versions updated"))
+            .doOnError(e -> logger.log(Level.WARNING, "Assembly accession versions update failed", e))
+            .subscribe();
     }
 
     /**

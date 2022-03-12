@@ -20,8 +20,8 @@ class HgReleaseTest {
     @BeforeAll
     void init() throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBldr = dbf.newDocumentBuilder();
-        xmlDocument = docBldr.parse("src/test/resources/hgReleaseNode.xml");
+        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        xmlDocument = docBuilder.parse("src/test/resources/hgReleaseNode.xml");
     }
 
     @Test

@@ -15,7 +15,7 @@ import fr.ferret.controller.settings.HumanGenomeVersions;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class HgVersionUpdater {
+public class HgVersion {
 
     // TODO: move to the resources
     private static final String XML_DOC_URL =
