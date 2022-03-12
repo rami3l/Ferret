@@ -2,6 +2,7 @@ package fr.ferret.model.vcf;
 
 import com.pivovarit.function.ThrowingFunction;
 import fr.ferret.controller.exceptions.ExceptionHandler;
+import fr.ferret.controller.exceptions.VcfStreamingException;
 import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.state.State;
 import fr.ferret.model.state.PublishingStateProcessus;
@@ -64,8 +65,7 @@ public class VcfExport extends PublishingStateProcessus {
                 logger.info(String.format("Downloading lines for locus %s", l));
                 var lines = reader.query(l.getChromosome(), l.getStart(), l.getEnd());
                 return new VcfObject((VCFHeader) reader.getHeader(), lines);
-            })).doOnError(ExceptionHandler::vcfStreamingError)
-            // TODO: on error ?
+            })).onErrorResume(e -> publishError(new VcfStreamingException(e)))
         );
     }
 
@@ -77,11 +77,8 @@ public class VcfExport extends PublishingStateProcessus {
                 publishState(State.DOWNLOADING_HEADER, chromosome, chromosome);
                 logger.info(String.format("Getting header of chr %s", chromosome));
             })
-            .doOnError(e -> {
-                ExceptionHandler.connectionError(e);
-                // TODO: error if one reader failed ? retry ?
-                publishError(e);
-            });
+            // TODO: error if one reader failed ? retry ?
+            .onErrorResume(this::publishError);
     }
 
     /**
@@ -123,7 +120,6 @@ public class VcfExport extends PublishingStateProcessus {
      * Exports a "distilled" VCF file from an IGSR online database query.
      *
      * @param outFile the output {@link File}
-     * TODO: @param samples the sample names, e.g. {HG00096, HG0009}
      */
     public void startTo(File outFile) {
         getVcf(locusFlux).subscribeOn(Schedulers.boundedElastic()).collect(Collectors.toList())
@@ -139,10 +135,7 @@ public class VcfExport extends PublishingStateProcessus {
                 logger.info("File written");
             })
             .doOnSuccess(r -> publishComplete())
-            .doOnError(FileSystemException.class, ExceptionHandler::fileWritingError)
-            .doOnError(ExceptionHandler::unknownError)
             .doOnError(this::publishError).subscribe();
-        // TODO: errors
     }
 
     /**
@@ -155,6 +148,7 @@ public class VcfExport extends PublishingStateProcessus {
         try {
             samples = Resource.getSamples(phase1KG, selection);
         } catch (IOException e) {
+            // TODO: this access to ExceptionHandler shouldn't be in the model part
             ExceptionHandler.ressourceAccessError(e);
         }
         return this;

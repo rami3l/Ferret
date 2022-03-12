@@ -1,8 +1,13 @@
 package fr.ferret.model.state;
 
-import reactor.core.publisher.FluxProcessor;
+import fr.ferret.controller.exceptions.ExceptionHandler;
+import fr.ferret.controller.exceptions.VcfStreamingException;
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+
+import java.net.UnknownHostException;
+import java.nio.file.FileSystemException;
 
 /**
  * Extend this class if your class need to publish the state of its processus
@@ -37,10 +42,22 @@ public abstract class PublishingStateProcessus {
         }
     }
 
-    protected void publishError(Throwable e) {
-        if (state != null) {
-            state.tryEmitError(e);
+    protected <T> Mono<T> publishError(Throwable error) {
+        try {
+            throw error;
+        } catch (UnknownHostException e) {
+            ExceptionHandler.connectionError(e);
+        } catch (VcfStreamingException e) {
+            ExceptionHandler.vcfStreamingError(e);
+        } catch (FileSystemException e) {
+            ExceptionHandler.fileWritingError(e);
+        } catch (Throwable e) {
+            ExceptionHandler.unknownError(e);
         }
+        if (state != null) {
+            state.tryEmitError(error);
+        }
+        return Mono.empty();
     }
 
     protected void publishComplete() {
@@ -49,5 +66,4 @@ public abstract class PublishingStateProcessus {
         }
     }
 
-    //protected abstract <T> T start();
 }
