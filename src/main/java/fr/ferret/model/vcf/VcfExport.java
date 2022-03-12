@@ -19,10 +19,12 @@ import htsjdk.variant.vcf.VCFUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystemException;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +42,9 @@ public class VcfExport extends PublishingStateProcessus {
     // TODO: add a warning while trying to close Ferret although an export is not finished -> keep somewhere the list of VcfExports
 
     private static final Logger logger = Logger.getLogger(VcfExport.class.getName());
+
+    private static final int NB_RETRY = 3;
+    private static final Duration RETRY_DELAY = Duration.ofMillis(500);
 
     private final Flux<Locus> locusFlux;
     private Set<String> samples;
@@ -71,14 +76,14 @@ public class VcfExport extends PublishingStateProcessus {
 
     private Mono<FeatureReader<VariantContext>> getReader(String chromosome) {
         // TODO: each getReader call could get into an IOException Error
-        return new IgsrClient(
-            Resource.getVcfUrlTemplate(phase1KG)).getReader(chromosome)
+        var client =new IgsrClient(Resource.getVcfUrlTemplate(phase1KG));
+        return Mono.defer(() -> client.getReader(chromosome))
             .doOnSubscribe(s -> {
                 publishState(State.DOWNLOADING_HEADER, chromosome, chromosome);
                 logger.info(String.format("Getting header of chr %s", chromosome));
             })
-            // TODO: error if one reader failed ? retry ?
-            .onErrorResume(this::publishError);
+            .retryWhen(Retry.backoff(NB_RETRY, RETRY_DELAY).filter(IOException.class::isInstance))
+            .onErrorResume(e -> publishError(e.getCause()));
     }
 
     /**
@@ -91,29 +96,32 @@ public class VcfExport extends PublishingStateProcessus {
         if(vcfObjects.size() == 1)
             return Mono.just(vcfObjects.get(0));
 
-        var headers = vcfObjects.stream().map(VcfObject::getHeader).toList();
+        return Mono.fromCallable(() -> {
 
-        Comparator<VariantContext> variantContextComparator;
-        try {
-            variantContextComparator = headers.get(0).getVCFRecordComparator();
-            // TODO: should be compatible (isCompatible) with all others
-        } catch (Exception e) {
-            variantContextComparator = Comparator.comparingInt(VariantContext::getStart);
-            logger.info("Using variant start position as comparator for merging");
-        }
+            var headers = vcfObjects.stream().map(VcfObject::getHeader).toList();
 
-        var iteratorCollection = vcfObjects.stream().map(VcfObject::getVariants).toList();
+            Comparator<VariantContext> variantContextComparator;
+            try {
+                variantContextComparator = headers.get(0).getVCFRecordComparator();
+                // TODO: should be compatible (isCompatible) with all others
+            } catch (Exception e) {
+                variantContextComparator = Comparator.comparingInt(VariantContext::getStart);
+                logger.info("Using variant start position as comparator for merging");
+            }
 
-        var sampleList = headers.get(0).getSampleNamesInOrder();
-        // TODO: all headers must have same sample entries ??
-        // TODO: is the order the same that in VariantContexts ?
+            var iteratorCollection = vcfObjects.stream().map(VcfObject::getVariants).toList();
 
-        // TODO: catch IllegalStateException
-        var header = new VCFHeader(VCFUtils.smartMergeHeaders(headers, false), sampleList);
-        final var mergingIterator =
-            new MergingIterator<>(variantContextComparator, iteratorCollection);
+            var sampleList = headers.get(0).getSampleNamesInOrder();
+            // TODO: all headers must have same sample entries ??
+            // TODO: is the order the same that in VariantContexts ?
 
-        return Mono.just(new VcfObject(header, mergingIterator));
+            var header = new VCFHeader(VCFUtils.smartMergeHeaders(headers, false), sampleList);
+            final var mergingIterator =
+                new MergingIterator<>(variantContextComparator, iteratorCollection);
+
+            return new VcfObject(header, mergingIterator);
+        }).onErrorResume(this::publishError);
+        // TODO: on error, write each VCF separately ?
     }
 
     /**

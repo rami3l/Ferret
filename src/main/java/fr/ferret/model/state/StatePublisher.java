@@ -1,9 +1,7 @@
 package fr.ferret.model.state;
 
 import fr.ferret.model.locus.Locus;
-import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Sinks;
 
 public class StatePublisher {

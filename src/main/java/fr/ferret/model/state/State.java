@@ -2,10 +2,6 @@ package fr.ferret.model.state;
 
 import fr.ferret.utils.Resource;
 import lombok.Getter;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
-
-import java.util.function.Function;
 
 /**
  * An object representing the state of a processus (a download for example). It contains a text and
@@ -26,7 +22,8 @@ import java.util.function.Function;
 
     /**
      * Creates a {@link State} using the Resource Bundle for getting the text and the tooltip.<br>
-     * _textElementBase_.text is used for the text, and _textElementBase_.tooltip for the tooltip
+     * <i>textElementBase</i>.text is used for the text, and <i>textElementBase.tooltip</i> for the
+     * tooltip
      *
      * @param textElementBase The prefix tu use for getting the text and the tooltip
      * @param arg1            the object which will be used to format the text (for example %s will

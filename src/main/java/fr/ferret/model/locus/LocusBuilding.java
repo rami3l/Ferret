@@ -1,5 +1,7 @@
 package fr.ferret.model.locus;
 
+import com.pivovarit.function.ThrowingSupplier;
+import fr.ferret.controller.exceptions.NoIdFoundException;
 import fr.ferret.model.state.State;
 import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.utils.GeneConverter;
@@ -7,7 +9,10 @@ import fr.ferret.model.utils.JsonDocument;
 import fr.ferret.utils.Conversion;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.Exceptions;
+import reactor.util.retry.Retry;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -30,6 +35,9 @@ public class LocusBuilding extends PublishingStateProcessus {
 
     /** Delay between requests, to avoid getting response code 429 from ncbi server */
     private static final Duration DELAY = Duration.ofMillis(200);
+
+    private static final int NB_RETRY = 3;
+    private static final Duration RETRY_DELAY = Duration.ofMillis(500);
 
     /**
      * The selected <i>assembly accession version</i>
@@ -80,16 +88,15 @@ public class LocusBuilding extends PublishingStateProcessus {
         // TODO: We should url encode the name
         publishState(State.GENE_NAME_TO_ID, name, name);
         logger.log(Level.INFO, "Getting id for gene [{0}]", name);
-        try {
-            var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
-            return GeneConverter.extractId(new JsonDocument(json)).or(notFound(name));
-        } catch (Exception e) {
-            // TODO: retry n times in case of IOException (could be 429)
-            // TODO: error popup (ExceptionHandler)
-            logger.log(Level.WARNING, String.format("Error while getting id of [%s] gene", name),
-                e);
-            return notFound(name);
-        }
+        return Mono.defer(ThrowingSupplier.sneaky(() -> {
+                var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
+                return GeneConverter.extractId(new JsonDocument(json)).or(notFound(name));
+            }))
+            .retryWhen(Retry.backoff(NB_RETRY, RETRY_DELAY).filter(IOException.class::isInstance))
+            .onErrorResume(Exceptions::isRetryExhausted, e -> Mono.error(e.getCause()))
+            .doOnError(e -> logger.log(Level.WARNING,
+                String.format("Error while getting id of [%s] gene", name), e))
+            .onErrorResume(e -> notFound(name));
     }
 
     private Mono<String> notFound(String name) {
@@ -105,7 +112,6 @@ public class LocusBuilding extends PublishingStateProcessus {
      * @return A {@link Flux} containing the {@link Locus locus} for found ids
      */
     public Flux<Locus> fromIds(Flux<String> ids) {
-        // TODO: we should url encode the ids
         // We cache the ids because we need them twice (once for creating the url, and once for
         // extracting locus from json) and we don't want to consume the flux twice (it would
         // duplicate all previous actions, like getting ids from names)
@@ -113,21 +119,31 @@ public class LocusBuilding extends PublishingStateProcessus {
         return idsCached.collect(Collectors.joining(",")).delayElement(DELAY)
             .flatMap(idString -> {
                 publishState(State.GENE_ID_TO_LOCUS, idString, idString);
-                try {
-                    logger.info(String.format("Getting locus for ids : %s", idString));
-                    var jsonUrl = new URL(String.format(ID_URL_TEMPLATE, idString));
-                    return Mono.just(new JsonDocument(jsonUrl.openStream()));
-                } catch (Exception e) {
-                    // TODO: retry n times in case of IOException (could be 429)
-                    logger.log(Level.WARNING,
-                        String.format("Error while requesting locus for ids %s", idString), e);
-                    return Mono.error(e);
-                }
+                return requestIds(idString);
             }).flatMapMany(json -> idsCached.flatMap(
                 id -> GeneConverter.extractLocus(id, assemblyAccVer, json).or(Mono.defer(() -> {
                     genesNotFound.add(id);
                     return Mono.empty();
                 }))
             ));
+    }
+
+    /**
+     * Makes the request to ncbi, to get the json document containing ids.<br>
+     * Retries the request NB_RETRY times with a RETRY_DELAY delay, augmenting at each retry
+     */
+    private Mono<JsonDocument> requestIds(String ids) {
+        if(ids.isBlank())
+            return Mono.error(new NoIdFoundException());
+        // TODO: we should url encode the ids
+        return Mono.defer(ThrowingSupplier.sneaky(() -> {
+                logger.info(String.format("Getting locus for ids : %s", ids));
+                var jsonUrl = new URL(String.format(ID_URL_TEMPLATE, ids));
+                return Mono.just(new JsonDocument(jsonUrl.openStream()));
+            }))
+            .retryWhen(Retry.backoff(NB_RETRY, RETRY_DELAY).filter(IOException.class::isInstance))
+            .onErrorResume(Exceptions::isRetryExhausted, e -> Mono.error(e.getCause()))
+            .doOnError(e -> logger.log(Level.WARNING,
+                String.format("Error while requesting locus for ids %s", ids), e));
     }
 }

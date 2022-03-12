@@ -40,7 +40,7 @@ public class IgsrClient {
     }
 
     private String getFilePath(String chromosome) {
-        // Replace chromosome in the template string.
+        // Replaces the chromosome in the template string.
         return MessageFormat.format(urlTemplate, chromosome);
     }
 
@@ -67,7 +67,5 @@ public class IgsrClient {
         var reader = readers.get(chromosome);
         return Mono.fromCallable(() -> reader == null ? initReader(chromosome) : reader);
     }
-
-    // TODO: Put the query method (returning a VcfObject) here instead of returning a reader ?
 
 }

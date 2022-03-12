@@ -1,6 +1,7 @@
 package fr.ferret.model.state;
 
 import fr.ferret.controller.exceptions.ExceptionHandler;
+import fr.ferret.controller.exceptions.NoIdFoundException;
 import fr.ferret.controller.exceptions.VcfStreamingException;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
@@ -27,14 +28,8 @@ public abstract class PublishingStateProcessus {
     }
 
     /**
-     * Publishes a {@link State} using the Resource Bundle for getting the text and the tooltip.<br>
-     * _textElementBase_.text is used for the text, and _textElementBase_.tooltip for the tooltip
-     *
-     * @param textElementBase The prefix tu use for getting the text and the tooltip
-     * @param arg1            the object which will be used to format the text (for example %s will
-     *                        be replaced by the object string representation in the text)
-     * @param arg2            the object which will be used to format the tooltip. If null arg1 is
-     *                        use instead
+     * Publishes a {@link State} created with the passed parameters. See the
+     * {@link State#State javadoc} of the State constructor for more information on parameters
      */
     protected void publishState(String textElementBase, Object arg1, Object arg2) {
         if (state != null) {
@@ -47,6 +42,8 @@ public abstract class PublishingStateProcessus {
             throw error;
         } catch (UnknownHostException e) {
             ExceptionHandler.connectionError(e);
+        } catch (NoIdFoundException e) {
+            ExceptionHandler.noIdFoundError(e);
         } catch (VcfStreamingException e) {
             ExceptionHandler.vcfStreamingError(e);
         } catch (FileSystemException e) {
