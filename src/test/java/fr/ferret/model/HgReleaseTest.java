@@ -3,9 +3,15 @@ package fr.ferret.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
+import java.util.Arrays;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import fr.ferret.controller.settings.HumanGenomeVersions;
+import fr.ferret.model.hgversion.HgRelease;
+import fr.ferret.model.hgversion.HgVersion;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.w3c.dom.Document;
@@ -45,14 +51,15 @@ class HgReleaseTest {
 
     // TODO: This test must be changed because it reaches the server
 
-    // @Test
-    // void testURL() {
-    // var theMap = VersionUpdater.getPatchesFromVersions(
-    // Arrays.asList(HumanGenomeVersions.HG19, HumanGenomeVersions.HG38));
-    // assertTrue(theMap.isPresent());
-    // var hg37 = theMap.get().get(HumanGenomeVersions.HG19);
-    // var hg38 = theMap.get().get(HumanGenomeVersions.HG38);
-    // assertEquals(25, hg37);
-    // assertEquals(39, hg38);
-    // }
+    @Test
+    void testURL() {
+        var theMap = HgVersion.getLatestAssemblyAccessVersions(
+            Arrays.asList(HumanGenomeVersions.HG19, HumanGenomeVersions.HG38));
+        var hg37 = theMap.get(HumanGenomeVersions.HG19);
+        var hg38 = theMap.get(HumanGenomeVersions.HG38);
+        assertTrue(hg37.isPresent());
+        assertTrue(hg38.isPresent());
+        assertEquals(25, hg37.get());
+        assertEquals(39, hg38.get());
+    }
 }
