@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.function.Function;
@@ -67,6 +66,15 @@ public class Resource {
         }
     }
 
+    public static void saveConfig() {
+        try {
+            Resource.config().save();
+            logger.info("Config saved");
+        } catch (ConfigurateException e) {
+            logger.log(Level.WARNING, "Impossible to save config", e);
+        }
+    }
+
     public static void updateAssemblyAccessVersions() {
         var versions = List.of(HumanGenomeVersions.HG19, HumanGenomeVersions.HG38);
         Mono.fromRunnable(() -> config.updateAssemblyAccessVersions(versions))
@@ -74,6 +82,7 @@ public class Resource {
             .doOnSubscribe(o -> logger.info("Starting assembly accession versions update"))
             .doOnSuccess(o -> logger.info("Assembly accession versions updated"))
             .doOnError(e -> logger.log(Level.WARNING, "Assembly accession versions update failed", e))
+            .doOnSuccess(r -> saveConfig())
             .subscribe();
     }
 

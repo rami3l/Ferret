@@ -88,6 +88,7 @@ public class SettingsFrameController {
                     "locus.input." + Resource.config().getSelectedHumanGenome()));
             ferretFrame.getRegionPanel().reloadPanel();
             settingsFrame.dispose();
+            Resource.saveConfig();
         }
     }
 
