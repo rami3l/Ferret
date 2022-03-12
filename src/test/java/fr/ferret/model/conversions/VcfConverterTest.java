@@ -36,19 +36,19 @@ class VcfConverterTest {
     //        .start(new File(vcfPath)).blockLast();
     //}
 
-    @Test
-    void testToPed(@TempDir Path tempDir) throws Exception {
-        var outPath = tempDir.resolve("test.ped");
-
-        var samples = Resource.getSamples(phase, selection);
-        VcfConverter.toPed(vcfPath, outPath.toString());
-
-        var got = Files.readAllLines(outPath);
-        var expected = Stream.of("Y016 NA18523 0 0 2 0 T T T T", "SL11 HG03081 0 0 1 0 T T T T",
-                "Y014 NA18520 0 0 2 0 T T T T").map(s -> s.replace(' ', '\t')).toList();
-        assertAll(() -> assertEquals(expected, got.subList(0, 3)),
-                () -> assertEquals(661, got.size()));
-    }
+    //@Test
+    //void testToPed(@TempDir Path tempDir) throws Exception {
+    //    var outPath = tempDir.resolve("test.ped");
+    //
+    //    var samples = Resource.getSamples(phase, selection);
+    //    VcfConverter.toPed(vcfPath, outPath.toString());
+    //
+    //    var got = Files.readAllLines(outPath);
+    //    var expected = Stream.of("Y016 NA18523 0 0 2 0 T T T T", "SL11 HG03081 0 0 1 0 T T T T",
+    //            "Y014 NA18520 0 0 2 0 T T T T").map(s -> s.replace(' ', '\t')).toList();
+    //    assertAll(() -> assertEquals(expected, got.subList(0, 3)),
+    //            () -> assertEquals(661, got.size()));
+    //}
 
     @Test
     void testToInfo(@TempDir Path tempDir) throws Exception {
@@ -76,16 +76,16 @@ class VcfConverterTest {
         assertAll(() -> assertEquals(expected, got), () -> assertEquals(2, got.size()));
     }
 
-    @Test
-    void testToFrq(@TempDir Path tempDir) throws Exception {
-        var outPath = tempDir.resolve("test.frq");
-
-        var samples = Resource.getSamples(phase, selection);
-        VcfConverter.toFrq(vcfPath, outPath.toString());
-
-        var got = Files.readAllLines(outPath);
-        var expected = Stream.of("1 1:196187886 T . 1.0000 661", "1 1:196194911 T . 1.0000 661")
-            .map(s -> s.replace(' ', '\t')).toList();
-        assertAll(() -> assertEquals(expected, got), () -> assertEquals(2, got.size()));
-    }
+    //@Test
+    //void testToFrq(@TempDir Path tempDir) throws Exception {
+    //    var outPath = tempDir.resolve("test.frq");
+    //
+    //    var samples = Resource.getSamples(phase, selection);
+    //    VcfConverter.toFrq(vcfPath, outPath.toString());
+    //
+    //    var got = Files.readAllLines(outPath);
+    //    var expected = Stream.of("1 1:196187886 T . 1.0000 661", "1 1:196194911 T . 1.0000 661")
+    //        .map(s -> s.replace(' ', '\t')).toList();
+    //    assertAll(() -> assertEquals(expected, got), () -> assertEquals(2, got.size()));
+    //}
 }

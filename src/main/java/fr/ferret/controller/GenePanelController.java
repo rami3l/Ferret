@@ -7,6 +7,7 @@ import fr.ferret.model.locus.LocusBuilding;
 import fr.ferret.model.state.StatePublisher;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.model.vcf.VcfExport;
+import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.GenePanel;
 
@@ -102,9 +103,8 @@ public class GenePanelController extends InputPanelController<GenePanel> {
 
     private void downloadVcf(ZoneSelection populations, List<String> geneList) {
         run(outFile -> {
-            logger.log(Level.INFO, "Starting gene research...");
-            // TODO: get the current assemblyAccVer from Resource
-            var assemblyAccVer = "GCF_000001405.39";
+            var assemblyAccVer = Resource.getAssemblyAccessVersion();
+            logger.log(Level.INFO, "Starting gene research using {0} assembly accession version...", assemblyAccVer);
             var download = frame.getBottomPanel().addState("Starting download", outFile);
 
             // Inits the locus building processus and attaches it to the StatePublisher

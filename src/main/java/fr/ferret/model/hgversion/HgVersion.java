@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import fr.ferret.model.utils.XmlParser;
+import fr.ferret.utils.Resource;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import fr.ferret.controller.settings.HumanGenomeVersions;
@@ -17,12 +18,9 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class HgVersion {
 
-    // TODO: move to the resources
-    private static final String XML_DOC_URL =
-        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=gene&id=1234&retmode=xml";
+    private static final String XML_DOC_URL = Resource.getServerConfig("ncbi.assAacVersion.url");
+    private static final String HG_RELEASES_PATH = Resource.getServerConfig("ncbi.assAacVersion.xmlPath");
 
-    private static final String HG_RELEASES_PATH =
-        "/Entrezgene-Set/Entrezgene/Entrezgene_comments/Gene-commentary[Gene-commentary_heading/text() = 'Gene Location History']/Gene-commentary_comment";
 
     /**
      * @param versions The {@link List} of {@link HumanGenomeVersions} to get the assembly accession
@@ -51,10 +49,14 @@ public class HgVersion {
 
         NodeList annotationReleases = locationHistoryNode.getChildNodes();
         var releaseList =
+            // NodeList to Stream of nodes conversion
             IntStream.range(0, annotationReleases.getLength()).mapToObj(annotationReleases::item)
+                // Create HgRelease objects from XML nodes, getting only distinct ones
                 .map(HgRelease::of).flatMap(Optional::stream).distinct().toList();
 
+        // Creation of a map with HG versions as keys...
         return versions.stream().collect(Collectors.toMap(Function.identity(),
+            // And the max assembly accession versions for each HG version as values
             version -> releaseList.stream()
                 .filter(release -> version.toGRC().equals(release.getHgVersion()))
                 .max(Comparator.comparing(HgRelease::getPatch)).map(HgRelease::getAssVersion)));

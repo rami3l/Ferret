@@ -7,6 +7,7 @@ import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.utils.GeneConverter;
 import fr.ferret.model.utils.JsonDocument;
 import fr.ferret.utils.Conversion;
+import fr.ferret.utils.Resource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.Exceptions;
@@ -26,12 +27,8 @@ public class LocusBuilding extends PublishingStateProcessus {
 
     private static final Logger logger = Logger.getLogger(LocusBuilding.class.getName());
 
-    // TODO: move these URL templates to a resource file
-    private static final String ID_URL_TEMPLATE =
-        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=%s&format=json";
-
-    private static final String NAME_URL_TEMPLATE =
-        "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&term=%s[GENE]%%20AND%%20human[ORGN]&retmode=json";
+    private static final String ID_URL_TEMPLATE = Resource.getServerConfig("ncbi.idUrlTemplate");
+    private static final String NAME_URL_TEMPLATE = Resource.getServerConfig("ncbi.nameUrlTemplate");
 
     /** Delay between requests, to avoid getting response code 429 from ncbi server */
     private static final Duration DELAY = Duration.ofMillis(200);

@@ -42,6 +42,8 @@ public class Resource {
     /** application configuration */
     private static final ResourceBundle serverConfig = ResourceBundle.getBundle("server");
 
+    public static final String ASS_ACC_VERSION_PREFIX = "GCF_000001405";
+
     public static final Color TITLE_COLOR = new Color(12, 28, 134);
     public static final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
     public static final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
@@ -84,6 +86,10 @@ public class Resource {
             .doOnError(e -> logger.log(Level.WARNING, "Assembly accession versions update failed", e))
             .doOnSuccess(r -> saveConfig())
             .subscribe();
+    }
+
+    public static String getAssemblyAccessVersion() {
+        return ASS_ACC_VERSION_PREFIX + "." + config.getAssemblyAccessVersion();
     }
 
     /**

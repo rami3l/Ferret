@@ -64,6 +64,10 @@ public class FerretConfig {
         );
     }
 
+    public int getAssemblyAccessVersion() {
+        return assemblyAccessVersions.get(selectedHumanGenome);
+    }
+
 
     public static final Path DEFAULT_DIR = Paths.get(SystemUtils.USER_HOME, ".config", "ferret");
     public static final String DEFAULT_FILENAME = "ferret.conf";
