@@ -1,6 +1,7 @@
 package fr.ferret.model.state;
 
 import fr.ferret.controller.exceptions.ExceptionHandler;
+import fr.ferret.controller.exceptions.GenesNotFoundException;
 import fr.ferret.controller.exceptions.NoIdFoundException;
 import fr.ferret.controller.exceptions.VcfStreamingException;
 import reactor.core.publisher.FluxSink;
@@ -18,10 +19,9 @@ public abstract class PublishingStateProcessus {
     private Sinks.Many<State> state;
 
     /**
-     * Sets the {@link FluxSink} to publish the state of the processus to
+     * Sets the {@link Sinks.Many 'skink'} to publish the state of the processus to
      *
-     * @param state the {@link FluxSink} to publish the state to
-     * @return this {@link PublishingStateProcessus}
+     * @param state the {@link Sinks.Many 'sink'} to publish the state to
      */
     public void publishTo(Sinks.Many<State> state) {
         this.state = state;
@@ -55,6 +55,13 @@ public abstract class PublishingStateProcessus {
             state.tryEmitError(error);
         }
         return Mono.empty();
+    }
+
+    protected void publishWarning(Throwable error) {
+        if(error instanceof GenesNotFoundException e) {
+            state.tryEmitNext(new State("state.waiting", null, null));
+            ExceptionHandler.genesNotFoundError(e);
+        }
     }
 
     protected void publishComplete() {

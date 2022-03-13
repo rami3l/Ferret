@@ -22,6 +22,12 @@ public class ExceptionHandler {
         new Error(f).append("error.connection").show();
     }
 
+    public void genesNotFoundError(GenesNotFoundException e) {
+        var ids = String.join(" ,", e.getNotFound());
+        logger.log(Level.WARNING, "Failed to convert those genes (ignored from vcf): {0}", ids);
+        new Error(f).append("error.genesNotFound", ids).show();
+    }
+
     public static void noIdFoundError(Throwable throwable) {
         logger.log(Level.WARNING, "No valid id for this request to ncbi server", throwable);
         new Error(f).append("error.noIdFound").show();
@@ -46,5 +52,4 @@ public class ExceptionHandler {
         logger.log(Level.WARNING, "Unknown error", throwable);
         new Error(f).append("error.unknown", throwable).show();
     }
-
 }
