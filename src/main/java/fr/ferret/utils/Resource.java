@@ -55,6 +55,7 @@ public class Resource {
     public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
     public static final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
     public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
+    public static final Font HELP_LABEL_FONT = new Font("Calibri", 0, 9);
 
     public static FerretConfig config() {
         return config;
@@ -85,7 +86,7 @@ public class Resource {
             .doOnSuccess(o -> logger.info("Assembly accession versions updated"))
             .doOnError(e -> logger.log(Level.WARNING, "Assembly accession versions update failed", e))
             .doOnSuccess(r -> saveConfig())
-            .subscribe();
+	        .subscribe();
     }
 
     public static String getAssemblyAccessVersion() {

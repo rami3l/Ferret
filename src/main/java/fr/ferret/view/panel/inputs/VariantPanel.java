@@ -10,7 +10,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import fr.ferret.controller.BrowseFileButtonListener;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.utils.GuiUtils;
@@ -40,20 +45,34 @@ public class VariantPanel extends JPanel {
         JPanel inputPanel = generateInputPanel();
 
         /* --- Help section --- */
-        JLabel helpLabel =
-                new JLabel(Resource.getTextElement("variant.help"), SwingConstants.CENTER);
+        JTextPane helpPane = new JTextPane();
+        helpPane.setContentType("text/html");
+        helpPane.setText(Resource.getTextElement("variant.help"));
+        helpPane.setBackground(null);
+        helpPane.setEditable(false);
+        StyledDocument styledHelpPane = helpPane.getStyledDocument();
+        // Set the font
+        MutableAttributeSet attrs = helpPane.getInputAttributes();
+        StyleConstants.setFontFamily(attrs, Resource.HELP_LABEL_FONT.getFamily());
+        StyleConstants.setFontSize(attrs, Resource.HELP_LABEL_FONT.getSize());
+        styledHelpPane.setCharacterAttributes(0, styledHelpPane.getLength() + 1, attrs, false);
+        // Center the text
+        SimpleAttributeSet center = new SimpleAttributeSet();
+        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+        styledHelpPane.setParagraphAttributes(0, styledHelpPane.getLength() + 1, center, false);
+
 
         // Add the 3 parts defined above to the layout
         this.setLayout(new BorderLayout());
         add(titleLabel, BorderLayout.NORTH);
         add(inputPanel, BorderLayout.CENTER);
-        add(helpLabel, BorderLayout.SOUTH);
+        add(helpPane, BorderLayout.SOUTH);
 
         // Set the borders
         setBorder(BorderFactory.createLineBorder(Resource.PANEL_BORDER_COLOR, 4));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
         inputPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
-        helpLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        helpPane.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
     }
 
     /**
