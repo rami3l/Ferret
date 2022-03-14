@@ -12,10 +12,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.AllArgsConstructor;
+import lombok.Setter;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
@@ -36,6 +38,8 @@ public class StatePanel extends JPanel {
     private boolean completed = false;
     private boolean canDestroy = true;
     private final File downloadLocation;
+    @Setter
+    private PublishingStateProcessus<?> associatedProcessus;
 
     public StatePanel(String text, File downloadLocation) {
 
@@ -60,6 +64,7 @@ public class StatePanel extends JPanel {
         stateLabel.addMouseListener(mouseListener);
         spinner.addMouseListener(mouseListener);
         openButton.addMouseListener(mouseListener);
+        spinner.addMouseListener(new MouseClickListener());
     }
 
     public void setState(State state) {
@@ -134,6 +139,15 @@ public class StatePanel extends JPanel {
             panel.setBackground(panel.getBackground().brighter());
             if (completed) {
                 destroyAction = startDestroyAction();
+            }
+        }
+    }
+
+    private class MouseClickListener extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (associatedProcessus != null) {
+                associatedProcessus.cancel();
             }
         }
     }

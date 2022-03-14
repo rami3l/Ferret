@@ -111,6 +111,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
 
             // Sets the locus building processus
             var locusProcessing = new LocusBuilding(geneList, assemblyAccVer);
+            download.setAssociatedProcessus(locusProcessing);
 
             // Starts the processus and subscribes to its state
             locusProcessing.start().doOnComplete(
@@ -125,6 +126,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
     private void download(ZoneSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
         // Sets the vcf export processus
         var vcfProcessus = new VcfExport(locusList, outFile).setFilter(populations);
+        download.setAssociatedProcessus(vcfProcessus);
 
         // Subscribes to the state of the launched processus via the StatePublisher
         vcfProcessus.start().doOnComplete(download::complete).doOnError(e -> {
