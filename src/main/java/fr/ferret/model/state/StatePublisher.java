@@ -6,7 +6,7 @@ import reactor.core.publisher.Sinks;
 
 public class StatePublisher {
 
-    private Sinks.Many<State> state;
+    private final Sinks.Many<State> state;
 
     public StatePublisher() {
         state = Sinks.many().multicast().directBestEffort();

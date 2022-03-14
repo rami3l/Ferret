@@ -4,7 +4,6 @@ import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.GenesNotFoundException;
 import fr.ferret.controller.exceptions.NoIdFoundException;
 import fr.ferret.controller.exceptions.VcfStreamingException;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
@@ -59,7 +58,9 @@ public abstract class PublishingStateProcessus {
 
     protected void publishWarning(Throwable error) {
         if(error instanceof GenesNotFoundException e) {
-            state.tryEmitNext(new State("state.waiting", null, null));
+            if(state != null){
+                state.tryEmitNext(new State("state.waiting", null, null));
+            }
             ExceptionHandler.genesNotFoundError(e);
         }
     }

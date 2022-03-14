@@ -2,6 +2,8 @@ package fr.ferret.model.locus;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -12,6 +14,7 @@ import lombok.ToString;
  */
 @Getter
 @ToString
+@EqualsAndHashCode
 public final class Locus {
     private static final Logger logger = Logger.getLogger(Locus.class.getName());
     private final String chromosome;

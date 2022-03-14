@@ -31,13 +31,11 @@ public class VcfObject {
 
     }
 
-    @AllArgsConstructor
-    class VariantIterator implements CloseableIterator<VariantContext> {
-
-        final Iterator<VariantContext> iterator;
+    private record VariantIterator(Iterator<VariantContext> iterator)
+        implements CloseableIterator<VariantContext> {
 
         @Override public void close() {
-            // TODO
+            // We do not have any resource to close
         }
 
         @Override public boolean hasNext() {

@@ -83,7 +83,6 @@ public class LocusBuilding extends PublishingStateProcessus {
      * @return A mono encapsulating the name of the gene (present if found)
      */
     public Mono<String> fromName(String name) {
-        // TODO: We should url encode the name
         publishState(State.GENE_NAME_TO_ID, name, name);
         logger.log(Level.INFO, "Getting id for gene [{0}]", name);
         return Mono.defer(ThrowingSupplier.sneaky(() -> {
@@ -129,7 +128,6 @@ public class LocusBuilding extends PublishingStateProcessus {
     private Mono<JsonDocument> requestIds(String ids) {
         if(ids.isBlank())
             return Mono.error(new NoIdFoundException());
-        // TODO: we should url encode the ids
         return Mono.defer(ThrowingSupplier.sneaky(() -> {
                 logger.info(String.format("Getting locus for ids : %s", ids));
                 var jsonUrl = new URL(String.format(ID_URL_TEMPLATE, ids));

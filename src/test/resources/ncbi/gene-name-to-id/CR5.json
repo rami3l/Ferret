@@ -1,0 +1,36 @@
+{
+  "header": {
+    "type": "esearch",
+    "version": "0.3"
+  },
+  "esearchresult": {
+    "count": "1",
+    "retmax": "1",
+    "retstart": "0",
+    "idlist": [
+      "22814"
+    ],
+    "translationset": [
+      {
+        "from": "human[ORGN]",
+        "to": "\"Homo sapiens\"[Organism]"
+      }
+    ],
+    "translationstack": [
+      {
+        "term": "CR5[GENE]",
+        "field": "GENE",
+        "count": "1",
+        "explode": "N"
+      },
+      {
+        "term": "\"Homo sapiens\"[Organism]",
+        "field": "Organism",
+        "count": "230091",
+        "explode": "Y"
+      },
+      "AND"
+    ],
+    "querytranslation": "CR5[GENE] AND \"Homo sapiens\"[Organism]"
+  }
+}
