@@ -110,10 +110,10 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var download = frame.getBottomPanel().addState("Starting download", outFile);
 
             // Sets the locus building processus
-            var locusProcessing = new LocusBuilding(assemblyAccVer);
+            var locusProcessing = new LocusBuilding(geneList, assemblyAccVer);
 
             // Starts the processus and subscribes to its state
-            locusProcessing.fromGenes(geneList).start().doOnComplete(
+            locusProcessing.start().doOnComplete(
                     () -> download(populations, outFile, locusProcessing.getResult(), download)
                 ).doOnError(e -> {
                     logger.log(Level.WARNING, "Error while downloading or writing");
@@ -123,11 +123,8 @@ public class GenePanelController extends InputPanelController<GenePanel> {
     }
 
     private void download(ZoneSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
-        // Inits the vcf export processus, attaches it to the StatePublisher, and starts it
-        var vcfProcessus = new VcfExport(locusList)
-            .setFilter(populations);
-        //statePublisher.attachTo(vcfProcessus);
-        vcfProcessus.setOutput(outFile);
+        // Sets the vcf export processus
+        var vcfProcessus = new VcfExport(locusList, outFile).setFilter(populations);
 
         // Subscribes to the state of the launched processus via the StatePublisher
         vcfProcessus.start().doOnComplete(download::complete).doOnError(e -> {

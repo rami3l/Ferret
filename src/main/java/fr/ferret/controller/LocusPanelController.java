@@ -103,9 +103,8 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
             var download = frame.getBottomPanel().addState("Starting download", outFile);
 
             // Sets the vcf export processus
-            var vcfProcessus = new VcfExport(List.of(new Locus(chr, start, end)))
-                .setFilter(populations)
-                .setOutput(outFile);
+            var vcfProcessus = new VcfExport(List.of(new Locus(chr, start, end)), outFile)
+                .setFilter(populations);
 
             // Starts the processus and subscribes its states
             vcfProcessus.start().doOnComplete(download::complete).doOnError(e -> {

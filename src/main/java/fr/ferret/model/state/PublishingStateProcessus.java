@@ -14,6 +14,8 @@ import java.nio.file.FileSystemException;
  */
 public abstract class PublishingStateProcessus<T> {
 
+    // TODO: add a warning while trying to close Ferret although an export is not finished -> keep somewhere the list of VcfExports
+
     private FluxSink<State> state;
     private Disposable disposable;
     protected Mono<T> resultPromise;
@@ -71,13 +73,15 @@ public abstract class PublishingStateProcessus<T> {
     }
 
     public void cancel() {
-        // TODO: check if started (= if disposable !=null)
+        if(disposable == null)
+            return;
         disposable.dispose();
         state.error(new CancelledProcessusException());
     }
 
     public T getResult() {
-        // TODO: check if finished and not cancelled (= if result!=null)
+        if(result == null)
+            throw new IllegalStateException("Trying to get the result before the end of the processus");
         return result;
     }
 

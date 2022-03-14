@@ -36,15 +36,11 @@ import java.util.stream.Collectors;
  */
 public class VcfExport extends PublishingStateProcessus<Void> {
 
-    // TODO: add a cancel option (Use the Disposable returned by the subscribe call at the end of the start method)
-    // TODO: add a warning while trying to close Ferret although an export is not finished -> keep somewhere the list of VcfExports
-
     private static final Logger logger = Logger.getLogger(VcfExport.class.getName());
 
     private static final int NB_RETRY = 3;
     private static final Duration RETRY_DELAY = Duration.ofMillis(500);
 
-    private final Flux<Locus> locusFlux;
     private Set<String> samples;
 
     /**
@@ -53,16 +49,37 @@ public class VcfExport extends PublishingStateProcessus<Void> {
     private final Phases1KG phase1KG = Resource.config().getSelectedVersion();
 
     /**
-     * Constructs a {@link VcfExport}.
+     * Constructs a {@link VcfExport}. It is used to export a "distilled" VCF file from an IGSR
+     * online database query.<br>
+     * Call the {@link VcfExport#setFilter(ZoneSelection)} method to filter the VCF by populations
      *
      * @param locusList The {@link List} of {@link Locus} to export in a VCF file.
+     * @param outFile the output {@link File}
      */
-    public VcfExport(List<Locus> locusList) {
-        locusFlux = Flux.fromIterable(locusList);
+    public VcfExport(List<Locus> locusList, File outFile) {
+        resultPromise = getVcf(locusList).subscribeOn(Schedulers.boundedElastic())
+            .collect(Collectors.toList())
+            .flatMap(this::merge).doOnNext(vcf -> {
+                if (samples != null) {
+                    logger.info("Filtering by samples");
+                    vcf = vcf.filter(samples);
+                }
+                publishState(State.WRITING, outFile.getName(), null);
+                logger.info("Writing to disk...");
+                FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
+                publishState(State.WRITTEN, outFile.getName(), null);
+                logger.info("File written");
+            })
+            .doOnSuccess(r -> publishComplete())
+            .doOnError(this::publishError).then();
     }
 
-    private Flux<VcfObject> getVcf(Flux<Locus> locus) {
-        return locus.flatMap(
+    /**
+     * Converts each {@link Locus} from the {@link List} to a {@link VcfObject} by downloading the
+     * VCF corresponding to these {@link Locus}
+     */
+    private Flux<VcfObject> getVcf(List<Locus> locus) {
+        return Flux.fromIterable(locus).flatMap(
             l -> getReader(l.getChromosome()).map(ThrowingFunction.unchecked(reader -> {
                 publishState(State.DOWNLOADING_LINES, l.getChromosome(), l);
                 logger.info(String.format("Downloading lines for locus %s", l));
@@ -72,6 +89,9 @@ public class VcfExport extends PublishingStateProcessus<Void> {
         );
     }
 
+    /**
+     * Creates a VCF reader for the given chromosome (downloads the VCF header)
+     */
     private Mono<FeatureReader<VariantContext>> getReader(String chromosome) {
         // TODO: each getReader call could get into an IOException Error
         var client =new IgsrClient(Resource.getVcfUrlTemplate(phase1KG));
@@ -122,28 +142,6 @@ public class VcfExport extends PublishingStateProcessus<Void> {
         // TODO: on error, write each VCF separately ?
     }
 
-    /**
-     * Exports a "distilled" VCF file from an IGSR online database query.
-     *
-     * @param outFile the output {@link File}
-     */
-    public VcfExport setOutput(File outFile) {
-        resultPromise = getVcf(locusFlux).subscribeOn(Schedulers.boundedElastic()).collect(Collectors.toList())
-            .flatMap(this::merge).doOnNext(vcf -> {
-                if (samples != null) {
-                    logger.info("Filtering by samples");
-                    vcf = vcf.filter(samples);
-                }
-                publishState(State.WRITING, outFile.getName(), null);
-                logger.info("Writing to disk...");
-                FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
-                publishState(State.WRITTEN, outFile.getName(), null);
-                logger.info("File written");
-            })
-            .doOnSuccess(r -> publishComplete())
-            .doOnError(this::publishError).then();
-        return this;
-    }
 
     /**
      * Set the sample filter for this {@link VcfExport export}
