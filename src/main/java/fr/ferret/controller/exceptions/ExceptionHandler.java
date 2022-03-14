@@ -2,8 +2,10 @@ package fr.ferret.controller.exceptions;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
+import javax.swing.*;
+
 import fr.ferret.controller.Error;
+import fr.ferret.utils.Resource;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -22,10 +24,10 @@ public class ExceptionHandler {
         new Error(f).append("error.connection").show();
     }
 
-    public void genesNotFoundError(GenesNotFoundException e) {
+    public boolean genesNotFoundMessage(GenesNotFoundException e) {
         var ids = String.join(" ,", e.getNotFound());
         logger.log(Level.WARNING, "Failed to convert those genes (ignored from vcf): {0}", ids);
-        new Error(f).append("error.genesNotFound", ids).show();
+        return new Error(f).append("error.genesNotFound", ids).confirm();
     }
 
     public static void noIdFoundError(Throwable throwable) {

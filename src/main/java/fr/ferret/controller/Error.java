@@ -30,8 +30,14 @@ public class Error {
     }
 
     public void show() {
-        JOptionPane.showMessageDialog(frame, errorMessage,
-            Resource.getTextElement("run.error"), JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(frame, errorMessage, Resource.getTextElement("run.error"),
+            JOptionPane.ERROR_MESSAGE);
+    }
+
+    public boolean confirm() {
+        return
+            JOptionPane.showConfirmDialog(frame, errorMessage, Resource.getTextElement("run.error"),
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
     // TODO: add stacktrace in the popup

@@ -54,7 +54,8 @@ public abstract class PublishingStateProcessus<T> {
     protected void publishWarning(Throwable error) {
         if(error instanceof GenesNotFoundException e) {
             state.next(new State("state.waiting", null, null));
-            ExceptionHandler.genesNotFoundError(e);
+            if(!ExceptionHandler.genesNotFoundMessage(e))
+                cancel();
         }
     }
 
