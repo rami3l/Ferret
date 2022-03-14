@@ -1,12 +1,10 @@
 package fr.ferret.model.state;
 
-import fr.ferret.controller.exceptions.ExceptionHandler;
-import fr.ferret.controller.exceptions.GenesNotFoundException;
-import fr.ferret.controller.exceptions.NoIdFoundException;
-import fr.ferret.controller.exceptions.VcfStreamingException;
+import fr.ferret.controller.exceptions.*;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
 
 import java.net.UnknownHostException;
 import java.nio.file.FileSystemException;
@@ -14,18 +12,12 @@ import java.nio.file.FileSystemException;
 /**
  * Extend this class if your class need to publish the state of its processus
  */
-public abstract class PublishingStateProcessus {
+public abstract class PublishingStateProcessus<T> {
 
-    private Sinks.Many<State> state;
-
-    /**
-     * Sets the {@link Sinks.Many 'skink'} to publish the state of the processus to
-     *
-     * @param state the {@link Sinks.Many 'sink'} to publish the state to
-     */
-    public void publishTo(Sinks.Many<State> state) {
-        this.state = state;
-    }
+    private FluxSink<State> state;
+    private Disposable disposable;
+    protected Mono<T> resultPromise;
+    private T result;
 
     /**
      * Publishes a {@link State} created with the passed parameters. See the
@@ -33,11 +25,11 @@ public abstract class PublishingStateProcessus {
      */
     protected void publishState(String textElementBase, Object arg1, Object arg2) {
         if (state != null) {
-            state.tryEmitNext(new State(textElementBase, arg1, arg2));
+            state.next(new State(textElementBase, arg1, arg2));
         }
     }
 
-    protected <T> Mono<T> publishError(Throwable error) {
+    protected <R> Mono<R> publishError(Throwable error) {
         try {
             throw error;
         } catch (UnknownHostException e) {
@@ -52,22 +44,41 @@ public abstract class PublishingStateProcessus {
             ExceptionHandler.unknownError(e);
         }
         if (state != null) {
-            state.tryEmitError(error);
+            state.error(error);
         }
         return Mono.empty();
     }
 
     protected void publishWarning(Throwable error) {
         if(error instanceof GenesNotFoundException e) {
-            state.tryEmitNext(new State("state.waiting", null, null));
+            state.next(new State("state.waiting", null, null));
             ExceptionHandler.genesNotFoundError(e);
         }
     }
 
     protected void publishComplete() {
         if (state != null) {
-            state.tryEmitComplete();
+            state.complete();
         }
+    }
+
+    public Flux<State> start() {
+        disposable = resultPromise.subscribe(r -> {
+            result = r;
+            publishComplete();
+        });
+        return Flux.create(s -> state = s);
+    }
+
+    public void cancel() {
+        // TODO: check if started (= if disposable !=null)
+        disposable.dispose();
+        state.error(new CancelledProcessusException());
+    }
+
+    public T getResult() {
+        // TODO: check if finished and not cancelled (= if result!=null)
+        return result;
     }
 
 }

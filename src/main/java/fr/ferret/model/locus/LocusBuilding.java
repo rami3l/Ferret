@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class LocusBuilding extends PublishingStateProcessus {
+public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
 
     private static final Logger logger = Logger.getLogger(LocusBuilding.class.getName());
 
@@ -57,7 +57,7 @@ public class LocusBuilding extends PublishingStateProcessus {
      * @param idsOrNames A {@link List list} of gene names/ids
      * @return A {@link Flux} containing the locus for found genes (empty in case of error).
      */
-    public Flux<Locus> startWith(List<String> idsOrNames) {
+    public LocusBuilding fromGenes(List<String> idsOrNames) {
         var flux = Flux.fromIterable(idsOrNames).filter(Predicate.not(String::isBlank));
         // ids are numeric
         var ids = flux.filter(Conversion::isInteger);
@@ -66,12 +66,13 @@ public class LocusBuilding extends PublishingStateProcessus {
             flux.filter(Predicate.not(Conversion::isInteger)).delayElements(DELAY);
         // concat ids with names converted to ids
         var allIds = ids.concatWith(names.flatMap(this::fromName)).distinct();
-        return fromIds(allIds)
+        resultPromise = fromIds(allIds)
             .onErrorResume(this::publishError)
             .doOnComplete(() -> {
                 if(!genesNotFound.isEmpty())
                     publishWarning(new GenesNotFoundException(genesNotFound));
-            });
+            }).collectList();
+        return this;
     }
 
     /**

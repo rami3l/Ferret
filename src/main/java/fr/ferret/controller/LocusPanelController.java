@@ -1,16 +1,15 @@
 package fr.ferret.controller;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import fr.ferret.model.locus.Locus;
 import fr.ferret.model.ZoneSelection;
-import fr.ferret.model.state.StatePublisher;
+import fr.ferret.model.locus.Locus;
 import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
-import reactor.core.publisher.Flux;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The {@link LocusPanel} controller
@@ -103,13 +102,13 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
             logger.log(Level.INFO, "Starting gene research...");
             var download = frame.getBottomPanel().addState("Starting download", outFile);
 
-            // Inits the vcf export processus, attaches it to the StatePublisher, and starts it
-            var vcfProcessus = new VcfExport(Flux.just(new Locus(chr, start, end))).setFilter(populations);
-            var statePublisher = new StatePublisher().attachTo(vcfProcessus);
-            vcfProcessus.startTo(outFile);
+            // Sets the vcf export processus
+            var vcfProcessus = new VcfExport(List.of(new Locus(chr, start, end)))
+                .setFilter(populations)
+                .setOutput(outFile);
 
-            // Subscribes to the state of the launched processus via the StatePublisher
-            statePublisher.getState().doOnComplete(download::complete).doOnError(e -> {
+            // Starts the processus and subscribes its states
+            vcfProcessus.start().doOnComplete(download::complete).doOnError(e -> {
                         logger.log(Level.WARNING, "Error while downloading or writing");
                         download.error();
                     }).subscribe(download::setState);

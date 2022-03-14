@@ -4,16 +4,15 @@ import com.pivovarit.function.ThrowingFunction;
 import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.VcfStreamingException;
 import fr.ferret.controller.settings.Phases1KG;
-import fr.ferret.model.state.State;
-import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
+import fr.ferret.model.state.PublishingStateProcessus;
+import fr.ferret.model.state.State;
 import fr.ferret.model.utils.FileWriter;
 import fr.ferret.utils.Resource;
 import htsjdk.samtools.util.MergingIterator;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.variantcontext.VariantContextComparator;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFUtils;
 import reactor.core.publisher.Flux;
@@ -23,7 +22,6 @@ import reactor.util.retry.Retry;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
@@ -36,7 +34,7 @@ import java.util.stream.Collectors;
  * set a {@link ZoneSelection population filter} with the <i>setFilter</i> method. We start the
  * export with the <i>start</i> method, passing it the {@link File outFile}
  */
-public class VcfExport extends PublishingStateProcessus {
+public class VcfExport extends PublishingStateProcessus<Void> {
 
     // TODO: add a cancel option (Use the Disposable returned by the subscribe call at the end of the start method)
     // TODO: add a warning while trying to close Ferret although an export is not finished -> keep somewhere the list of VcfExports
@@ -57,10 +55,10 @@ public class VcfExport extends PublishingStateProcessus {
     /**
      * Constructs a {@link VcfExport}.
      *
-     * @param locusFlux A flux containing all the locus to export in a VCF file.
+     * @param locusList The {@link List} of {@link Locus} to export in a VCF file.
      */
-    public VcfExport(Flux<Locus> locusFlux) {
-        this.locusFlux = locusFlux;
+    public VcfExport(List<Locus> locusList) {
+        locusFlux = Flux.fromIterable(locusList);
     }
 
     private Flux<VcfObject> getVcf(Flux<Locus> locus) {
@@ -129,8 +127,8 @@ public class VcfExport extends PublishingStateProcessus {
      *
      * @param outFile the output {@link File}
      */
-    public void startTo(File outFile) {
-        getVcf(locusFlux).subscribeOn(Schedulers.boundedElastic()).collect(Collectors.toList())
+    public VcfExport setOutput(File outFile) {
+        resultPromise = getVcf(locusFlux).subscribeOn(Schedulers.boundedElastic()).collect(Collectors.toList())
             .flatMap(this::merge).doOnNext(vcf -> {
                 if (samples != null) {
                     logger.info("Filtering by samples");
@@ -143,7 +141,8 @@ public class VcfExport extends PublishingStateProcessus {
                 logger.info("File written");
             })
             .doOnSuccess(r -> publishComplete())
-            .doOnError(this::publishError).subscribe();
+            .doOnError(this::publishError).then();
+        return this;
     }
 
     /**

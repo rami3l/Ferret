@@ -60,8 +60,8 @@ class GeneConverterTest {
                 "APOL1", "8542", "4627", "MYH9");
         // var genes = List.of("CR5", "1234");
         var builder = new LocusBuilding("GCF_000001405.39");
-        var locusFlux = builder.startWith(genes).doOnNext(System.out::println);
-        locusFlux.blockLast();
+        var state = builder.fromGenes(genes).start();
+        state.doOnComplete(() -> System.out.println(builder.getResult())).blockLast();
     }
 
     // Test to get the delay to apply between request to avoid 429 response code from server

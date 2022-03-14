@@ -3,15 +3,17 @@ package fr.ferret.controller;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
 import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.locus.Locus;
 import fr.ferret.model.locus.LocusBuilding;
-import fr.ferret.model.state.StatePublisher;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
+import fr.ferret.view.panel.StatePanel;
 import fr.ferret.view.panel.inputs.GenePanel;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -107,22 +109,31 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             logger.log(Level.INFO, "Starting gene research using {0} assembly accession version...", assemblyAccVer);
             var download = frame.getBottomPanel().addState("Starting download", outFile);
 
-            // Inits the locus building processus and attaches it to the StatePublisher
+            // Sets the locus building processus
             var locusProcessing = new LocusBuilding(assemblyAccVer);
-            var statePublisher = new StatePublisher().attachTo(locusProcessing);
-            var locusFlux = locusProcessing.startWith(geneList);
 
-            // Inits the vcf export processus, attaches it to the StatePublisher, and starts it
-            var vcfProcessus = new VcfExport(locusFlux).setFilter(populations);
-            statePublisher.attachTo(vcfProcessus);
-            vcfProcessus.startTo(outFile);
-
-            // Subscribes to the state of the launched processus via the StatePublisher
-            statePublisher.getState().doOnComplete(download::complete).doOnError(e -> {
+            // Starts the processus and subscribes to its state
+            locusProcessing.fromGenes(geneList).start().doOnComplete(
+                    () -> download(populations, outFile, locusProcessing.getResult(), download)
+                ).doOnError(e -> {
                     logger.log(Level.WARNING, "Error while downloading or writing");
                     download.error();
                 }).subscribe(download::setState);
         });
+    }
+
+    private void download(ZoneSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
+        // Inits the vcf export processus, attaches it to the StatePublisher, and starts it
+        var vcfProcessus = new VcfExport(locusList)
+            .setFilter(populations);
+        //statePublisher.attachTo(vcfProcessus);
+        vcfProcessus.setOutput(outFile);
+
+        // Subscribes to the state of the launched processus via the StatePublisher
+        vcfProcessus.start().doOnComplete(download::complete).doOnError(e -> {
+            logger.log(Level.WARNING, "Error while downloading or writing");
+            download.error();
+        }).subscribe(download::setState);
     }
 
     private void displayError(boolean geneListInputted, boolean geneFileImported,
