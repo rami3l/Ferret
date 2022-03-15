@@ -81,7 +81,7 @@ public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
      */
     private Mono<String> fromName(String name) {
         // TODO: We should url encode the name
-        publishState(State.GENE_NAME_TO_ID, name, name);
+        publishState(State.geneNameToId(name));
         logger.log(Level.INFO, "Getting id for gene [{0}]", name);
         return Mono.defer(ThrowingSupplier.sneaky(() -> {
                 var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
@@ -112,7 +112,7 @@ public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
         var idsCached = ids.replay().autoConnect();
         return idsCached.collect(Collectors.joining(",")).delayElement(DELAY)
             .flatMap(idString -> {
-                publishState(State.GENE_ID_TO_LOCUS, idString, idString);
+                publishState(State.geneIdToLocus(idString));
                 return requestIds(idString);
             }).flatMapMany(json -> idsCached.flatMap(
                 id -> GeneConverter.extractLocus(id, assemblyAccVer, json).switchIfEmpty(notFound(id))

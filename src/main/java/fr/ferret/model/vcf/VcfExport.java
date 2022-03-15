@@ -64,10 +64,10 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                     logger.info("Filtering by samples");
                     vcf = vcf.filter(samples);
                 }
-                publishState(State.WRITING, outFile.getName(), null);
+                publishState(State.writing(outFile.getName()));
                 logger.info("Writing to disk...");
                 FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
-                publishState(State.WRITTEN, outFile.getName(), null);
+                publishState(State.written(outFile.getName()));
                 logger.info("File written");
             })
             .doOnError(this::publishErrorAndCancel).then();
@@ -80,7 +80,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
     private Flux<VcfObject> getVcf(List<Locus> locus) {
         return Flux.fromIterable(locus).flatMap(
             l -> getReader(l.getChromosome()).map(ThrowingFunction.unchecked(reader -> {
-                publishState(State.DOWNLOADING_LINES, l.getChromosome(), l);
+                publishState(State.downloadingLines(l));
                 logger.info(String.format("Downloading lines for locus %s", l));
                 var lines = reader.query(l.getChromosome(), l.getStart(), l.getEnd());
                 return new VcfObject((VCFHeader) reader.getHeader(), lines);
@@ -96,7 +96,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
         var client =new IgsrClient(Resource.getVcfUrlTemplate(phase1KG));
         return Mono.defer(() -> client.getReader(chromosome))
             .doOnSubscribe(s -> {
-                publishState(State.DOWNLOADING_HEADER, chromosome, chromosome);
+                publishState(State.downloadingHeader(chromosome));
                 logger.info(String.format("Getting header of chr %s", chromosome));
             })
             .retryWhen(Retry.backoff(NB_RETRY, RETRY_DELAY).filter(IOException.class::isInstance))

@@ -5,6 +5,7 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 /**
  * Extend this class if your class need to publish the state of its processus
@@ -13,7 +14,7 @@ public abstract class PublishingStateProcessus<T> {
 
     // TODO: add a warning while trying to close Ferret although an export is not finished -> keep somewhere the list of VcfExports
 
-    private FluxSink<State> state;
+    private final Sinks.Many<State> state = Sinks.many().multicast().directBestEffort();
     private Disposable disposable;
     protected Mono<T> resultPromise;
     private T result;
@@ -22,39 +23,42 @@ public abstract class PublishingStateProcessus<T> {
      * Publishes a {@link State} created with the passed parameters. See the
      * {@link State#State javadoc} of the State constructor for more information on parameters
      */
-    protected void publishState(String textElementBase, Object arg1, Object arg2) {
-        checkStarted();
-        state.next(new State(textElementBase, arg1, arg2));
+    protected void publishState(State state) {
+        this.state.tryEmitNext(state);
     }
 
     protected void publishErrorAndCancel(Throwable error) {
         checkStarted();
-        state.error(error);
+        state.tryEmitError(error);
         disposable.dispose();
     }
 
     protected void confirmContinue(Throwable error) {
-        checkStarted();
         if(error instanceof GenesNotFoundException e) {
-            state.next(new State("state.waiting", null, null));
+            state.tryEmitNext(new State("state.waiting", null, null));
             if(!ExceptionHandler.genesNotFoundMessage(e))
                 cancel();
         }
     }
 
+    /**
+     * Starts the processus
+     *
+     * @return a {@link Flux} of {@link State states} you can subscribe to, to get the current state
+     * of the processus
+     */
     public Flux<State> start() {
-        Flux<State> stateFlux = Flux.create(s -> state = s);
         disposable = resultPromise.doOnSuccess(r -> {
             result = r;
-            state.complete();
+            state.tryEmitComplete();
         }).subscribe();
-        return stateFlux;
+        return state.asFlux();
     }
 
     public void cancel() {
         checkStarted();
         disposable.dispose();
-        state.error(new CancelledProcessusException());
+        state.tryEmitError(new CancelledProcessusException());
     }
 
     public T getResult() {
@@ -64,8 +68,8 @@ public abstract class PublishingStateProcessus<T> {
     }
 
     private void checkStarted() {
-        if (state == null || disposable == null)
-            throw new IllegalStateException("Cannot publish or cancel before starting processus");
+        if (disposable == null)
+            throw new IllegalStateException("Cannot cancel before starting the processus");
     }
 
 }
