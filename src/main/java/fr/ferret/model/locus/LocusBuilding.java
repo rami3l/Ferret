@@ -64,10 +64,10 @@ public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
         // concat ids with names converted to ids
         var allIds = ids.concatWith(names.flatMap(this::fromName)).distinct();
         resultPromise = fromIds(allIds)
-            .onErrorResume(this::publishError)
+            .doOnError(this::publishErrorAndCancel)
             .doOnComplete(() -> {
                 if(!genesNotFound.isEmpty())
-                    publishWarning(new GenesNotFoundException(genesNotFound));
+                    confirmContinue(new GenesNotFoundException(genesNotFound));
             }).collectList();
     }
 

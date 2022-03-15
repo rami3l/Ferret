@@ -1,5 +1,7 @@
 package fr.ferret.controller.exceptions;
 
+import java.net.UnknownHostException;
+import java.nio.file.FileSystemException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
@@ -17,6 +19,22 @@ public class ExceptionHandler {
 
     public static void setFrame(JFrame frame) {
         f = frame;
+    }
+
+    public static void show(Throwable error) {
+        try {
+            throw error;
+        } catch (UnknownHostException e) {
+            ExceptionHandler.connectionError(e);
+        } catch (NoIdFoundException e) {
+            ExceptionHandler.noIdFoundError(e);
+        } catch (VcfStreamingException e) {
+            ExceptionHandler.vcfStreamingError(e);
+        } catch (FileSystemException e) {
+            ExceptionHandler.fileWritingError(e);
+        } catch (Throwable e) {
+            ExceptionHandler.unknownError(e);
+        }
     }
 
     public static void connectionError(Throwable throwable) {

@@ -1,5 +1,6 @@
 package fr.ferret.controller;
 
+import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
 import fr.ferret.model.ZoneSelection;
@@ -117,8 +118,9 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             locusProcessing.start().doOnComplete(
                     () -> download(populations, outFile, locusProcessing.getResult(), download)
                 ).doOnError(e -> {
-                    logger.log(Level.WARNING, "Error while downloading or writing");
+                    logger.log(Level.WARNING, "Error while downloading or writing", e);
                     download.error();
+                    ExceptionHandler.show(e);
                 }).subscribe(download::setState);
         });
     }

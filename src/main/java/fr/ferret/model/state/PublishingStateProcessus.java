@@ -6,9 +6,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
-import java.net.UnknownHostException;
-import java.nio.file.FileSystemException;
-
 /**
  * Extend this class if your class need to publish the state of its processus
  */
@@ -26,32 +23,18 @@ public abstract class PublishingStateProcessus<T> {
      * {@link State#State javadoc} of the State constructor for more information on parameters
      */
     protected void publishState(String textElementBase, Object arg1, Object arg2) {
-        if (state != null) {
-            state.next(new State(textElementBase, arg1, arg2));
-        }
+        checkStarted();
+        state.next(new State(textElementBase, arg1, arg2));
     }
 
-    protected <R> Mono<R> publishError(Throwable error) {
-        try {
-            throw error;
-        } catch (UnknownHostException e) {
-            ExceptionHandler.connectionError(e);
-        } catch (NoIdFoundException e) {
-            ExceptionHandler.noIdFoundError(e);
-        } catch (VcfStreamingException e) {
-            ExceptionHandler.vcfStreamingError(e);
-        } catch (FileSystemException e) {
-            ExceptionHandler.fileWritingError(e);
-        } catch (Throwable e) {
-            ExceptionHandler.unknownError(e);
-        }
-        if (state != null) {
-            state.error(error);
-        }
-        return Mono.empty();
+    protected void publishErrorAndCancel(Throwable error) {
+        checkStarted();
+        state.error(error);
+        disposable.dispose();
     }
 
-    protected void publishWarning(Throwable error) {
+    protected void confirmContinue(Throwable error) {
+        checkStarted();
         if(error instanceof GenesNotFoundException e) {
             state.next(new State("state.waiting", null, null));
             if(!ExceptionHandler.genesNotFoundMessage(e))
@@ -59,23 +42,17 @@ public abstract class PublishingStateProcessus<T> {
         }
     }
 
-    protected void publishComplete() {
-        if (state != null) {
-            state.complete();
-        }
-    }
-
     public Flux<State> start() {
-        disposable = resultPromise.subscribe(r -> {
+        Flux<State> stateFlux = Flux.create(s -> state = s);
+        disposable = resultPromise.doOnSuccess(r -> {
             result = r;
-            publishComplete();
-        });
-        return Flux.create(s -> state = s);
+            state.complete();
+        }).subscribe();
+        return stateFlux;
     }
 
     public void cancel() {
-        if(disposable == null)
-            return;
+        checkStarted();
         disposable.dispose();
         state.error(new CancelledProcessusException());
     }
@@ -84,6 +61,11 @@ public abstract class PublishingStateProcessus<T> {
         if(result == null)
             throw new IllegalStateException("Trying to get the result before the end of the processus");
         return result;
+    }
+
+    private void checkStarted() {
+        if (state == null || disposable == null)
+            throw new IllegalStateException("Cannot publish or cancel before starting processus");
     }
 
 }

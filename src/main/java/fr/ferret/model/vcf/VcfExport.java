@@ -70,8 +70,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                 publishState(State.WRITTEN, outFile.getName(), null);
                 logger.info("File written");
             })
-            .doOnSuccess(r -> publishComplete())
-            .doOnError(this::publishError).then();
+            .doOnError(this::publishErrorAndCancel).then();
     }
 
     /**
@@ -85,7 +84,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                 logger.info(String.format("Downloading lines for locus %s", l));
                 var lines = reader.query(l.getChromosome(), l.getStart(), l.getEnd());
                 return new VcfObject((VCFHeader) reader.getHeader(), lines);
-            })).onErrorResume(e -> publishError(new VcfStreamingException(e)))
+            })).doOnError(e -> publishErrorAndCancel(new VcfStreamingException(e)))
         );
     }
 
@@ -101,7 +100,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                 logger.info(String.format("Getting header of chr %s", chromosome));
             })
             .retryWhen(Retry.backoff(NB_RETRY, RETRY_DELAY).filter(IOException.class::isInstance))
-            .onErrorResume(e -> publishError(e.getCause()));
+            .doOnError(e -> publishErrorAndCancel(e.getCause()));
     }
 
     /**
@@ -138,7 +137,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                 new MergingIterator<>(variantContextComparator, iteratorCollection);
 
             return new VcfObject(header, mergingIterator);
-        }).onErrorResume(this::publishError);
+        }).doOnError(this::publishErrorAndCancel);
         // TODO: on error, write each VCF separately ?
     }
 
