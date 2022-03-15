@@ -41,10 +41,9 @@ public class ExceptionHandler {
         new Error(f).append("error.connection").show();
     }
 
-    public boolean genesNotFoundMessage(GenesNotFoundException e) {
-        var ids = String.join(" ,", e.getNotFound());
-        logger.log(Level.WARNING, "Failed to convert those genes (ignored from vcf): {0}", ids);
-        return new Error(f).append("error.genesNotFound", ids).confirm();
+    public boolean genesNotFoundMessage(String genesNotFound) {
+        logger.log(Level.WARNING, "Failed to convert those genes (ignored from vcf): {0}", genesNotFound);
+        return new Error(f).append("error.genesNotFound", genesNotFound).confirm();
     }
 
     public static void noIdFoundError(Throwable throwable) {

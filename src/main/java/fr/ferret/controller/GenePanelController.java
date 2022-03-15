@@ -7,6 +7,7 @@ import fr.ferret.controller.state.Error;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.locus.LocusBuilding;
+import fr.ferret.model.state.State;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
@@ -20,6 +21,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -115,14 +118,27 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var locusProcessing = new LocusBuilding(geneList, assemblyAccVer);
             download.setAssociatedProcessus(locusProcessing);
 
+            var notFound = new AtomicReference<>("");
+
             // Starts the processus and subscribes to its state
             locusProcessing.start().doOnComplete(
-                    () -> download(populations, outFile, locusProcessing.getResult(), download)
+                    () -> {
+                        if("".equals(notFound.get()) || ExceptionHandler.genesNotFoundMessage(notFound.get())) {
+                            download(populations, outFile, locusProcessing.getResult(), download);
+                        } else {
+                            // TODO: make a particular error for cancel
+                            download.error();
+                        }
+                    }
                 ).doOnError(e -> {
                     logger.log(Level.WARNING, "Error while downloading or writing", e);
                     download.error();
                     ExceptionHandler.show(e);
-                }).subscribe(download::setState);
+                }).doOnNext(state -> {
+                    if(state.getAction()== State.States.CONFIRM_CONTINUE)
+                        notFound.set(String.join(",", (List<String>) state.getObjectBeingProcessed()));
+                })
+                .subscribe(download::setState);
         });
     }
 
