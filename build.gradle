@@ -32,7 +32,7 @@ dependencies {
 
     // Library used for asynchronous operations
     // https://mvnrepository.com/artifact/io.projectreactor/reactor-core
-    implementation 'io.projectreactor:reactor-core:3.4.15'
+    implementation 'io.projectreactor:reactor-core:3.4.16'
 
     /** CONFIGURATION PERSISTENCE **/
     // Configuration managing lib
