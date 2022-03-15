@@ -12,6 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import fr.ferret.controller.state.Message;
 import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
 import fr.ferret.utils.Resource;
@@ -68,13 +69,17 @@ public class StatePanel extends JPanel {
     }
 
     public void setState(State state) {
-        stateLabel.setText(state.getText());
-        stateLabel.setToolTipText(state.getTooltip());
-        this.setToolTipText(state.getTooltip());
+        setMessage(Message.from(state));
+    }
+
+    public void setMessage(Message message) {
+        stateLabel.setText(message.getText());
+        stateLabel.setToolTipText(message.getTooltip());
+        this.setToolTipText(message.getTooltip());
     }
 
     public void error() {
-        setState(new State("error.toast", null, null));
+        setMessage(new Message("error.toast", null, null));
         complete(false);
     }
 

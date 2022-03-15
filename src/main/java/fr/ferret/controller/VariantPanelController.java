@@ -8,6 +8,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
+import fr.ferret.controller.state.Error;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.VariantPanel;

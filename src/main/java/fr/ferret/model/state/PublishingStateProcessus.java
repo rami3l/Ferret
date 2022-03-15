@@ -34,8 +34,9 @@ public abstract class PublishingStateProcessus<T> {
     }
 
     protected void confirmContinue(Throwable error) {
+        // TODO: find a solution to not call ExceptionHandler here (→ need to be able to pause the processus...)
         if(error instanceof GenesNotFoundException e) {
-            state.tryEmitNext(new State("state.waiting", null, null));
+            state.tryEmitNext(State.confirmContinue(e.getNotFound()));
             if(!ExceptionHandler.genesNotFoundMessage(e))
                 cancel();
         }

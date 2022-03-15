@@ -1,4 +1,4 @@
-package fr.ferret.controller;
+package fr.ferret.controller.state;
 
 import fr.ferret.utils.Resource;
 

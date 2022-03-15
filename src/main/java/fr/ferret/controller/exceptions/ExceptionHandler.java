@@ -6,8 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 
-import fr.ferret.controller.Error;
-import fr.ferret.utils.Resource;
+import fr.ferret.controller.state.Error;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
