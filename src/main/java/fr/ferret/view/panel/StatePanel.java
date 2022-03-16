@@ -40,7 +40,7 @@ public class StatePanel extends JPanel {
     private boolean canDestroy = true;
     private final File downloadLocation;
     @Setter
-    private PublishingStateProcessus<?> associatedProcessus;
+    private transient PublishingStateProcessus<?> associatedProcessus;
 
     public StatePanel(String text, File downloadLocation) {
 
@@ -70,6 +70,9 @@ public class StatePanel extends JPanel {
 
     public void setState(State state) {
         setMessage(Message.from(state));
+        if(state.getAction() == State.States.CANCELLED) {
+            complete(false);
+        }
     }
 
     public void setMessage(Message message) {
@@ -80,6 +83,11 @@ public class StatePanel extends JPanel {
 
     public void error() {
         setMessage(new Message("error.toast", null, null));
+        complete(false);
+    }
+
+    public void cancel() {
+        setMessage(Message.from(State.cancelled()));
         complete(false);
     }
 
@@ -112,7 +120,7 @@ public class StatePanel extends JPanel {
 
     private void destroy() {
         this.setVisible(false);
-        // TODO: remove this from the StatesPanel
+        // TODO: remove this StatePanel from the BottomPanel
     }
 
 

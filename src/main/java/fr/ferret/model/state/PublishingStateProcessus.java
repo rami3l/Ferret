@@ -1,9 +1,7 @@
 package fr.ferret.model.state;
 
-import fr.ferret.controller.exceptions.*;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
@@ -34,10 +32,7 @@ public abstract class PublishingStateProcessus<T> {
     }
 
     protected void confirmContinue(Throwable error) {
-        // TODO: find a solution to not have to filter exceptions type here
-        if(error instanceof GenesNotFoundException e) {
-            state.tryEmitNext(State.confirmContinue(e.getNotFound()));
-        }
+        state.tryEmitNext(State.confirmContinue(error));
     }
 
     /**
@@ -57,7 +52,7 @@ public abstract class PublishingStateProcessus<T> {
     public void cancel() {
         checkStarted();
         disposable.dispose();
-        state.tryEmitError(new CancelledProcessusException());
+        state.tryEmitNext(State.cancelled());
     }
 
     public T getResult() {

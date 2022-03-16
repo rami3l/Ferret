@@ -3,6 +3,7 @@ package fr.ferret.controller;
 import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
+import fr.ferret.controller.exceptions.GenesNotFoundException;
 import fr.ferret.controller.state.Error;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
@@ -21,7 +22,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,7 +98,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var locale = new Locale("all");
             geneList = geneList.stream().map(text -> text.toUpperCase(locale)).toList();
 
-            downloadVcf(populations, geneList);
+            convertGenesAndDownloadVcf(populations, geneList);
 
             // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
 
@@ -108,7 +108,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         }
     }
 
-    private void downloadVcf(ZoneSelection populations, List<String> geneList) {
+    private void convertGenesAndDownloadVcf(ZoneSelection populations, List<String> geneList) {
         run(outFile -> {
             var assemblyAccVer = Resource.getAssemblyAccessVersion();
             logger.log(Level.INFO, "Starting gene research using {0} assembly accession version...", assemblyAccVer);
@@ -121,13 +121,14 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var notFound = new AtomicReference<>("");
 
             // Starts the processus and subscribes to its state
-            locusProcessing.start().doOnComplete(
+            locusProcessing.start()
+                .doOnComplete(
                     () -> {
                         if("".equals(notFound.get()) || ExceptionHandler.genesNotFoundMessage(notFound.get())) {
-                            download(populations, outFile, locusProcessing.getResult(), download);
+                            downloadVcf(populations, outFile, locusProcessing.getResult(), download);
                         } else {
-                            // TODO: make a particular error for cancel
-                            download.error();
+                            download.cancel();
+                            logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
                         }
                     }
                 ).doOnError(e -> {
@@ -135,14 +136,19 @@ public class GenePanelController extends InputPanelController<GenePanel> {
                     download.error();
                     ExceptionHandler.show(e);
                 }).doOnNext(state -> {
-                    if(state.getAction()== State.States.CONFIRM_CONTINUE)
-                        notFound.set(String.join(",", (List<String>) state.getObjectBeingProcessed()));
+                    if(state.getAction()== State.States.CONFIRM_CONTINUE
+                            && state.getObjectBeingProcessed() instanceof GenesNotFoundException e) {
+                        notFound.set(String.join(",", e.getNotFound()));
+                    } else if(state.getAction() == State.States.CANCELLED) {
+                        logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
+                    }
                 })
                 .subscribe(download::setState);
         });
     }
 
-    private void download(ZoneSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
+    private void downloadVcf(ZoneSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
+        logger.log(Level.INFO, "Starting locus download...");
         // Sets the vcf export processus
         var vcfProcessus = new VcfExport(locusList, outFile).setFilter(populations);
         download.setAssociatedProcessus(vcfProcessus);

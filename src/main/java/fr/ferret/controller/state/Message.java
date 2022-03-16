@@ -5,7 +5,7 @@ import fr.ferret.model.state.State;
 import fr.ferret.utils.Resource;
 import lombok.Getter;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 @Getter
@@ -14,7 +14,7 @@ public class Message {
     /**
      * Contains the locations of the texts and tooltips for the state messages
      */
-    private static final Map<State.States, String> stateTexts = new HashMap<>();
+    private static final Map<State.States, String> stateTexts = new EnumMap<>(State.States.class);
     static {
         stateTexts.put(State.States.GENE_NAME_TO_ID, "state.geneNameToId");
         stateTexts.put(State.States.GENE_ID_TO_LOCUS, "state.geneIdToLocus");
@@ -23,6 +23,7 @@ public class Message {
         stateTexts.put(State.States.WRITING, "state.writingFile");
         stateTexts.put(State.States.WRITTEN, "state.fileWritten");
         stateTexts.put(State.States.CONFIRM_CONTINUE, "state.waiting");
+        stateTexts.put(State.States.CANCELLED, "state.cancelled");
     }
 
     private final String text;
