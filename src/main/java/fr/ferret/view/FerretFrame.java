@@ -1,13 +1,12 @@
 package fr.ferret.view;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.*;
+
+import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.panel.BottomPanel;
 import fr.ferret.view.panel.RegionPanel;
@@ -15,6 +14,7 @@ import fr.ferret.view.panel.header.MenuPanel;
 import fr.ferret.view.panel.inputs.GenePanel;
 import fr.ferret.view.panel.inputs.LocusPanel;
 import fr.ferret.view.panel.inputs.VariantPanel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -79,8 +79,29 @@ public class FerretFrame extends JFrame {
         panel.add(bottomPanel);
 
         // Window settings
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new CloseListener(this));
         pack();
+    }
+
+    @AllArgsConstructor
+    private static class CloseListener extends WindowAdapter {
+
+        private JFrame parent;
+
+        @Override
+        public void windowClosing(WindowEvent event) {
+            if(PublishingStateProcessus.getCurrentProcessusList().isEmpty() || confirmClose()) {
+                System.exit(0);
+            }
+        }
+
+        private boolean confirmClose() {
+            var confirmMessage = Resource.getTextElement("close.confirmMessage");
+            var confirmTitle = Resource.getTextElement("close.confirmTitle");
+            return JOptionPane.showConfirmDialog(parent, confirmMessage, confirmTitle,
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+        }
     }
 
 }

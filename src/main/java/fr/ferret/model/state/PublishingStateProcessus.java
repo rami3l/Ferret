@@ -1,16 +1,21 @@
 package fr.ferret.model.state;
 
+import lombok.Getter;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Extend this class if your class need to publish the state of its processus
  */
 public abstract class PublishingStateProcessus<T> {
 
-    // TODO: add a warning while trying to close Ferret although an export is not finished -> keep somewhere the list of VcfExports
+    @Getter
+    private static final List<PublishingStateProcessus<?>> currentProcessusList = new ArrayList<>();
 
     private final Sinks.Many<State> state = Sinks.many().multicast().directBestEffort();
     private Disposable disposable;
@@ -42,14 +47,17 @@ public abstract class PublishingStateProcessus<T> {
      * of the processus
      */
     public Flux<State> start() {
+        currentProcessusList.add(this);
         disposable = resultPromise.doOnSuccess(r -> {
             result = r;
             state.tryEmitComplete();
+            currentProcessusList.remove(this);
         }).subscribe();
         return state.asFlux();
     }
 
     public void cancel() {
+        currentProcessusList.remove(this);
         checkStarted();
         disposable.dispose();
         state.tryEmitNext(State.cancelled());

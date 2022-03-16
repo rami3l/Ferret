@@ -8,6 +8,7 @@ import fr.ferret.controller.state.Error;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.locus.LocusBuilding;
+import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.model.vcf.VcfExport;

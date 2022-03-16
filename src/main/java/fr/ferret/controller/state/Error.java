@@ -40,5 +40,5 @@ public class Error {
                 JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
     }
 
-    // TODO: add stacktrace in the popup
+    // TODO: add possibility to display the stacktrace in the popup ?
 }
