@@ -1,6 +1,6 @@
 package fr.ferret.view.panel;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -27,6 +27,7 @@ public class StatePanel extends JPanel {
      * the label describing the current state (downloading header, lines, etc.)
      */
     private final JLabel stateLabel;
+    private final JButton cancelButton;
     /**
      * The spinner displayed while downloading
      */
@@ -47,6 +48,12 @@ public class StatePanel extends JPanel {
         this.downloadLocation = downloadLocation;
 
         stateLabel = new JLabel(text);
+
+        cancelButton = new JButton();
+        Resource.getIcon("/img/cancel.png").ifPresentOrElse(cancelButton::setIcon,
+            () -> cancelButton.setText("X"));
+        cancelButton.setToolTipText(Resource.getTextElement("tooltip.cancelDownload"));
+
         spinner = new JLabel();
         Resource.getIcon("/img/loading.gif").ifPresentOrElse(spinner::setIcon,
                 () -> spinner.setText("..."));
@@ -57,15 +64,17 @@ public class StatePanel extends JPanel {
         openButton.setSize(10, 10);
 
         this.add(stateLabel);
+        this.add(cancelButton);
         this.add(spinner);
         this.add(openButton);
 
         var mouseListener = new MousePanelListener(this);
         addMouseListener(mouseListener);
         stateLabel.addMouseListener(mouseListener);
+        cancelButton.addMouseListener(mouseListener);
         spinner.addMouseListener(mouseListener);
         openButton.addMouseListener(mouseListener);
-        spinner.addMouseListener(new MouseClickListener());
+        cancelButton.addActionListener(new CancelListener());
     }
 
     public void setState(State state) {
@@ -97,12 +106,13 @@ public class StatePanel extends JPanel {
 
     private void complete(boolean ok) {
         // When the download is complete, hides spinner and makes the open button visible
+        cancelButton.setVisible(false);
         spinner.setVisible(false);
         if (ok && downloadLocation != null) {
             openButton.setToolTipText(Resource.getTextElement("tooltip.openDownload"));
             Resource.getIcon("/img/open-folder.png").ifPresentOrElse(openButton::setIcon,
                     () -> openButton.setText(Resource.getTextElement("button.open")));
-            openButton.addActionListener(new ButtonListener());
+            openButton.addActionListener(new OpenFileLocationListener());
             openButton.setVisible(true);
         }
         completed = true;
@@ -156,16 +166,16 @@ public class StatePanel extends JPanel {
         }
     }
 
-    private class MouseClickListener extends MouseAdapter {
+    private class CancelListener implements ActionListener {
         @Override
-        public void mouseClicked(MouseEvent e) {
+        public void actionPerformed(ActionEvent actionEvent) {
             if (associatedProcessus != null) {
                 associatedProcessus.cancel();
             }
         }
     }
 
-    private class ButtonListener implements ActionListener {
+    private class OpenFileLocationListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
             GuiUtils.openFileLocation(downloadLocation);
