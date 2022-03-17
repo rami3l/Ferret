@@ -1,6 +1,7 @@
 package fr.ferret.model.state;
 
-import fr.ferret.utils.Resource;
+import fr.ferret.model.locus.Locus;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
@@ -9,32 +10,47 @@ import lombok.Getter;
  * panel} in the {@link fr.ferret.view.panel.BottomPanel bottom panel}, using the <i>setState</i>
  * method.
  */
-@Getter public final class State {
-    public static final String GENE_NAME_TO_ID = "state.geneNameToId";
-    public static final String GENE_ID_TO_LOCUS = "state.geneIdToLocus";
-    public static final String DOWNLOADING_HEADER = "state.downloadingHeader";
-    public static final String DOWNLOADING_LINES = "state.downloadingLines";
-    public static final String WRITING = "state.writingFile";
-    public static final String WRITTEN = "state.fileWritten";
+@Getter
+@AllArgsConstructor
+public final class State {
 
-    private final String text;
-    private final String tooltip;
+    public enum States {
+        DOWNLOADING_HEADER, DOWNLOADING_LINES, GENE_ID_TO_LOCUS, GENE_NAME_TO_ID, WRITING, WRITTEN,
+        CONFIRM_CONTINUE, CANCELLED
+    }
 
-    /**
-     * Creates a {@link State} using the Resource Bundle for getting the text and the tooltip.<br>
-     * <i>textElementBase</i>.text is used for the text, and <i>textElementBase.tooltip</i> for the
-     * tooltip
-     *
-     * @param textElementBase The prefix tu use for getting the text and the tooltip
-     * @param arg1            the object which will be used to format the text (for example %s will
-     *                        be replaced by the object string representation in the text)
-     * @param arg2            the object which will be used to format the tooltip. If null arg1 is
-     *                        use instead
-     */
-    public State(String textElementBase, Object arg1, Object arg2) {
-        if (arg2 == null)
-            arg2 = arg1;
-        text = String.format(Resource.getTextElement(textElementBase + ".text"), arg1);
-        tooltip = String.format(Resource.getTextElement(textElementBase + ".tooltip"), arg2);
+    private final States action;
+    private final Object objectBeingProcessed;
+
+    public static State geneNameToId(String name) {
+        return new State(States.GENE_NAME_TO_ID, name);
+    }
+
+    public static State geneIdToLocus(String ids) {
+        return new State(States.GENE_ID_TO_LOCUS, ids);
+    }
+
+    public static State writing(String filename) {
+        return new State(States.WRITING, filename);
+    }
+
+    public static State written(String filename) {
+        return new State(States.WRITTEN, filename);
+    }
+
+    public static State downloadingLines(Locus locus) {
+        return new State(States.DOWNLOADING_LINES, locus);
+    }
+
+    public static State downloadingHeader(String chromosome) {
+        return new State(States.DOWNLOADING_HEADER, chromosome);
+    }
+
+    public static State confirmContinue(Throwable error) {
+        return new State(States.CONFIRM_CONTINUE, error);
+    }
+
+    public static State cancelled() {
+        return new State(States.CANCELLED, null);
     }
 }

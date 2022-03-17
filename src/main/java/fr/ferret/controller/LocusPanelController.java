@@ -1,16 +1,17 @@
 package fr.ferret.controller;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import fr.ferret.model.locus.Locus;
+import fr.ferret.controller.state.Error;
 import fr.ferret.model.ZoneSelection;
-import fr.ferret.model.state.StatePublisher;
+import fr.ferret.model.locus.Locus;
+import fr.ferret.model.state.State;
 import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
-import reactor.core.publisher.Flux;
+
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The {@link LocusPanel} controller
@@ -100,19 +101,24 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
     private void downloadVcf(ZoneSelection populations, String chr, final int start,
             final int end) {
         run(outFile -> {
-            logger.log(Level.INFO, "Starting gene research...");
+            logger.log(Level.INFO, "Starting locus download...");
             var download = frame.getBottomPanel().addState("Starting download", outFile);
 
-            // Inits the vcf export processus, attaches it to the StatePublisher, and starts it
-            var vcfProcessus = new VcfExport(Flux.just(new Locus(chr, start, end))).setFilter(populations);
-            var statePublisher = new StatePublisher().attachTo(vcfProcessus);
-            vcfProcessus.startTo(outFile);
+            // Sets the vcf export processus
+            var vcfProcessus = new VcfExport(List.of(new Locus(chr, start, end)), outFile)
+                .setFilter(populations);
+            download.setAssociatedProcessus(vcfProcessus);
 
-            // Subscribes to the state of the launched processus via the StatePublisher
-            statePublisher.getState().doOnComplete(download::complete).doOnError(e -> {
-                        logger.log(Level.WARNING, "Error while downloading or writing");
-                        download.error();
-                    }).subscribe(download::setState);
+            // Starts the processus and subscribes its states
+            vcfProcessus.start()
+                .doOnNext(state -> {
+                    if(state.getAction() == State.States.CANCELLED)
+                        logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
+                })
+                .doOnComplete(download::complete).doOnError(e -> {
+                    logger.log(Level.WARNING, "Error while downloading or writing");
+                    download.error();
+                }).subscribe(download::setState);
         });
     }
 

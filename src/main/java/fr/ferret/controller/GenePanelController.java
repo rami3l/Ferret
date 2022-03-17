@@ -1,21 +1,29 @@
 package fr.ferret.controller;
 
+import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
+import fr.ferret.controller.exceptions.GenesNotFoundException;
+import fr.ferret.controller.state.Error;
 import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.locus.Locus;
 import fr.ferret.model.locus.LocusBuilding;
-import fr.ferret.model.state.StatePublisher;
+import fr.ferret.model.state.PublishingStateProcessus;
+import fr.ferret.model.state.State;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
+import fr.ferret.view.panel.StatePanel;
 import fr.ferret.view.panel.inputs.GenePanel;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,7 +99,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var locale = new Locale("all");
             geneList = geneList.stream().map(text -> text.toUpperCase(locale)).toList();
 
-            downloadVcf(populations, geneList);
+            convertGenesAndDownloadVcf(populations, geneList);
 
             // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
 
@@ -101,28 +109,56 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         }
     }
 
-    private void downloadVcf(ZoneSelection populations, List<String> geneList) {
+    private void convertGenesAndDownloadVcf(ZoneSelection populations, List<String> geneList) {
         run(outFile -> {
             var assemblyAccVer = Resource.getAssemblyAccessVersion();
             logger.log(Level.INFO, "Starting gene research using {0} assembly accession version...", assemblyAccVer);
             var download = frame.getBottomPanel().addState("Starting download", outFile);
 
-            // Inits the locus building processus and attaches it to the StatePublisher
-            var locusProcessing = new LocusBuilding(assemblyAccVer);
-            var statePublisher = new StatePublisher().attachTo(locusProcessing);
-            var locusFlux = locusProcessing.startWith(geneList);
+            // Sets the locus building processus
+            var locusProcessing = new LocusBuilding(geneList, assemblyAccVer);
+            download.setAssociatedProcessus(locusProcessing);
 
-            // Inits the vcf export processus, attaches it to the StatePublisher, and starts it
-            var vcfProcessus = new VcfExport(locusFlux).setFilter(populations);
-            statePublisher.attachTo(vcfProcessus);
-            vcfProcessus.startTo(outFile);
+            var notFound = new AtomicReference<>("");
 
-            // Subscribes to the state of the launched processus via the StatePublisher
-            statePublisher.getState().doOnComplete(download::complete).doOnError(e -> {
-                    logger.log(Level.WARNING, "Error while downloading or writing");
+            // Starts the processus and subscribes to its state
+            locusProcessing.start()
+                .doOnComplete(
+                    () -> {
+                        if("".equals(notFound.get()) || ExceptionHandler.genesNotFoundMessage(notFound.get())) {
+                            downloadVcf(populations, outFile, locusProcessing.getResult(), download);
+                        } else {
+                            download.cancel();
+                            logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
+                        }
+                    }
+                ).doOnError(e -> {
+                    logger.log(Level.WARNING, "Error while downloading or writing", e);
                     download.error();
-                }).subscribe(download::setState);
+                    ExceptionHandler.show(e);
+                }).doOnNext(state -> {
+                    if(state.getAction()== State.States.CONFIRM_CONTINUE
+                            && state.getObjectBeingProcessed() instanceof GenesNotFoundException e) {
+                        notFound.set(String.join(",", e.getNotFound()));
+                    } else if(state.getAction() == State.States.CANCELLED) {
+                        logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
+                    }
+                })
+                .subscribe(download::setState);
         });
+    }
+
+    private void downloadVcf(ZoneSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
+        logger.log(Level.INFO, "Starting locus download...");
+        // Sets the vcf export processus
+        var vcfProcessus = new VcfExport(locusList, outFile).setFilter(populations);
+        download.setAssociatedProcessus(vcfProcessus);
+
+        // Subscribes to the state of the launched processus via the StatePublisher
+        vcfProcessus.start().doOnComplete(download::complete).doOnError(e -> {
+            logger.log(Level.WARNING, "Error while downloading or writing");
+            download.error();
+        }).subscribe(download::setState);
     }
 
     private void displayError(boolean geneListInputted, boolean geneFileImported,

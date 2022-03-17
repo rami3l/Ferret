@@ -24,7 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class LocusBuilding extends PublishingStateProcessus {
+public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
 
     private static final Logger logger = Logger.getLogger(LocusBuilding.class.getName());
 
@@ -45,19 +45,16 @@ public class LocusBuilding extends PublishingStateProcessus {
     private final List<String> genesNotFound = new ArrayList<>();
 
     /**
-     * @param assemblyAccVer The <i>assembly access version</i> to use for getting start and end positions
-     */
-    public LocusBuilding(String assemblyAccVer) {
-        this.assemblyAccVer = assemblyAccVer;
-    }
-
-    /**
      * Converts the found gene names/ids to locus.<br>
+     * The result of this processus is a {@link Flux} containing the locus for found genes
+     * (empty in case of error).
      *
+     * @param assemblyAccVer The <i>assembly access version</i> to use for getting start and end positions
      * @param idsOrNames A {@link List list} of gene names/ids
-     * @return A {@link Flux} containing the locus for found genes (empty in case of error).
      */
-    public Flux<Locus> startWith(List<String> idsOrNames) {
+    public LocusBuilding(List<String> idsOrNames, String assemblyAccVer) {
+        this.assemblyAccVer = assemblyAccVer;
+        // On ne garde que les ids/names qui ne sont pas vides (isBlank)
         var flux = Flux.fromIterable(idsOrNames).filter(Predicate.not(String::isBlank));
         // ids are numeric
         var ids = flux.filter(Conversion::isInteger);
@@ -66,12 +63,12 @@ public class LocusBuilding extends PublishingStateProcessus {
             flux.filter(Predicate.not(Conversion::isInteger)).delayElements(DELAY);
         // concat ids with names converted to ids
         var allIds = ids.concatWith(names.flatMap(this::fromName)).distinct();
-        return fromIds(allIds)
-            .onErrorResume(this::publishError)
+        resultPromise = fromIds(allIds)
+            .doOnError(this::publishErrorAndCancel)
             .doOnComplete(() -> {
                 if(!genesNotFound.isEmpty())
-                    publishWarning(new GenesNotFoundException(genesNotFound));
-            });
+                    confirmContinue(new GenesNotFoundException(genesNotFound));
+            }).collectList();
     }
 
     /**
@@ -82,9 +79,9 @@ public class LocusBuilding extends PublishingStateProcessus {
      * @param name The name of the gene to find the id of
      * @return A mono encapsulating the name of the gene (present if found)
      */
-    public Mono<String> fromName(String name) {
+    private Mono<String> fromName(String name) {
         // TODO: We should url encode the name
-        publishState(State.GENE_NAME_TO_ID, name, name);
+        publishState(State.geneNameToId(name));
         logger.log(Level.INFO, "Getting id for gene [{0}]", name);
         return Mono.defer(ThrowingSupplier.sneaky(() -> {
                 var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
@@ -108,14 +105,14 @@ public class LocusBuilding extends PublishingStateProcessus {
      * @param ids A {@link Flux} containing all the ids to convert to locus
      * @return A {@link Flux} containing the {@link Locus locus} for found ids
      */
-    public Flux<Locus> fromIds(Flux<String> ids) {
+    private Flux<Locus> fromIds(Flux<String> ids) {
         // We cache the ids because we need them twice (once for creating the url, and once for
         // extracting locus from json) and we don't want to consume the flux twice (it would
         // duplicate all previous actions, like getting ids from names)
         var idsCached = ids.replay().autoConnect();
         return idsCached.collect(Collectors.joining(",")).delayElement(DELAY)
             .flatMap(idString -> {
-                publishState(State.GENE_ID_TO_LOCUS, idString, idString);
+                publishState(State.geneIdToLocus(idString));
                 return requestIds(idString);
             }).flatMapMany(json -> idsCached.flatMap(
                 id -> GeneConverter.extractLocus(id, assemblyAccVer, json).switchIfEmpty(notFound(id))
