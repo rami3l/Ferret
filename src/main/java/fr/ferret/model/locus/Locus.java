@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.ToString;
 
 /**
- * A locus is a zone of a given chromosome (from start to end). We can get the locus of a gene with
- * a {@link LocusBuilding}.
- *
+ * A locus is a zone of a chromosome (from start to end).<br>
+ * We can get the locus of a gene using a {@link GeneConversion}.<br>
+ * We can get the locus of a variant using a {@link VariantConversion}.
  */
 @Getter
 @ToString

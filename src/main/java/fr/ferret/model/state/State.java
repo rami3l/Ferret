@@ -16,7 +16,7 @@ public final class State {
 
     public enum States {
         DOWNLOADING_HEADER, DOWNLOADING_LINES, GENE_ID_TO_LOCUS, GENE_NAME_TO_ID, WRITING, WRITTEN,
-        CONFIRM_CONTINUE, CANCELLED
+        VARIANT_ID_TO_LOCUS, CONFIRM_CONTINUE, CANCELLED
     }
 
     private final States action;
@@ -28,6 +28,10 @@ public final class State {
 
     public static State geneIdToLocus(String ids) {
         return new State(States.GENE_ID_TO_LOCUS, ids);
+    }
+
+    public static State variantIdToLocus(String id) {
+        return new State(States.VARIANT_ID_TO_LOCUS, id);
     }
 
     public static State writing(String filename) {

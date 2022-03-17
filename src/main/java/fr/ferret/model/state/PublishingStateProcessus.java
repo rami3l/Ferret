@@ -36,10 +36,6 @@ public abstract class PublishingStateProcessus<T> {
         disposable.dispose();
     }
 
-    protected void confirmContinue(Throwable error) {
-        state.tryEmitNext(State.confirmContinue(error));
-    }
-
     /**
      * Starts the processus
      *

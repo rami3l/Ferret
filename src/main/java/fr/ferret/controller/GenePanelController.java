@@ -7,8 +7,7 @@ import fr.ferret.controller.exceptions.GenesNotFoundException;
 import fr.ferret.controller.state.Error;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
-import fr.ferret.model.locus.LocusBuilding;
-import fr.ferret.model.state.PublishingStateProcessus;
+import fr.ferret.model.locus.GeneConversion;
 import fr.ferret.model.state.State;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.model.vcf.VcfExport;
@@ -101,8 +100,6 @@ public class GenePanelController extends InputPanelController<GenePanel> {
 
             convertGenesAndDownloadVcf(populations, geneList);
 
-            // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
-
         } else {
             displayError(geneListInputted, geneFileImported, geneFileError, geneFileExtensionError,
                     invalidCharacter, popSelected);
@@ -116,7 +113,7 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var download = frame.getBottomPanel().addState("Starting download", outFile);
 
             // Sets the locus building processus
-            var locusProcessing = new LocusBuilding(geneList, assemblyAccVer);
+            var locusProcessing = new GeneConversion(geneList, assemblyAccVer);
             download.setAssociatedProcessus(locusProcessing);
 
             var notFound = new AtomicReference<>("");
