@@ -50,8 +50,8 @@ public class StatePanel extends JPanel {
         stateLabel = new JLabel(text);
 
         cancelButton = new JButton();
-        Resource.getIcon("/img/cancel.png").ifPresentOrElse(cancelButton::setIcon,
-            () -> cancelButton.setText("X"));
+        Resource.getIcon("/img/cancel.png", 20, 20)
+            .ifPresentOrElse(cancelButton::setIcon, () -> cancelButton.setText("X"));
         cancelButton.setToolTipText(Resource.getTextElement("tooltip.cancelDownload"));
 
         spinner = new JLabel();

@@ -107,6 +107,7 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
             // Sets the vcf export processus
             var vcfProcessus = new VcfExport(List.of(new Locus(chr, start, end)), outFile)
                 .setFilter(populations);
+            download.setAssociatedProcessus(vcfProcessus);
 
             // Starts the processus and subscribes its states
             vcfProcessus.start()
