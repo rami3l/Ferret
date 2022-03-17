@@ -5,13 +5,16 @@ import com.jayway.jsonpath.JsonPath;
 
 import java.io.InputStream;
 
+/**
+ * Object encapsulating a json document with its parser, so that you can extract multiple
+ * information from a json {@link InputStream} without parsing (and downloading it) each time
+ */
 public class JsonDocument {
 
     private final DocumentContext document;
 
     /**
-     * Encapsulates a json document with its parser, so that you can extract multiple
-     * information from a json {@link InputStream} without parsing (and downloading it) each time
+     * Creates a {@link JsonDocument} encapsulating the given json
      *
      * @param json The json {@link InputStream} to extract information from
      */

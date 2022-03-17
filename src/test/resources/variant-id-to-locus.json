@@ -1,0 +1,367 @@
+{
+   "snp_id" : "1257",
+   "direct_mRNA" : {},
+   "supported_assm" : [
+      {
+         "annot_rel_id" : "108",
+         "ref_asm_name" : "GRCh38.p7"
+      },
+      {
+         "annot_rel_id" : "105",
+         "ref_asm_name" : "GRCh37.p13"
+      }
+   ],
+   "org" : "human_9606",
+   "is_clinical" : "N",
+   "orgStr" : "Homo_sapiens",
+   "assembly" : {
+      "GRCh37.p13" : [
+         {
+            "genomicAcc" : "NC_000008.10",
+            "contigAcc" : "NT_023736.17",
+            "snp2chrOrien" : "0",
+            "ctg2chrOrien" : "0",
+            "groupTerm" : "Primary_Assembly",
+            "chrPosFrom" : "6473357",
+            "snpAlleleInContigOrien" : "A/G",
+            "snpMapMethod" : "blast",
+            "genomeBuildId" : "105",
+            "assembly" : "GRCh37.p13",
+            "gcAssemblyName" : "GRCh37.p13",
+            "chr" : "8",
+            "chrPosTo" : "6473357",
+            "contigTo" : "6463357",
+            "contigLabel" : "",
+            "contigAllele" : "G",
+            "snp2ctgOrien" : "0",
+            "gc_asm_acc_ver" : "GCF_000001405.25",
+            "contigFrom" : "6463357"
+         }
+      ],
+      "GRCh38.p7" : [
+         {
+            "genomicAcc" : "NC_000008.11",
+            "contigAcc" : "NT_023736.18",
+            "snp2chrOrien" : "0",
+            "ctg2chrOrien" : "0",
+            "groupTerm" : "Primary_Assembly",
+            "chrPosFrom" : "6615836",
+            "snpAlleleInContigOrien" : "A/G",
+            "snpMapMethod" : "mapup",
+            "genomeBuildId" : "108",
+            "assembly" : "GRCh38.p7",
+            "gcAssemblyName" : "GRCh38.p7",
+            "geneModel" : [
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "NM_001322042.1"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "NM_024596.4"
+               },
+               {
+                  "mrnaFrom" : "3899",
+                  "mrnaTo" : "3899",
+                  "geneSymbol" : "MCPH1-AS1",
+                  "snp2mRNAOrien" : "1",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "MCPH1 antisense RNA 1",
+                  "geneId" : "100507530",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "30",
+                        "aaCode" : "",
+                        "fxnName" : "ncRNA",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "NR_125386.1"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "XM_011534755.2"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "XM_011534760.2"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "XM_017013829.1"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "XM_017013830.1"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "XM_017013831.1"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "XM_017013832.1"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "XM_017013833.1"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "XM_017013834.1"
+               },
+               {
+                  "mrnaFrom" : "",
+                  "mrnaTo" : "",
+                  "geneSymbol" : "MCPH1",
+                  "snp2mRNAOrien" : "",
+                  "proteinPos" : "",
+                  "contigAcc" : "NT_023736.18",
+                  "geneName" : "microcephalin 1",
+                  "geneId" : "79648",
+                  "proteinAcc" : "",
+                  "variation_allele" : [
+                     {
+                        "fxnClass" : "6",
+                        "aaCode" : "",
+                        "fxnName" : "intron",
+                        "codon" : "",
+                        "aaAbbrev" : "",
+                        "allele" : "-"
+                     }
+                  ],
+                  "codonPos" : "",
+                  "contig_allele" : "",
+                  "mrnaAcc" : "XR_001745596.1"
+               }
+            ],
+            "chr" : "8",
+            "chrPosTo" : "6615836",
+            "contigTo" : "6555836",
+            "contigLabel" : "",
+            "contigAllele" : "G",
+            "snp2ctgOrien" : "0",
+            "gc_asm_acc_ver" : "GCF_000001405.33",
+            "contigFrom" : "6555836"
+         }
+      ],
+      "RefSeqGene" : [
+         {
+            "RSG_snpOrien" : "0",
+            "geneSymbol" : "MCPH1",
+            "RSG_snpPosTo" : "214245",
+            "geneId" : "79648",
+            "RSG_allele" : "G",
+            "RSG_snpPosFrom" : "214245",
+            "RSG_accession" : "NG_016619.2",
+            "assembly" : "RefSeqGene"
+         }
+      ]
+   }
+}
