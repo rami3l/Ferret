@@ -1,17 +1,17 @@
 package fr.ferret.model.locus;
 
 import com.pivovarit.function.ThrowingSupplier;
-import fr.ferret.controller.exceptions.GenesNotFoundException;
+import fr.ferret.controller.exceptions.ConversionIncompleteException;
 import fr.ferret.controller.exceptions.NoIdFoundException;
-import fr.ferret.model.state.State;
 import fr.ferret.model.state.PublishingStateProcessus;
+import fr.ferret.model.state.State;
 import fr.ferret.model.utils.GeneConverter;
 import fr.ferret.model.utils.JsonDocument;
 import fr.ferret.utils.Conversion;
 import fr.ferret.utils.Resource;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.Exceptions;
 import reactor.util.retry.Retry;
 
 import java.io.IOException;
@@ -24,12 +24,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
+public class GeneConversion extends PublishingStateProcessus<List<Locus>> {
 
-    private static final Logger logger = Logger.getLogger(LocusBuilding.class.getName());
+    private static final Logger logger = Logger.getLogger(GeneConversion.class.getName());
 
-    private static final String ID_URL_TEMPLATE = Resource.getServerConfig("ncbi.idUrlTemplate");
-    private static final String NAME_URL_TEMPLATE = Resource.getServerConfig("ncbi.nameUrlTemplate");
+    private static final String ID_URL_TEMPLATE = Resource.getServerConfig("ncbi.gene.idUrlTemplate");
+    private static final String NAME_URL_TEMPLATE = Resource.getServerConfig(
+        "ncbi.gene.nameUrlTemplate");
 
     /** Delay between requests, to avoid getting response code 429 from ncbi server */
     private static final Duration DELAY = Duration.ofMillis(200);
@@ -52,7 +53,7 @@ public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
      * @param assemblyAccVer The <i>assembly access version</i> to use for getting start and end positions
      * @param idsOrNames A {@link List list} of gene names/ids
      */
-    public LocusBuilding(List<String> idsOrNames, String assemblyAccVer) {
+    public GeneConversion(List<String> idsOrNames, String assemblyAccVer) {
         this.assemblyAccVer = assemblyAccVer;
         // On ne garde que les ids/names qui ne sont pas vides (isBlank)
         var flux = Flux.fromIterable(idsOrNames).filter(Predicate.not(String::isBlank));
@@ -67,7 +68,7 @@ public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
             .doOnError(this::publishErrorAndCancel)
             .doOnComplete(() -> {
                 if(!genesNotFound.isEmpty())
-                    confirmContinue(new GenesNotFoundException(genesNotFound));
+                    publishState(State.confirmContinue(new ConversionIncompleteException(genesNotFound)));
             }).collectList();
     }
 
@@ -80,10 +81,9 @@ public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
      * @return A mono encapsulating the name of the gene (present if found)
      */
     private Mono<String> fromName(String name) {
-        // TODO: We should url encode the name
-        publishState(State.geneNameToId(name));
-        logger.log(Level.INFO, "Getting id for gene [{0}]", name);
         return Mono.defer(ThrowingSupplier.sneaky(() -> {
+                publishState(State.geneNameToId(name));
+                logger.log(Level.INFO, "Getting id for gene [{0}]", name);
                 var json = new URL(String.format(NAME_URL_TEMPLATE, name)).openStream();
                 return GeneConverter.extractId(new JsonDocument(json)).switchIfEmpty(notFound(name));
             }))
@@ -126,7 +126,6 @@ public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
     private Mono<JsonDocument> requestIds(String ids) {
         if(ids.isBlank())
             return Mono.error(new NoIdFoundException());
-        // TODO: we should url encode the ids
         return Mono.defer(ThrowingSupplier.sneaky(() -> {
                 logger.info(String.format("Getting locus for ids : %s", ids));
                 var jsonUrl = new URL(String.format(ID_URL_TEMPLATE, ids));
@@ -135,6 +134,6 @@ public class LocusBuilding extends PublishingStateProcessus<List<Locus>> {
             .retryWhen(Retry.backoff(NB_RETRY, RETRY_DELAY).filter(IOException.class::isInstance))
             .onErrorResume(Exceptions::isRetryExhausted, e -> Mono.error(e.getCause()))
             .doOnError(e -> logger.log(Level.WARNING,
-                String.format("Error while requesting locus for ids %s", ids), e));
+                String.format("Error while requesting locus for gene with ids %s", ids), e));
     }
 }
