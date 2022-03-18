@@ -109,6 +109,12 @@ public class Resource {
         return ResourceFile.getResource(resourceFileName, ImageIcon::new);
     }
 
+    public static Optional<ImageIcon> getIcon(String resourceFilename, int width, int height) {
+        return getIcon(resourceFilename).map(icon -> new ImageIcon(icon.getImage()
+            .getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH)
+        ));
+    }
+
     /**
      * Gets an element of text from the resources according to system langage
      *

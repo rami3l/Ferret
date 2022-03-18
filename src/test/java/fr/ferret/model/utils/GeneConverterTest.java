@@ -1,12 +1,10 @@
 package fr.ferret.model.utils;
 
-import fr.ferret.model.locus.LocusBuilding;
+import fr.ferret.model.locus.GeneConversion;
 import fr.ferret.utils.Resource;
 import org.junit.jupiter.api.Test;
-import reactor.core.publisher.Flux;
 
 import java.io.InputStream;
-import java.time.Duration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,32 +50,15 @@ class GeneConverterTest {
     }
 
 
-    /** Tests for the locus builder (not real unit tests because they reach the server) **/
+    /** Tests for the locus builder (not real unit test because it reaches the server) **/
 
     @Test
     void testLocusBuilder() {
         var genes = List.of("KCNT2", "343450", "CCR5", "1234", "MICB", "4277", "IL6", "3569",
                 "APOL1", "8542", "4627", "MYH9");
         // var genes = List.of("CR5", "1234");
-        var builder = new LocusBuilding("GCF_000001405.39");
-        var locusFlux = builder.startWith(genes).doOnNext(System.out::println);
-        locusFlux.blockLast();
-    }
-
-    // Test to get the delay to apply between request to avoid 429 response code from server
-    @Test
-    void testFromNames() {
-        var names = List.of("KCNT2", "CCR5", "MICB", "IL6", "APOL1", "MYH9");
-        var builder = new LocusBuilding("GCF_000001405.39");
-        var flux = Flux.fromIterable(names).delayElements(Duration.ofMillis(200))
-                .flatMap(builder::fromName).doOnNext(System.out::println);
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
-        //flux.blockLast();
+        var locusBuilding = new GeneConversion(genes, "GCF_000001405.39");
+        locusBuilding.start().doOnComplete(() -> System.out.println(locusBuilding.getResult())).blockLast();
     }
 
 }

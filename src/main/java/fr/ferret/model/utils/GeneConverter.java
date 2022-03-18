@@ -15,20 +15,20 @@ public class GeneConverter {
 
     private static final Logger logger = Logger.getLogger(GeneConverter.class.getName());
 
-    // Here are the json paths to find the information inside the files
+    // Here are the json paths to find the information inside the document
     private static final String CHROMOSOME_PATH = "$.result.%s.chromosome";
     private static final String LOCATION_HIST_PATH = "$.result.%s.locationhist[*]";
     private static final String ID_PATH = "$.esearchresult.idlist[0]";
 
-    // Here are the json attribute names to find the information inside the file
+    // Here are the json attribute names to find the information inside the document
     private static final String ASS_ACC_VER = "assemblyaccver";
     private static final String CHR_START = "chrstart";
     private static final String CHR_STOP = "chrstop";
 
     /**
-     * Gets a Locus from a gene id and a gene esummary json file, obtained from ncbi server.<br>
+     * Gets a Locus from a gene id and a gene esummary json file, obtained from the ncbi server.<br>
      * Here is <a href="https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=1234
-     * &format=json">an example of ncbi gene esummary file</a>
+     *    &format=json">an example of ncbi gene esummary file</a>
      *
      * @param id The id of the gene to find the {@link Locus locus} of
      * @param assemblyAccVer The <i>assembly access version</i> to use for getting start and end
