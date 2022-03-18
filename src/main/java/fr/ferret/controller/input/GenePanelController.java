@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +30,7 @@ import java.util.logging.Logger;
  */
 public class GenePanelController extends NeedingConversionPanelController {
 
+    /** The panel which is controlled by this controller */
     private final GenePanel panel;
 
     private static final Logger logger = Logger.getLogger(GenePanelController.class.getName());
@@ -70,7 +70,18 @@ public class GenePanelController extends NeedingConversionPanelController {
         boolean geneFileExtensionError = false;
         boolean invalidCharacter = false;
 
+        // windowSize field must be an integer or be empty (0 as default value)
+        String snpWindowSizeText = panel.getBpField().getText();
+        boolean validWindowSizeEntered = true;
         int windowSize = 0;
+
+        if(!snpWindowSizeText.isBlank()) {
+            try {
+                windowSize = Integer.parseInt(snpWindowSizeText);
+            } catch (Exception e) {
+                validWindowSizeEntered = false;
+            }
+        }
 
         // Invalid characters for the genes names/ids (inputted as a list or a file)
         // This is everything except letters and numbers, including underscore
@@ -107,7 +118,7 @@ public class GenePanelController extends NeedingConversionPanelController {
 
         } else {
             displayError(geneListInputted, geneFileImported, geneFileError, geneFileExtensionError,
-                    invalidCharacter, popSelected);
+                    invalidCharacter, popSelected, validWindowSizeEntered);
         }
     }
 
@@ -126,7 +137,7 @@ public class GenePanelController extends NeedingConversionPanelController {
 
     private void displayError(boolean geneListInputted, boolean geneFileImported,
             boolean geneFileError, boolean geneFileExtensionError, boolean invalidCharacter,
-            boolean popSelected) {
+            boolean popSelected, boolean validWindowSizeEntered) {
 
         JComponent inputField = panel.getInputField();
         JComponent runButton = panel.getFileSelector().getRunButton();
@@ -150,6 +161,9 @@ public class GenePanelController extends NeedingConversionPanelController {
         }
         if (!popSelected) {
             error.append("run.selectpop").highlight(frame.getRegionPanel());
+        }
+        if (!validWindowSizeEntered) {
+            error.append("run.selectvari.wsize").highlight(panel.getBpField());
         }
         error.show();
     }

@@ -18,6 +18,7 @@ import java.util.logging.Logger;
  */
 public class LocusPanelController extends InputPanelController {
 
+    /** The panel which is controlled by this controller */
     private final LocusPanel panel;
 
     private static final Logger logger = Logger.getLogger(LocusPanelController.class.getName());

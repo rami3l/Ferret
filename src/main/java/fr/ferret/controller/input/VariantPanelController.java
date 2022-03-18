@@ -3,7 +3,6 @@ package fr.ferret.controller.input;
 import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
-import fr.ferret.controller.input.common.InputPanelController;
 import fr.ferret.controller.input.common.NeedingConversionPanelController;
 import fr.ferret.controller.state.Error;
 import fr.ferret.model.locus.Locus;
@@ -68,13 +67,14 @@ public class VariantPanelController extends NeedingConversionPanelController {
         boolean snpFileExtensionError = false;
         boolean invalidCharacter = false;
 
+        // windowSize field must be an integer or be empty (0 as default value)
         String snpWindowSizeText = panel.getBpField().getText();
-        boolean validWindowSizeEntered = true; // must be both not empty and an int
-        int windowsSize = 0;
+        boolean validWindowSizeEntered = true;
+        int windowSize = 0;
 
         if(!snpWindowSizeText.isBlank()) {
             try {
-                windowsSize = Integer.parseInt(snpWindowSizeText);
+                windowSize = Integer.parseInt(snpWindowSizeText);
             } catch (Exception e) {
                 validWindowSizeEntered = false;
             }
@@ -106,7 +106,7 @@ public class VariantPanelController extends NeedingConversionPanelController {
 
         if ((snpListInputted || (snpFileImported && !snpFileError && !snpFileExtensionError)) && !invalidCharacter && validWindowSizeEntered && popSelected) {
 
-            convertAndDownloadVcf(populations, snpList, windowsSize);
+            convertAndDownloadVcf(populations, snpList, windowSize);
 
         } else {
             displayError(snpListInputted, snpFileImported, snpFileError, snpFileExtensionError,
