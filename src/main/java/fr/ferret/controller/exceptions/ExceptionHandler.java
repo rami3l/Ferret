@@ -46,6 +46,11 @@ public class ExceptionHandler {
         return new Error(f).append("error.genesNotFound", genesNotFound).confirm();
     }
 
+    public boolean variantsNotFoundMessage(String variantsNotFound) {
+        logger.log(Level.WARNING, "Failed to convert those variants (ignored from vcf): {0}", variantsNotFound);
+        return new Error(f).append("error.genesNotFound", variantsNotFound).confirm();
+    }
+
     public static void noIdFoundError(Throwable throwable) {
         logger.log(Level.WARNING, "No valid id for this request to ncbi server", throwable);
         new Error(f).append("error.noIdFound").show();

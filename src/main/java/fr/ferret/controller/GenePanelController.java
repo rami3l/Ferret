@@ -113,17 +113,17 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var download = frame.getBottomPanel().addState("Starting download", outFile);
 
             // Sets the locus building processus
-            var locusProcessing = new GeneConversion(geneList, assemblyAccVer);
-            download.setAssociatedProcessus(locusProcessing);
+            var geneConversion = new GeneConversion(geneList, assemblyAccVer);
+            download.setAssociatedProcessus(geneConversion);
 
             var notFound = new AtomicReference<>("");
 
             // Starts the processus and subscribes to its state
-            locusProcessing.start()
+            geneConversion.start()
                 .doOnComplete(
                     () -> {
                         if("".equals(notFound.get()) || ExceptionHandler.genesNotFoundMessage(notFound.get())) {
-                            downloadVcf(populations, outFile, locusProcessing.getResult(), download);
+                            downloadVcf(populations, outFile, geneConversion.getResult(), download);
                         } else {
                             download.cancel();
                             logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
@@ -145,18 +145,6 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         });
     }
 
-    private void downloadVcf(ZoneSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
-        logger.log(Level.INFO, "Starting locus download...");
-        // Sets the vcf export processus
-        var vcfProcessus = new VcfExport(locusList, outFile).setFilter(populations);
-        download.setAssociatedProcessus(vcfProcessus);
-
-        // Subscribes to the state of the launched processus via the StatePublisher
-        vcfProcessus.start().doOnComplete(download::complete).doOnError(e -> {
-            logger.log(Level.WARNING, "Error while downloading or writing");
-            download.error();
-        }).subscribe(download::setState);
-    }
 
     private void displayError(boolean geneListInputted, boolean geneFileImported,
             boolean geneFileError, boolean geneFileExtensionError, boolean invalidCharacter,

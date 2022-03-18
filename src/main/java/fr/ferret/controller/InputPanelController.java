@@ -2,16 +2,26 @@ package fr.ferret.controller;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import fr.ferret.controller.exceptions.ExceptionHandler;
+import fr.ferret.controller.exceptions.GenesNotFoundException;
 import fr.ferret.model.Region;
 import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.locus.Locus;
+import fr.ferret.model.state.PublishingStateProcessus;
+import fr.ferret.model.state.State;
+import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
+import fr.ferret.view.panel.StatePanel;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import reactor.core.publisher.Mono;
 
 import javax.swing.*;
 
@@ -70,6 +80,25 @@ public abstract class InputPanelController<T extends JPanel> {
             }
         });
         return selection;
+    }
+
+
+    protected void downloadVcf(ZoneSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
+        logger.log(Level.INFO, "Starting locus download...");
+        // Sets the vcf export processus
+        var vcfProcessus = new VcfExport(locusList, outFile).setFilter(populations);
+        download.setAssociatedProcessus(vcfProcessus);
+
+        // Starts the processus and subscribes its states
+        vcfProcessus.start()
+            .doOnNext(state -> {
+                if(state.getAction() == State.States.CANCELLED)
+                    logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
+            })
+            .doOnComplete(download::complete).doOnError(e -> {
+                logger.log(Level.WARNING, "Error while downloading or writing");
+                download.error();
+            }).subscribe(download::setState);
     }
 
 }

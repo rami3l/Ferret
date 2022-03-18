@@ -30,4 +30,8 @@ public final class Locus {
         }
     }
 
+    public Locus withWindow(int windowSize) {
+        return new Locus(chromosome, start - windowSize, end + windowSize);
+    }
+
 }

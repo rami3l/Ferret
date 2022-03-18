@@ -103,22 +103,7 @@ public class LocusPanelController extends InputPanelController<LocusPanel> {
         run(outFile -> {
             logger.log(Level.INFO, "Starting locus download...");
             var download = frame.getBottomPanel().addState("Starting download", outFile);
-
-            // Sets the vcf export processus
-            var vcfProcessus = new VcfExport(List.of(new Locus(chr, start, end)), outFile)
-                .setFilter(populations);
-            download.setAssociatedProcessus(vcfProcessus);
-
-            // Starts the processus and subscribes its states
-            vcfProcessus.start()
-                .doOnNext(state -> {
-                    if(state.getAction() == State.States.CANCELLED)
-                        logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
-                })
-                .doOnComplete(download::complete).doOnError(e -> {
-                    logger.log(Level.WARNING, "Error while downloading or writing");
-                    download.error();
-                }).subscribe(download::setState);
+            downloadVcf(populations, outFile, List.of(new Locus(chr, start, end)), download);
         });
     }
 
