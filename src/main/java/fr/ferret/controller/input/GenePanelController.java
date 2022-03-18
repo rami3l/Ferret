@@ -1,17 +1,13 @@
 package fr.ferret.controller.input;
 
-import fr.ferret.controller.exceptions.ConversionIncompleteException;
 import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
 import fr.ferret.controller.input.common.NeedingConversionPanelController;
 import fr.ferret.controller.state.Error;
-import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.GeneConversion;
 import fr.ferret.model.locus.Locus;
-import fr.ferret.model.locus.VariantConversion;
 import fr.ferret.model.state.PublishingStateProcessus;
-import fr.ferret.model.state.State;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;

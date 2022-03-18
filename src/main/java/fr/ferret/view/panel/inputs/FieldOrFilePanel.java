@@ -56,16 +56,16 @@ public class FieldOrFilePanel extends JPanel {
         JPanel includingVariantSubPanel = includingVariantsPanel();
 
         // Or Label
-        JLabel orLabel = new JLabel(Resource.getTextElement("gene.or"));
+        JLabel orLabel = new JLabel(Resource.getTextElement("input.or"));
         orLabel.setBorder(BorderFactory.createEmptyBorder(0, 130, 0, 10));
         orLabel.setFont(new Font(orLabel.getFont().getFontName(), Font.PLAIN, 16));
 
         // File selection
-        JButton browseButton = new JButton(Resource.getTextElement("gene.browse"));
+        JButton browseButton = new JButton(Resource.getTextElement("input.browse"));
         browseButton.setPreferredSize(new Dimension(200, 30));
         browseButton.setBackground(Resource.BUTTON_COLOR);
 
-        JLabel selectedFile = new JLabel(Resource.getTextElement("gene.selectfile"));
+        JLabel selectedFile = new JLabel(Resource.getTextElement("input.selectfile"));
         selectedFile.setFont(new Font(selectedFile.getFont().getFontName(), Font.PLAIN, 13));
 
         fileSelector = new BrowseFileButtonListener(this, browseButton, selectedFile);
