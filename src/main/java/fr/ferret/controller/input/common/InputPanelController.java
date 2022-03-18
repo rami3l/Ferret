@@ -1,18 +1,14 @@
-package fr.ferret.controller;
+package fr.ferret.controller.input.common;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import fr.ferret.controller.exceptions.ExceptionHandler;
-import fr.ferret.controller.exceptions.GenesNotFoundException;
 import fr.ferret.model.Region;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
-import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
 import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
@@ -21,7 +17,6 @@ import fr.ferret.view.panel.StatePanel;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import reactor.core.publisher.Mono;
 
 import javax.swing.*;
 
@@ -29,15 +24,13 @@ import javax.swing.*;
  * The base for input panel controllers (locus, gene and variant panel controllers)
  */
 @AllArgsConstructor
-public abstract class InputPanelController<T extends JPanel> {
+public abstract class InputPanelController {
 
     private static final Logger logger = Logger.getLogger(InputPanelController.class.getName());
 
     /** The main ferret frame */
     @Getter
     protected final FerretFrame frame;
-    /** The panel which is controlled by this {@link InputPanelController} */
-    protected final T panel;
 
     /**
      * Validates input and runs the program if it's valid

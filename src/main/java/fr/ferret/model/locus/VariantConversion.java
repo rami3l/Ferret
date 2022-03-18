@@ -1,8 +1,7 @@
 package fr.ferret.model.locus;
 
 import com.pivovarit.function.ThrowingSupplier;
-import fr.ferret.controller.exceptions.GenesNotFoundException;
-import fr.ferret.controller.exceptions.VariantsNotFoundException;
+import fr.ferret.controller.exceptions.ConversionIncompleteException;
 import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
 import fr.ferret.model.utils.JsonDocument;
@@ -46,7 +45,7 @@ public class VariantConversion extends PublishingStateProcessus<List<Locus>> {
             .doOnError(this::publishErrorAndCancel)
             .doOnComplete(() -> {
                 if(!variantsNotFound.isEmpty())
-                    publishState(State.confirmContinue(new VariantsNotFoundException(variantsNotFound)));
+                    publishState(State.confirmContinue(new ConversionIncompleteException(variantsNotFound)));
             }).collectList();
     }
 

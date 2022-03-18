@@ -1,17 +1,17 @@
 package fr.ferret.model.locus;
 
 import com.pivovarit.function.ThrowingSupplier;
-import fr.ferret.controller.exceptions.GenesNotFoundException;
+import fr.ferret.controller.exceptions.ConversionIncompleteException;
 import fr.ferret.controller.exceptions.NoIdFoundException;
-import fr.ferret.model.state.State;
 import fr.ferret.model.state.PublishingStateProcessus;
+import fr.ferret.model.state.State;
 import fr.ferret.model.utils.GeneConverter;
 import fr.ferret.model.utils.JsonDocument;
 import fr.ferret.utils.Conversion;
 import fr.ferret.utils.Resource;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.Exceptions;
 import reactor.util.retry.Retry;
 
 import java.io.IOException;
@@ -68,7 +68,7 @@ public class GeneConversion extends PublishingStateProcessus<List<Locus>> {
             .doOnError(this::publishErrorAndCancel)
             .doOnComplete(() -> {
                 if(!genesNotFound.isEmpty())
-                    publishState(State.confirmContinue(new GenesNotFoundException(genesNotFound)));
+                    publishState(State.confirmContinue(new ConversionIncompleteException(genesNotFound)));
             }).collectList();
     }
 

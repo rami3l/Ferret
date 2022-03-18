@@ -1,10 +1,10 @@
-package fr.ferret.controller;
+package fr.ferret.controller.input;
 
+import fr.ferret.controller.input.common.InputPanelController;
+import fr.ferret.controller.input.common.NeedingConversionPanelController;
 import fr.ferret.controller.state.Error;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
-import fr.ferret.model.state.State;
-import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.LocusPanel;
@@ -16,12 +16,15 @@ import java.util.logging.Logger;
 /**
  * The {@link LocusPanel} controller
  */
-public class LocusPanelController extends InputPanelController<LocusPanel> {
+public class LocusPanelController extends InputPanelController {
+
+    private final LocusPanel panel;
 
     private static final Logger logger = Logger.getLogger(LocusPanelController.class.getName());
 
     public LocusPanelController(FerretFrame frame) {
-        super(frame, frame.getLocusPanel());
+        super(frame);
+        panel = frame.getLocusPanel();
     }
 
     public void validateInfoAndRun() {

@@ -1,13 +1,14 @@
-package fr.ferret.controller;
+package fr.ferret.controller.input;
 
 import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
-import fr.ferret.controller.exceptions.VariantsNotFoundException;
+import fr.ferret.controller.input.common.InputPanelController;
+import fr.ferret.controller.input.common.NeedingConversionPanelController;
 import fr.ferret.controller.state.Error;
-import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.locus.Locus;
 import fr.ferret.model.locus.VariantConversion;
-import fr.ferret.model.state.State;
+import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
@@ -17,19 +18,22 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * The {@link VariantPanel} controller
  */
-public class VariantPanelController extends InputPanelController<VariantPanel> {
+public class VariantPanelController extends NeedingConversionPanelController {
+
+    /** The panel which is controlled by this controller */
+    private final VariantPanel panel;
 
     private static final Logger logger = Logger.getLogger(VariantPanelController.class.getName());
 
     public VariantPanelController(FerretFrame frame) {
-        super(frame, frame.getVariantPanel());
+        super(frame);
+        panel =  frame.getVariantPanel();
     }
 
     public void validateInfoAndRun() {
@@ -66,11 +70,11 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
 
         String snpWindowSizeText = panel.getBpField().getText();
         boolean validWindowSizeEntered = true; // must be both not empty and an int
-        int snpWindowSize = 0;
+        int windowsSize = 0;
 
         if(!snpWindowSizeText.isBlank()) {
             try {
-                snpWindowSize = Integer.parseInt(snpWindowSizeText);
+                windowsSize = Integer.parseInt(snpWindowSizeText);
             } catch (Exception e) {
                 validWindowSizeEntered = false;
             }
@@ -102,7 +106,7 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
 
         if ((snpListInputted || (snpFileImported && !snpFileError && !snpFileExtensionError)) && !invalidCharacter && validWindowSizeEntered && popSelected) {
 
-            convertVariantAndDownloadVcf(populations, snpList, snpWindowSize);
+            convertAndDownloadVcf(populations, snpList, windowsSize);
 
         } else {
             displayError(snpListInputted, snpFileImported, snpFileError, snpFileExtensionError,
@@ -110,45 +114,18 @@ public class VariantPanelController extends InputPanelController<VariantPanel> {
         }
     }
 
-
-    private void convertVariantAndDownloadVcf(ZoneSelection populations, List<String> variantList, int windowSize) {
-        run(outFile -> {
-            var hgVersion = Resource.config().getSelectedHumanGenome().toGRC();
-            logger.log(Level.INFO,
-                "Starting gene research using {0} HG version...", hgVersion);
-            var download = frame.getBottomPanel().addState("Starting download", outFile);
-
-            // Sets the locus building processus
-            var variantConversion = new VariantConversion(variantList, hgVersion);
-            download.setAssociatedProcessus(variantConversion);
-
-            var notFound = new AtomicReference<>("");
-
-            // Starts the processus and subscribes to its state
-            variantConversion.start().doOnComplete(() -> {
-                if ("".equals(notFound.get()) || ExceptionHandler.variantsNotFoundMessage(notFound.get())) {
-                    var locusList = variantConversion.getResult();
-                    if(windowSize!=0)
-                        locusList = locusList.stream().map(l -> l.withWindow(windowSize)).toList();
-                    downloadVcf(populations, outFile, locusList, download);
-                } else {
-                    download.cancel();
-                    logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
-                }
-            }).doOnError(e -> {
-                logger.log(Level.WARNING, "Error while downloading or writing", e);
-                download.error();
-                ExceptionHandler.show(e);
-            }).doOnNext(state -> {
-                if (state.getAction() == State.States.CONFIRM_CONTINUE
-                        && state.getObjectBeingProcessed() instanceof VariantsNotFoundException e) {
-                    notFound.set(String.join(",", e.getNotFound()));
-                } else if (state.getAction() == State.States.CANCELLED) {
-                    logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
-                }
-            }).subscribe(download::setState);
-        });
+    @Override
+    protected boolean confirmContinue(String notFound) {
+        return ExceptionHandler.variantsNotFoundMessage(notFound);
     }
+
+    @Override
+    protected PublishingStateProcessus<List<Locus>> getConversionProcessus(List<String> variantList) {
+        var hgVersion = Resource.config().getSelectedHumanGenome().toGRC();
+        logger.log(Level.INFO, "Starting gene research using {0} HG version...", hgVersion);
+        return new VariantConversion(variantList, hgVersion);
+    }
+
 
 
     private void displayError(boolean snpListInputted, boolean snpFileImported,
