@@ -1,5 +1,6 @@
 package fr.ferret.utils;
 
+import fr.ferret.model.Phase1KG;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
@@ -18,15 +19,15 @@ class SamplesResource {
     private final String PHASES_FILE = SAMPLES_DIR + "phaseList.txt";
 
     @Getter
-    private final Map<String, String> phases = loadPhases();
-    private final Map<String, Map<String, Map<String, Set<String>>>> samples = new HashMap<>();
+    private final Map<Phase1KG, String> phases = loadPhases();
+    private final Map<Phase1KG, Map<String, Map<String, Set<String>>>> samples = new HashMap<>();
 
-    private Map<String, String> loadPhases() {
+    private Map<Phase1KG, String> loadPhases() {
         return ResourceFile.readResource(PHASES_FILE, reader ->
             reader.lines().filter(Predicate.not(String::isBlank)).map(line -> line.split("\\s*:\\s*"))
                 .collect(Collectors.toMap(
-                    line -> line[0],
-                    line -> line.length > 1 ? line[1] : "",
+                    line -> new Phase1KG(line[0], line[1]),
+                    line -> line.length > 2 ? line[2] : "",
                     (x, y) -> y,
                     // we use a LinkedHashMap to preserve the order of the phases
                     LinkedHashMap::new
@@ -34,7 +35,7 @@ class SamplesResource {
         ).orElseThrow();
     }
 
-    private Map<String, Map<String, Set<String>>> tryLoadSample(String phase) {
+    private Map<String, Map<String, Set<String>>> tryLoadSample(Phase1KG phase) {
         var phaseFile = phases.get(phase);
         if(phaseFile == null || phaseFile.isBlank())
         {
@@ -56,7 +57,7 @@ class SamplesResource {
             )).orElse(Collections.emptyMap());
     }
 
-    public Map<String, Map<String, Set<String>>> getSample(String phase) {
+    public Map<String, Map<String, Set<String>>> getSample(Phase1KG phase) {
         return samples.computeIfAbsent(phase, SamplesResource::tryLoadSample);
     }
 

@@ -3,7 +3,6 @@ package fr.ferret.view.panel.header.ferret;
 import java.awt.Dimension;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -18,6 +17,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.SettingsFrameController;
+import fr.ferret.model.Phase1KG;
+import fr.ferret.model.Region;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 
@@ -31,7 +32,7 @@ public class SettingsFrame extends JFrame {
     private JRadioButton allFilesButton;
     private JRadioButton freqFileButton;
     private JRadioButton vcfFileButton;
-    private Map<String, JRadioButton> phaseButtons = new LinkedHashMap<>();
+    private Map<Phase1KG, JRadioButton> phaseButtons = new LinkedHashMap<>();
 
     private JFormattedTextField mafValueField;
 
@@ -94,11 +95,19 @@ public class SettingsFrame extends JFrame {
         vcfVersionLabel.setFont(Resource.SETTINGS_LABEL_FONT);
         settingsPanel.add(vcfVersionLabel);
 
-        // list of all phase buttons (disabled if phase is disabled)
+        // list of all phase buttons (disabled if phase is unsupported)
         Resource.getPhases().forEach(phase -> {
-            var button = new JRadioButton(Resource.getTextElement("settings.phase." + phase));
+            var isSupported = Resource.isSupported(phase);
+            String buttonLabel;
+            if(isSupported) {
+                var sampleSize = Resource.getSample(phase).stream().mapToInt(Region::getNbPeople).sum();
+                buttonLabel = Resource.getTextElement("settings.phase.supported", phase.display(), sampleSize);
+            } else {
+                buttonLabel = Resource.getTextElement("settings.phase.unsupported", phase.display());
+            }
+            var button = new JRadioButton(buttonLabel);
             phaseButtons.put(phase, button);
-            if(Resource.isDisabled(phase))
+            if(!isSupported)
                 button.setEnabled(false);
         });
 

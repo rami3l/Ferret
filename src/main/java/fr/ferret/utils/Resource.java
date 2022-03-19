@@ -13,6 +13,7 @@ import javax.swing.ImageIcon;
 import com.opencsv.bean.CsvToBeanBuilder;
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.HumanGenomeVersions;
+import fr.ferret.model.Phase1KG;
 import fr.ferret.model.Region;
 import fr.ferret.model.conversions.Pedigree;
 import lombok.experimental.UtilityClass;
@@ -115,10 +116,13 @@ public class Resource {
      * Gets an element of text from the resources according to system langage
      *
      * @param element of text to get in the resources
+     * @param args Objects to use in order to format the text element
      */
-    public static String getTextElement(String element) {
+    public static String getTextElement(String element, Object... args) {
         try {
-            return textElements.getString(element);
+            return args.length == 0 ?
+                textElements.getString(element) :
+                String.format(textElements.getString(element), args);
         } catch (Exception e) {
             logger.log(Level.WARNING, String.format("Impossible to get text element: %s", element),
                     e);
@@ -147,22 +151,22 @@ public class Resource {
     }
 
 
-    public static Set<Region> getSample(String phase) {
+    public static Set<Region> getSample(Phase1KG phase) {
         return Region.fromSample(SamplesResource.getSample(phase));
     }
 
-    public static Set<String> getPhases() {
+    public static Set<Phase1KG> getPhases() {
         return SamplesResource.getPhases().keySet();
     }
 
-    public static boolean isDisabled(String phase) {
-        return SamplesResource.getPhases().get(phase).isBlank();
+    public static boolean isSupported(Phase1KG phase) {
+        return !SamplesResource.getPhases().get(phase).isBlank();
     }
 
     /**
      * Gets the VCF URL template for the selected phase
      */
-    public static String getVcfUrlTemplate(String phase1KG) {
+    public static String getVcfUrlTemplate(Phase1KG phase1KG) {
         String path = getServerConfig("1kg." + phase1KG + ".path");
         String filenameTemplate = getServerConfig("1kg." + phase1KG + ".filename");
         String host = getServerConfig("1kg.host");

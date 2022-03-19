@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.model.Region;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
@@ -86,7 +87,8 @@ public abstract class InputPanelController {
                     logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
             })
             .doOnComplete(download::complete).doOnError(e -> {
-                logger.log(Level.WARNING, "Error while downloading or writing");
+                logger.log(Level.WARNING, "Error while downloading or writing", e);
+                ExceptionHandler.show(e);
                 download.error();
             }).subscribe(download::setState);
     }

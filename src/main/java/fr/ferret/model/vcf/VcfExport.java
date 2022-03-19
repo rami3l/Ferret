@@ -2,6 +2,7 @@ package fr.ferret.model.vcf;
 
 import com.pivovarit.function.ThrowingFunction;
 import fr.ferret.controller.exceptions.VcfStreamingException;
+import fr.ferret.model.Phase1KG;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.state.PublishingStateProcessus;
@@ -44,7 +45,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
     /**
      * The phase to use for getting variants (default: selected version)
      */
-    private final String phase1KG = Resource.config().getSelectedPhase();
+    private final Phase1KG phase1KG = Resource.config().getSelectedPhase();
 
     /**
      * Constructs a {@link VcfExport}. It is used to export a "distilled" VCF file from an IGSR

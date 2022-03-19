@@ -23,7 +23,7 @@ class IgsrClientTest {
     private final String chr = "1";
     private final int start = 114514;
     private final int end = 196194913;
-    private final String phase = "phase3";
+    private final Phase1KG phase = new Phase1KG("phase3", "Phase 3");
     private final String vcfPath = "src/test/resources/chr1-africans-phase3.vcf.gz";
     private final IgsrClient igsrClient = new IgsrClient(vcfPath);
 

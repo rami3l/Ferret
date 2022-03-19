@@ -10,6 +10,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import fr.ferret.model.Phase1KG;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.header.ferret.SettingsFrame;
@@ -41,7 +43,7 @@ public class SettingsFrameController {
 
         private final FerretFrame ferretFrame;
         private final SettingsFrame settingsFrame;
-        private final Map<String, JRadioButton> phaseButtons;
+        private final Map<Phase1KG, JRadioButton> phaseButtons;
         private final JRadioButton[] humanVersionButtons;
         private final JFormattedTextField mafText;
         private final JRadioButton allFilesButton;
