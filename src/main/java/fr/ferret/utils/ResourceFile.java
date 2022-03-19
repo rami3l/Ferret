@@ -1,14 +1,16 @@
 package fr.ferret.utils;
 
-import java.io.InputStream;
+import com.pivovarit.function.ThrowingFunction;
+import fr.ferret.controller.exceptions.ExceptionHandler;
+import fr.ferret.controller.settings.HumanGenomeVersions;
+import lombok.experimental.UtilityClass;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.pivovarit.function.ThrowingFunction;
-import fr.ferret.controller.settings.HumanGenomeVersions;
-import fr.ferret.controller.settings.Phases1KG;
-import lombok.experimental.UtilityClass;
 
 @UtilityClass
 class ResourceFile {
@@ -35,18 +37,20 @@ class ResourceFile {
         return Optional.ofNullable(resource);
     }
 
-    public InputStream getFileInputStream(String file) {
-        return Resource.class.getClassLoader().getResourceAsStream(file);
+    public InputStreamReader getFileReader(String file) {
+        return new InputStreamReader(ResourceFile.class.getClassLoader().getResourceAsStream(file));
     }
 
-    /**
-     * Gets the file of population samples (people ids by regions and zones)
-     *
-     * @param phase the phase to get samples from
-     * @return the file of population samples
-     */
-    public InputStream getSampleFile(Phases1KG phase) {
-        return getFileInputStream("samples/" + phase + ".txt");
+    public <T> Optional<T> readResource(String file,
+        ThrowingFunction<BufferedReader, T, Exception> extractionMethod) {
+        T resource = null;
+        try(var streamReader = getFileReader(file);
+                var reader = new BufferedReader(streamReader)) {
+            resource = extractionMethod.apply(reader);
+        } catch (Exception e) {
+            ExceptionHandler.ressourceAccessError(e);
+        }
+        return Optional.ofNullable(resource);
     }
 
     /**
@@ -55,8 +59,8 @@ class ResourceFile {
      * @param hgVersion the human genome version
      * @return the file of ending positions
      */
-    public InputStream getChrEndPositionsFile(HumanGenomeVersions hgVersion) {
-        return getFileInputStream("chrEndPositions/" + hgVersion + ".txt");
+    public InputStreamReader getChrEndPositionsFile(HumanGenomeVersions hgVersion) {
+        return getFileReader("chrEndPositions/" + hgVersion + ".txt");
     }
 
 }

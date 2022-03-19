@@ -1,9 +1,11 @@
 package fr.ferret.model;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class ZoneSelection {
 
@@ -12,29 +14,23 @@ public class ZoneSelection {
      * region. A region of which all zones are selected can be represented by an empty list for its
      * value.
      */
-    private final Map<String, List<String>> selectedZones = new HashMap<>();
+    private final List<Zone> selectedZones = new ArrayList<>();
+    @Getter
     private boolean allSelected = false;
 
     public boolean isEmpty() {
         return selectedZones.isEmpty() && !allSelected;
     }
 
-    public boolean isSelected(String region, String zone) {
-        return allSelected
-                || (selectedZones.containsKey(region) && (selectedZones.get(region).isEmpty()
-                        || selectedZones.get(region).contains(zone)));
+    public boolean isSelected(Zone zone) {
+        return allSelected || selectedZones.contains(zone);
     }
 
-    public ZoneSelection add(String region, List<String> zones) {
-        selectedZones.computeIfAbsent(region, k -> new ArrayList<>()).addAll(zones);
-        return this;
-    }
-
-    public ZoneSelection add(String region) {
-        if ("ALL".equals(region)) {
-            selectAll();
+    public ZoneSelection add(Zone zone) {
+        if (zone instanceof Region region) {
+            selectedZones.addAll(region.getZones());
         } else {
-            selectedZones.put(region, new ArrayList<>());
+            selectedZones.add(zone);
         }
         return this;
     }
@@ -42,5 +38,12 @@ public class ZoneSelection {
     public ZoneSelection selectAll() {
         allSelected = true;
         return this;
+    }
+
+    // TODO: ne fonctionne pas quand allSelected (car on a juste changé la valeur du booléen sans ajouter l'ensemble des zones à la sélection)
+    public Set<String> getSample() {
+        Set<String> people = new HashSet<>();
+        selectedZones.forEach(zone -> people.addAll(zone.getPeople()));
+        return people;
     }
 }

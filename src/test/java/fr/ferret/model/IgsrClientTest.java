@@ -1,33 +1,29 @@
 package fr.ferret.model;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import fr.ferret.model.utils.FileWriter;
+import fr.ferret.model.utils.VCFHeaderExt;
+import fr.ferret.model.vcf.IgsrClient;
+import fr.ferret.utils.Resource;
+import htsjdk.variant.variantcontext.Allele;
+import htsjdk.variant.vcf.VCFFileReader;
+import htsjdk.variant.vcf.VCFHeader;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import fr.ferret.model.vcf.IgsrClient;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import fr.ferret.controller.settings.Phases1KG;
-import fr.ferret.model.utils.FileWriter;
-import fr.ferret.model.utils.VCFHeaderExt;
-import fr.ferret.utils.Resource;
-import htsjdk.variant.variantcontext.Allele;
-import htsjdk.variant.vcf.VCFFileReader;
-import htsjdk.variant.vcf.VCFHeader;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class IgsrClientTest {
     private final String chr = "1";
     private final int start = 114514;
     private final int end = 196194913;
-    private final Phases1KG phase = Phases1KG.V3;
+    private final String phase = "phase3";
     private final String vcfPath = "src/test/resources/chr1-africans-phase3.vcf.gz";
     private final IgsrClient igsrClient = new IgsrClient(vcfPath);
 
@@ -72,9 +68,14 @@ class IgsrClientTest {
     void testWriteVCFFromSample(@TempDir Path tempDir) throws IOException {
 
         try (var reader = igsrClient.getReader(chr).block(); var it = reader.query(chr, start, end)) {
-            var selection = new ZoneSelection();
-            selection.add("AFR", List.of("MSL"));
-            var samples = Resource.getSamples(phase, selection);
+
+            var samples = Resource.getSample(phase).stream()
+                .filter(region -> "AFR".equals(region.getAbbrev()))
+                .flatMap(region -> region.getZones().stream())
+                .filter(zone -> "MSL".equals(zone.getAbbrev()))
+                .map(Zone::getPeople)
+                .findFirst().orElseThrow();
+
             var variants =
                     it.stream().map(variant -> variant.subContextFromSamples(samples)).toList();
             var oldHeader = (VCFHeader) reader.getHeader();

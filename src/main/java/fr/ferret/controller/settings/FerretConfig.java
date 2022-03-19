@@ -3,7 +3,6 @@ package fr.ferret.controller.settings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,7 @@ public class FerretConfig {
      * Version du projet 1KG utilisée
      */
     @Builder.Default
-    private Phases1KG selectedVersion = Phases1KG.V3;
+    private String selectedPhase = "phase3";
 
     /**
      * Selected output file type

@@ -59,19 +59,16 @@ public abstract class InputPanelController {
     protected ZoneSelection getSelectedPopulations() {
         frame.getRegionPanel().setBorder(null);
         var selection = new ZoneSelection();
-        frame.getRegionPanel().getRegions().forEach(region -> {
-            for (int i = 0; i < region.getCheckBoxes().length; i++) {
-                if (region.getCheckBoxes()[i].isSelected()) {
-                    // Adds the selected region to the populations list
-                    if (i == 0) {
-                        selection.add(region.getRegion().getAbbrev());
-                    } else {
-                        String zone = region.getRegion().getZones()[i];
-                        selection.add(region.getRegion().getAbbrev(), List.of(zone));
-                    }
-                }
-            }
-        });
+        // We add to the selection all the zones associated with a selected checkbox
+        if(frame.getRegionPanel().isAllPopulationSelected()) {
+            selection.selectAll();
+        } {
+            frame.getRegionPanel().getRegions().forEach(
+                region -> region.getCheckBoxes().entrySet().stream()
+                    .filter(entry -> entry.getKey().isSelected())
+                    .forEach(entry -> selection.add(entry.getValue()))
+            );
+        }
         return selection;
     }
 

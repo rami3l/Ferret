@@ -67,7 +67,7 @@ public class ExceptionHandler {
     }
 
     public static void ressourceAccessError(Throwable throwable) {
-        logger.log(Level.WARNING, "Resource access error", throwable);
+        logger.log(Level.SEVERE, "Resource access error", throwable);
         new Error(f).append("error.resource").show();
     }
 

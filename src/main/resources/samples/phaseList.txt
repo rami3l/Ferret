@@ -1,0 +1,3 @@
+phase1 : phase1.txt
+phase3 : phase3.txt
+nygc_30x

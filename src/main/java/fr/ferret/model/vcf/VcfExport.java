@@ -1,9 +1,7 @@
 package fr.ferret.model.vcf;
 
 import com.pivovarit.function.ThrowingFunction;
-import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.VcfStreamingException;
-import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.model.ZoneSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.state.PublishingStateProcessus;
@@ -46,7 +44,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
     /**
      * The phase to use for getting variants (default: selected version)
      */
-    private final Phases1KG phase1KG = Resource.config().getSelectedVersion();
+    private final String phase1KG = Resource.config().getSelectedPhase();
 
     /**
      * Constructs a {@link VcfExport}. It is used to export a "distilled" VCF file from an IGSR
@@ -149,11 +147,9 @@ public class VcfExport extends PublishingStateProcessus<Void> {
      * @return this {@link VcfExport}
      */
     public VcfExport setFilter(ZoneSelection selection) {
-        try {
-            samples = Resource.getSamples(phase1KG, selection);
-        } catch (IOException e) {
-            // TODO: this access to ExceptionHandler shouldn't be in the model part
-            ExceptionHandler.ressourceAccessError(e);
+        // TODO: see comment on ZoneSelection#getPeopleFor
+        if(!selection.isAllSelected()) {
+            samples = selection.getSample();
         }
         return this;
     }

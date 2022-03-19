@@ -2,6 +2,9 @@ package fr.ferret.model;
 
 import lombok.Getter;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * A <strong>world region</strong> of the 1KG project. <br>
  * Currently, the world regions are "All populations", "Africa", "Europe", "East asia", "America"
@@ -12,40 +15,51 @@ import lombok.Getter;
  * CEU, GBR, FIN, IBS and TSI.
  */
 @Getter
-public class Region {
+public final class Region extends Zone {
+
+    // TODO: move to a resource file
+    private static final Map<String, String> names = Map.of(
+        "AFR", "Afrique",
+        "EUR", "Europe",
+        "EAS", "East Asia",
+        "AMR", "America",
+        "SAS", "South Asia"
+    );
+
     /**
      * The region name
      */
     private final String name;
 
-    /**
-     * The abbreviation of the region name
-     */
-    private final String abbrev;
 
     /**
      * The zones (populations) of the region
      */
-    private final String[] zones;
-
-    /**
-     * The individuals count for each zone, respectively
-     */
-    private final int[] individualCount;
+    private final Set<Zone> zones;
 
     /**
      * Creates a new Region
-     * @param name The name of the region (for translation)
      * @param abbrev The abbreviation of the region
      * @param zones The zones (populations) of the region
-     * @param individualCount The individuals count for each zone, respectively
      */
-    public Region(String name, String abbrev, String[] zones, int[] individualCount) {
-        this.name = name;
-        this.abbrev = abbrev;
+    public Region(String abbrev, Set<Zone> zones) {
+        super(abbrev, zones.stream().mapToInt(Zone::getNbPeople).sum());
+        this.name = names.get(abbrev);
         this.zones = zones;
-        this.individualCount = individualCount;
-        if (zones.length != individualCount.length)
-            throw new AssertionError("The zones length doesn't match the individuals count");
+        zones.forEach(zone -> zone.setRegion(this));
     }
+
+    public Region(String abbrev, int nbPeople) {
+        // TODO: get name from a resource file
+        super(abbrev, nbPeople);
+        this.name = "";
+        this.zones = new HashSet<>();
+    }
+
+    public static Set<Region> fromSample(Map<String, Map<String, Set<String>>> regions) {
+        return regions.entrySet().stream()
+            .map(entry -> new Region(entry.getKey(), Zone.of(entry.getValue())))
+            .collect(Collectors.toSet());
+    }
+
 }

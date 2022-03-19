@@ -2,8 +2,8 @@ package fr.ferret.view.panel.header.ferret;
 
 import java.awt.Dimension;
 import java.text.NumberFormat;
-import java.util.Hashtable;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import fr.ferret.controller.settings.HumanGenomeVersions;
-import fr.ferret.controller.settings.Phases1KG;
 import fr.ferret.controller.settings.SettingsFrameController;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
@@ -32,7 +31,7 @@ public class SettingsFrame extends JFrame {
     private JRadioButton allFilesButton;
     private JRadioButton freqFileButton;
     private JRadioButton vcfFileButton;
-    private JRadioButton[] phaseButtons;
+    private Map<String, JRadioButton> phaseButtons = new LinkedHashMap<>();
 
     private JFormattedTextField mafValueField;
 
@@ -95,25 +94,23 @@ public class SettingsFrame extends JFrame {
         vcfVersionLabel.setFont(Resource.SETTINGS_LABEL_FONT);
         settingsPanel.add(vcfVersionLabel);
 
-        // list of all phase buttons
-        phaseButtons = new JRadioButton[Phases1KG.values().length];
+        // list of all phase buttons (disabled if phase is disabled)
+        Resource.getPhases().forEach(phase -> {
+            var button = new JRadioButton(Resource.getTextElement("settings.phase." + phase));
+            phaseButtons.put(phase, button);
+            if(Resource.isDisabled(phase))
+                button.setEnabled(false);
+        });
 
         // phase buttons are grouped (in order to let only one of them to be selected)
         ButtonGroup vcfRadioButtons = new ButtonGroup();
 
-        // we add buttons to the list and the group, and set their text
-        for (int i = 0; i < phaseButtons.length; i++) {
-            phaseButtons[i] = new JRadioButton(
-                    Resource.getTextElement("settings.phase." + Phases1KG.values()[i].name()));
-            vcfRadioButtons.add(phaseButtons[i]);
-            settingsPanel.add(phaseButtons[i]);
-        }
+        // we add buttons to the list and the group
+        phaseButtons.values().forEach(vcfRadioButtons::add);
+        phaseButtons.values().forEach(settingsPanel::add);
 
         // Default button
-        phaseButtons[Resource.config().getSelectedVersion().ordinal()].setSelected(true);
-
-        // Disable NYGC : not implemented
-        phaseButtons[Phases1KG.NYGC_30X.ordinal()].setEnabled(false);
+        phaseButtons.get(Resource.config().getSelectedPhase()).setSelected(true);
 
     }
 

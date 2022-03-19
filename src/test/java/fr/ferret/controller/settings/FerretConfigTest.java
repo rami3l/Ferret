@@ -45,7 +45,7 @@ class FerretConfigTest {
 
         var expected = FerretConfig.builder().mafThreshold(1.2)
                 .selectedHumanGenome(HumanGenomeVersions.HG19)
-                .selectedOutputType(FileOutputType.ALL).selectedVersion(Phases1KG.V3)
+                .selectedOutputType(FileOutputType.ALL).selectedPhase(Phases1KG.V3)
                 .assemblyAccessVersions(
                     Map.of(HumanGenomeVersions.HG19, 24, HumanGenomeVersions.HG38, 37)
                 ).build();

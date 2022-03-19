@@ -3,9 +3,6 @@ package fr.ferret.utils;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -16,8 +13,7 @@ import javax.swing.ImageIcon;
 import com.opencsv.bean.CsvToBeanBuilder;
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.HumanGenomeVersions;
-import fr.ferret.controller.settings.Phases1KG;
-import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.Region;
 import fr.ferret.model.conversions.Pedigree;
 import lombok.experimental.UtilityClass;
 import org.spongepowered.configurate.ConfigurateException;
@@ -60,6 +56,7 @@ public class Resource {
         return config;
     }
 
+    //TODO: !!! Si éléments de config incorrects dans le fichier sur le disque (ex la phase), garder la valeur par défaut !!!
     public static void loadConfig() {
         try {
             config = FerretConfig.load();
@@ -142,38 +139,30 @@ public class Resource {
      * Order", "Third Order", "Children", "Other Comments"
      */
     public Map<String, Pedigree> getPedigrees() {
-        var fin = ResourceFile.getFileInputStream("samples/pedigrees.txt");
-        var parser = new CsvToBeanBuilder<Pedigree>(new InputStreamReader(fin))
+        var pedigreeReader = ResourceFile.getFileReader("samples/pedigrees.txt");
+        var parser = new CsvToBeanBuilder<Pedigree>(pedigreeReader)
                 .withType(Pedigree.class).withSeparator('\t').build();
         return parser.parse().stream()
                 .collect(Collectors.toMap(Pedigree::getIndividualId, Function.identity()));
     }
 
-    /**
-     * Gets the list of people of the selected zones for the given phase
-     *
-     * @param phase the phase to get the sample from
-     * @param selection the zones and region to get the sample from
-     * @return the sample (a Set containing people ids)
-     * @throws IOException if an error occurred while reading the file
-     */
-    public static Set<String> getSamples(Phases1KG phase, ZoneSelection selection)
-            throws IOException {
-        try (var streamReader = new InputStreamReader(ResourceFile.getSampleFile(phase));
-                var reader = new BufferedReader(streamReader)) {
-            return reader.lines().map(line -> line.split("\t"))
-                    .filter(fields -> selection.isSelected(fields[2], fields[1]))
-                    .map(fields -> fields[0]).collect(Collectors.toSet());
-        }
+
+    public static Set<Region> getSample(String phase) {
+        return Region.fromSample(SamplesResource.getSample(phase));
+    }
+
+    public static Set<String> getPhases() {
+        return SamplesResource.getPhases().keySet();
+    }
+
+    public static boolean isDisabled(String phase) {
+        return SamplesResource.getPhases().get(phase).isBlank();
     }
 
     /**
-     * Gets the VCF URL template for the given phase
-     *
-     * @param phase1KG the phase to use for getting VCF files
-     * @return the URL template
+     * Gets the VCF URL template for the selected phase
      */
-    public static String getVcfUrlTemplate(Phases1KG phase1KG) {
+    public static String getVcfUrlTemplate(String phase1KG) {
         String path = getServerConfig("1kg." + phase1KG + ".path");
         String filenameTemplate = getServerConfig("1kg." + phase1KG + ".filename");
         String host = getServerConfig("1kg.host");
@@ -190,15 +179,10 @@ public class Resource {
      */
     public static Optional<Integer> getChrEndPosition(HumanGenomeVersions hgVersion,
             String chrName) {
-        try (var streamReader =
-                new InputStreamReader(ResourceFile.getChrEndPositionsFile(hgVersion));
-                var reader = new BufferedReader(streamReader)) {
-            return reader.lines().map(line -> line.split("\t"))
-                    .filter(fields -> fields[0].equals(chrName)).map(fields -> fields[1])
-                    .findFirst().map(Integer::parseInt);
-        } catch (IOException e) {
-            logger.log(Level.WARNING, "Impossible to open file", e);
-            return Optional.empty();
-        }
+        return ResourceFile.readResource("chrEndPositions/" + hgVersion, reader ->
+            reader.lines().map(line -> line.split("\t"))
+                .filter(fields -> fields[0].equals(chrName)).map(fields -> fields[1])
+                .findFirst().map(Integer::parseInt)
+        ).flatMap(Function.identity());
     }
 }
