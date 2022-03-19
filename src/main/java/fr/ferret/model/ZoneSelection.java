@@ -16,7 +16,7 @@ public class ZoneSelection {
     private boolean allSelected = false;
 
     public boolean isEmpty() {
-        return selectedZones.isEmpty();
+        return selectedZones.isEmpty() && !allSelected;
     }
 
     public boolean isSelected(String region, String zone) {
