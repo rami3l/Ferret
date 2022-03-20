@@ -1,5 +1,6 @@
 package fr.ferret.model;
 
+import fr.ferret.utils.Resource;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,11 @@ public class Zone {
      * The abbreviation of the zone name
      */
     protected final String abbrev;
+
+    /**
+     * The name of the zone
+     */
+    protected final String name;
 
     /**
      * The size of the population from this zone
@@ -33,12 +39,14 @@ public class Zone {
         this.abbrev = abbrev;
         this.people = people;
         this.nbPeople = people.size();
+        this.name = Resource.getTextElement("region." + abbrev);
     }
 
     protected Zone(String abbrev, int nbPeople) {
         this.abbrev = abbrev;
         this.people = new HashSet<>();
         this.nbPeople = nbPeople;
+        this.name = Resource.getTextElement("region." + abbrev);
     }
 
     public static Set<Zone> of(Map<String, Set<String>> zones) {

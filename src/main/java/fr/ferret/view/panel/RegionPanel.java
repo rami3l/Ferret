@@ -106,8 +106,7 @@ public class RegionPanel extends JPanel {
         private JCheckBox addCheckbox(Zone zone, boolean bold) {
 
             var checkbox = new JCheckBox(
-                zone.getAbbrev() + " " + Resource.getTextElement("region." + zone.getAbbrev())
-                    + " (n=" + zone.getNbPeople() + ")");
+                zone.getAbbrev() + " " + zone.getName() + " (n=" + zone.getNbPeople() + ")");
 
             checkbox.setFont(new Font(checkbox.getFont().getFontName(), bold ? Font.BOLD : Font.PLAIN, 14));
 

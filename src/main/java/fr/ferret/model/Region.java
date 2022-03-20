@@ -17,21 +17,6 @@ import java.util.stream.Collectors;
 @Getter
 public final class Region extends Zone {
 
-    // TODO: move to a resource file
-    private static final Map<String, String> names = Map.of(
-        "AFR", "Afrique",
-        "EUR", "Europe",
-        "EAS", "East Asia",
-        "AMR", "America",
-        "SAS", "South Asia"
-    );
-
-    /**
-     * The region name
-     */
-    private final String name;
-
-
     /**
      * The zones (populations) of the region
      */
@@ -44,15 +29,12 @@ public final class Region extends Zone {
      */
     public Region(String abbrev, Set<Zone> zones) {
         super(abbrev, zones.stream().mapToInt(Zone::getNbPeople).sum());
-        this.name = names.get(abbrev);
         this.zones = zones;
         zones.forEach(zone -> zone.setRegion(this));
     }
 
     public Region(String abbrev, int nbPeople) {
-        // TODO: get name from a resource file
         super(abbrev, nbPeople);
-        this.name = "";
         this.zones = new HashSet<>();
     }
 
