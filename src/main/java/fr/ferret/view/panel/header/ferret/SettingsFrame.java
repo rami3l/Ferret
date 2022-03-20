@@ -15,6 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
+
+import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.controller.settings.SettingsFrameController;
 import fr.ferret.model.Phase1KG;

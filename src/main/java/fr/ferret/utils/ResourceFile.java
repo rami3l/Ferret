@@ -36,8 +36,9 @@ class ResourceFile {
         return Optional.ofNullable(resource);
     }
 
-    public InputStreamReader getFileReader(String file) {
-        return new InputStreamReader(ResourceFile.class.getClassLoader().getResourceAsStream(file));
+    public Optional<InputStreamReader> getFileReader(String file) {
+        return Optional.ofNullable(ResourceFile.class.getClassLoader().getResourceAsStream(file))
+            .map(InputStreamReader::new);
     }
 
     /**
@@ -47,7 +48,7 @@ class ResourceFile {
     public <T> Optional<T> readResource(String file,
         ThrowingFunction<BufferedReader, T, Exception> extractionMethod) {
         T resource = null;
-        try(var streamReader = getFileReader(file);
+        try(var streamReader = getFileReader(file).get();
                 var reader = new BufferedReader(streamReader)) {
             resource = extractionMethod.apply(reader);
         } catch (Exception e) {

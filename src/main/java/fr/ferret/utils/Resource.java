@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import com.opencsv.bean.CsvToBeanBuilder;
+import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.settings.FerretConfig;
 import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.model.Phase1KG;
@@ -163,7 +164,12 @@ public class Resource {
      */
     public Map<String, Pedigree> getPedigrees() {
         var pedigreeReader = ResourceFile.getFileReader("samples/pedigrees.txt");
-        var parser = new CsvToBeanBuilder<Pedigree>(pedigreeReader)
+        if(pedigreeReader.isEmpty()) {
+            logger.warning("Failed to get pedigree resource file");
+            ExceptionHandler.ressourceAccessError(null, "pedigrees");
+            return Collections.emptyMap();
+        }
+        var parser = new CsvToBeanBuilder<Pedigree>(pedigreeReader.get())
                 .withType(Pedigree.class).withSeparator('\t').build();
         return parser.parse().stream()
                 .collect(Collectors.toMap(Pedigree::getIndividualId, Function.identity()));
@@ -216,7 +222,7 @@ public class Resource {
      */
     public static Optional<Integer> getChrEndPosition(HumanGenomeVersions hgVersion,
             String chrName) {
-        return ResourceFile.readResource("chrEndPositions/" + hgVersion, reader ->
+        return ResourceFile.readResource("chrEndPositions/" + hgVersion + ".txt", reader ->
             reader.lines().map(line -> line.split("\t"))
                 .filter(fields -> fields[0].equals(chrName)).map(fields -> fields[1])
                 .findFirst().map(Integer::parseInt)
