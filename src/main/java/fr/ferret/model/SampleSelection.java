@@ -1,5 +1,6 @@
 package fr.ferret.model;
 
+import fr.ferret.utils.Resource;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ZoneSelection {
+public class SampleSelection {
 
     /**
      * The keys represent the selected regions and the values represent the zones selected in each
@@ -18,29 +19,38 @@ public class ZoneSelection {
     @Getter
     private boolean allSelected = false;
 
+    /**
+     * Checks if this SampleSelection is empty
+     */
     public boolean isEmpty() {
         return selectedZones.isEmpty() && !allSelected;
     }
 
-    public boolean isSelected(Zone zone) {
-        return allSelected || selectedZones.contains(zone);
-    }
-
-    public ZoneSelection add(Zone zone) {
+    /**
+     * Adds recursively all the people of the given {@link Zone} or its child zones (if it is a
+     * {@link Region}) to this {@link SampleSelection}
+     */
+    public SampleSelection add(Zone zone) {
         if (zone instanceof Region region) {
-            selectedZones.addAll(region.getZones());
+            region.getZones().forEach(this::add);
         } else {
             selectedZones.add(zone);
         }
         return this;
     }
 
-    public ZoneSelection selectAll() {
+    /**
+     * Adds all the people of the given {@link Phase1KG} to this {@link SampleSelection}
+     */
+    public SampleSelection selectAllFor(Phase1KG phase) {
         allSelected = true;
+        Resource.getSample(phase).forEach(this::add);
         return this;
     }
 
-    // TODO: ne fonctionne pas quand allSelected (car on a juste changé la valeur du booléen sans ajouter l'ensemble des zones à la sélection)
+    /**
+     * Gets all the people contained in this {@link SampleSelection}
+     */
     public Set<String> getSample() {
         Set<String> people = new HashSet<>();
         selectedZones.forEach(zone -> people.addAll(zone.getPeople()));

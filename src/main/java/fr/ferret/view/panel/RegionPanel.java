@@ -41,8 +41,7 @@ public class RegionPanel extends JPanel {
     }
 
     /**
-     * Reloads the contents of the panel <br>
-     * Called when the Ferret settings are modified
+     * Reloads the contents of the panel. <br> Called when the Ferret settings are modified
      */
     public void reloadPanel() {
         removeAll();
@@ -84,8 +83,7 @@ public class RegionPanel extends JPanel {
 
 
     /**
-     * A JPanel containing a {@link Region} <br>
-     * Contains all the selectable zones of the region
+     * A JPanel containing a {@link Region} <br> Contains all the selectable zones of the region
      */
     @Getter
     public class ZonesPanel extends JPanel {
@@ -99,24 +97,6 @@ public class RegionPanel extends JPanel {
         private final Map<JCheckBox, Zone> checkBoxes = new LinkedHashMap<>();
 
         /**
-         * Indicate if this ZonesPanel is the "All populations" one
-         */
-        private final boolean isGlobal;
-
-        private JCheckBox addCheckbox(Zone zone, boolean bold) {
-
-            var checkbox = new JCheckBox(
-                zone.getAbbrev() + " " + zone.getName() + " (n=" + zone.getNbPeople() + ")");
-
-            checkbox.setFont(new Font(checkbox.getFont().getFontName(), bold ? Font.BOLD : Font.PLAIN, 14));
-
-            checkBoxes.put(checkbox, zone);
-            add(checkbox);
-
-            return checkbox;
-        }
-
-        /**
          * Creates a panel for the given region
          * 
          * @param region The region
@@ -128,7 +108,6 @@ public class RegionPanel extends JPanel {
         public ZonesPanel(Region region, int lines,  boolean isGlobal) {
 
             this.region = region;
-            this.isGlobal = isGlobal;
             this.setLayout(new GridLayout(lines, 1));
 
             // Zone panel title
@@ -157,10 +136,27 @@ public class RegionPanel extends JPanel {
         }
 
         /**
-         * Changes the states of all zone checkboxes between start and checkBoxes.length
+         * Creates a checkbox for the given {@link Zone} (or {@link Region}) and makes its label
+         * bold according to the bold boolean argument
+         */
+        private JCheckBox addCheckbox(Zone zone, boolean bold) {
+
+            // creates the checkbox and setting his font
+            var checkbox = new JCheckBox(
+                zone.getAbbrev() + " " + zone.getName() + " (n=" + zone.getNbPeople() + ")");
+            checkbox.setFont(new Font(checkbox.getFont().getFontName(), bold ? Font.BOLD : Font.PLAIN, 14));
+
+            // adds the checkbox to the checkBoxes map and the panel, then returns it
+            checkBoxes.put(checkbox, zone);
+            add(checkbox);
+            return checkbox;
+        }
+
+        /**
+         * Changes the state of the checkboxes in this panel
          *
          * @param state The new selected state of the checkboxes
-         * @param regionsAlso Boolean indicating if the state change must also be applied to regions
+         * @param regionsAlso Boolean indicating if the state change must also be applied to the regions
          */
         private void setCheckBoxesState(boolean state, boolean regionsAlso) {
             checkBoxes.forEach((checkBox, zone) -> {

@@ -1,12 +1,18 @@
 package fr.ferret.controller.exceptions;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.UnknownHostException;
 import java.nio.file.FileSystemException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 
 import fr.ferret.controller.state.Error;
+import fr.ferret.model.Phase1KG;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -69,6 +75,15 @@ public class ExceptionHandler {
     public static void ressourceAccessError(Throwable throwable) {
         logger.log(Level.SEVERE, "Resource access error", throwable);
         new Error(f).append("error.resource").show();
+    }
+
+    public static LinkedHashMap<Phase1KG, String> phaseInitialisationError() {
+        new Error(f).append("error.phaseInitialisation").show();
+        return new LinkedHashMap<>();
+    }
+
+    public static void phaseNotFoundError() {
+        new Error(f).append("error.phaseNotFound").show();
     }
 
     public void unknownError(Throwable throwable) {

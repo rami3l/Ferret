@@ -1,7 +1,7 @@
 package fr.ferret.model.conversions;
 
 import fr.ferret.model.Phase1KG;
-import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.SampleSelection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -21,7 +21,7 @@ class VcfConverterTest {
     //private final String vcfSource = "src/test/resources/chr1-africans-phase3.vcf.gz";
     private final String vcfPath = "src/test/resources/chr1-africans-phase3.vcf";
     // TODO: if we need toRegion::getZones correct this → see IgsrClientTest L72
-    private final ZoneSelection selection = new ZoneSelection(); //.add("AFR", List.of("MSL"));
+    private final SampleSelection selection = new SampleSelection(); //.add("AFR", List.of("MSL"));
 
 
     //@BeforeAll

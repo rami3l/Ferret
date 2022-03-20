@@ -119,7 +119,9 @@ public class SettingsFrame extends JFrame {
         phaseButtons.values().forEach(settingsPanel::add);
 
         // Default button
-        phaseButtons.get(Resource.config().getSelectedPhase()).setSelected(true);
+        var selectedPhase = phaseButtons.get(Resource.config().getSelectedPhase());
+        if(selectedPhase != null)
+            selectedPhase.setSelected(true);
 
     }
 

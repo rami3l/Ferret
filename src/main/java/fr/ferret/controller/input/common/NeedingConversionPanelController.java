@@ -2,7 +2,7 @@ package fr.ferret.controller.input.common;
 
 import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.ConversionIncompleteException;
-import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.SampleSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
@@ -24,7 +24,7 @@ public abstract class NeedingConversionPanelController extends InputPanelControl
     protected abstract boolean confirmContinue(String notFound);
     protected abstract PublishingStateProcessus<List<Locus>> getConversionProcessus(List<String> toConvert);
 
-    protected void convertAndDownloadVcf(ZoneSelection populations, List<String> toConvert, int windowSize) {
+    protected void convertAndDownloadVcf(SampleSelection populations, List<String> toConvert, int windowSize) {
         run(outFile -> {
 
             var download = frame.getBottomPanel().addState("Starting download", outFile);

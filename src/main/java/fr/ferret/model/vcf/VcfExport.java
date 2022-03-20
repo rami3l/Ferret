@@ -3,7 +3,7 @@ package fr.ferret.model.vcf;
 import com.pivovarit.function.ThrowingFunction;
 import fr.ferret.controller.exceptions.VcfStreamingException;
 import fr.ferret.model.Phase1KG;
-import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.SampleSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 /**
  * An object representing a VCF export. It is constructed with a {@link Locus} {@link Flux}. We can
- * set a {@link ZoneSelection population filter} with the <i>setFilter</i> method. We start the
+ * set a {@link SampleSelection population filter} with the <i>setFilter</i> method. We start the
  * export with the <i>start</i> method, passing it the {@link File outFile}
  */
 public class VcfExport extends PublishingStateProcessus<Void> {
@@ -50,7 +50,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
     /**
      * Constructs a {@link VcfExport}. It is used to export a "distilled" VCF file from an IGSR
      * online database query.<br>
-     * Call the {@link VcfExport#setFilter(ZoneSelection)} method to filter the VCF by populations
+     * Call the {@link VcfExport#setFilter(SampleSelection)} method to filter the VCF by populations
      *
      * @param locusList The {@link List} of {@link Locus} to export in a VCF file.
      * @param outFile the output {@link File}
@@ -147,8 +147,8 @@ public class VcfExport extends PublishingStateProcessus<Void> {
      * @param selection the selected populations
      * @return this {@link VcfExport}
      */
-    public VcfExport setFilter(ZoneSelection selection) {
-        // TODO: see comment on ZoneSelection#getPeopleFor
+    public VcfExport setFilter(SampleSelection selection) {
+        // TODO: see comment on SampleSelection#getPeopleFor
         if(!selection.isAllSelected()) {
             samples = selection.getSample();
         }

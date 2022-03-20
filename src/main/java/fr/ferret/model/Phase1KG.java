@@ -5,6 +5,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
+/**
+ * A phase of the 1KG project. <br>
+ * - <i>name</i> is used to get the associated information like the vcf url (so it must be exact).
+ * <br>- <i>display</i> is the string representation (used in the interface).
+ */
 @ConfigSerializable
 @EqualsAndHashCode
 @NoArgsConstructor
