@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import fr.ferret.model.Phase1KG;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -23,7 +24,10 @@ class FerretConfigTest {
                 maf-threshold=0.0
                 selected-human-genome=HG19
                 selected-output-type=ALL
-                selected-version=V3
+                selected-phase {
+                    display="Phase 3"
+                    name=phase3
+                }
                 """;
         assertEquals(expected, got);
     }
@@ -38,14 +42,17 @@ class FerretConfigTest {
                 maf-threshold=1.2
                 selected-human-genome=HG19
                 selected-output-type=ALL
-                selected-version=V3
+                selected-phase {
+                    display="Phase 1"
+                    name=phase1
+                }
                 """;
         var tempFile = tempDir.resolve(FerretConfig.DEFAULT_FILENAME);
         Files.write(tempFile, cfgStr.getBytes());
 
         var expected = FerretConfig.builder().mafThreshold(1.2)
                 .selectedHumanGenome(HumanGenomeVersions.HG19)
-                .selectedOutputType(FileOutputType.ALL).selectedPhase(Phases1KG.V3)
+                .selectedOutputType(FileOutputType.ALL).selectedPhase(new Phase1KG("phase1" ,"Phase 1"))
                 .assemblyAccessVersions(
                     Map.of(HumanGenomeVersions.HG19, 24, HumanGenomeVersions.HG38, 37)
                 ).build();
