@@ -65,7 +65,6 @@ public class RegionPanel extends JPanel {
 
         var phaseRegions = Resource.getSample(Resource.config().getSelectedPhase());
 
-        // TODO: move the "ALL" to a resource file
         var allPopulationRegion = new Region("ALL", phaseRegions.stream().mapToInt(Region::getNbPeople).sum());
         allPopulations = new ZonesPanel(allPopulationRegion, 9, true);
         container.add(RegionPanel.this.allPopulations);

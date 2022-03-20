@@ -57,7 +57,9 @@ public class Resource {
         return config;
     }
 
-    //TODO: !!! Si éléments de config incorrects dans le fichier sur le disque (ex la phase), garder la valeur par défaut !!!
+    /**
+     * Tries to load the Ferret config from the config file
+     */
     public static void loadConfig() {
         try {
             config = FerretConfig.load();
@@ -66,6 +68,9 @@ public class Resource {
         }
     }
 
+    /**
+     * Tries to save the actual config of Ferret to the config file
+     */
     public static void saveConfig() {
         try {
             Resource.config().save();
@@ -75,6 +80,9 @@ public class Resource {
         }
     }
 
+    /**
+     * Updates the correspondence between assembly accession versions and HG versions with patch
+     */
     public static void updateAssemblyAccessVersions() {
         var versions = List.of(HumanGenomeVersions.HG19, HumanGenomeVersions.HG38);
         Mono.fromRunnable(() -> config.updateAssemblyAccessVersions(versions))
@@ -86,6 +94,10 @@ public class Resource {
             .subscribe();
     }
 
+    /**
+     * Gets the assembly accession version corresponding to the latest patch of the selected HG
+     * version
+     */
     public static String getAssemblyAccessVersion() {
         return ASS_ACC_VERSION_PREFIX + "." + config.getAssemblyAccessVersion();
     }
@@ -99,13 +111,17 @@ public class Resource {
     }
 
     /**
-     * @param resourceFileName relative path of the resource icon
+     * @param resourceFilename relative path of the resource icon
      * @return an optional icon
      */
-    public static Optional<ImageIcon> getIcon(String resourceFileName) {
-        return ResourceFile.getResource(resourceFileName, ImageIcon::new);
+    public static Optional<ImageIcon> getIcon(String resourceFilename) {
+        return ResourceFile.getResource(resourceFilename, ImageIcon::new);
     }
 
+    /**
+     * Gets a resource icon, resized to the given width and height. <br>
+     * See {@link Resource#getIcon(String resourceFilename)}
+     */
     public static Optional<ImageIcon> getIcon(String resourceFilename, int width, int height) {
         return getIcon(resourceFilename).map(icon -> new ImageIcon(icon.getImage()
             .getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH)
@@ -130,6 +146,9 @@ public class Resource {
         }
     }
 
+    /**
+     * Gets a server configuration element from the server.properties file
+     */
     public static String getServerConfig(String element) {
         return serverConfig.getString(element);
     }
@@ -151,14 +170,28 @@ public class Resource {
     }
 
 
+    /**
+     * Get the {@link Set} of {@link Region} for the given phase. The people contained in these
+     * regions (and the list of regions and zones) are loaded from the resource files
+     */
     public static Set<Region> getSample(Phase1KG phase) {
         return Region.fromSample(SamplesResource.getSample(phase));
     }
 
+    /**
+     * Gets the list of phases declared in the resource file sample/phaseList.txt <br>
+     * This included unsupported ones. <br>
+     * See also {@link #isSupported(Phase1KG)}
+     */
     public static Set<Phase1KG> getPhases() {
         return SamplesResource.getPhases().keySet();
     }
 
+    /**
+     * Check if the given {@link Phase1KG phase} is currently supported. <br>
+     * To support a new phase, add a new phase file in the sample resource folder, and declare it
+     * in the samples/phaseList.txt file
+     */
     public static boolean isSupported(Phase1KG phase) {
         return !SamplesResource.getPhases().get(phase).isBlank();
     }
