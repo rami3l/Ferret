@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.List;
 
 @AllArgsConstructor
-public class GenesNotFoundException extends RuntimeException {
+public class ConversionIncompleteException extends RuntimeException {
     @Getter
     private final List<String> notFound;
 }

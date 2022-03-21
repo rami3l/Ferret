@@ -50,7 +50,7 @@ public class GuiUtils {
     public Optional<File> chooseFile(Component parent, boolean save) {
         var fileChooser = save ? new SaveFileChooser() : new OpenFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setDialogTitle(Resource.getTextElement(save ? "run.save" : "gene.selectfile"));
+        fileChooser.setDialogTitle(Resource.getTextElement(save ? "run.save" : "input.selectfile"));
         int returnVal = fileChooser.showDialog(parent,
                 Resource.getTextElement(save ? "run.saveButtonText" : "gene.openButtonText"));
         if (returnVal == JFileChooser.APPROVE_OPTION) {

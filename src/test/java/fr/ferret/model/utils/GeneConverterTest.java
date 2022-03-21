@@ -1,15 +1,16 @@
 package fr.ferret.model.utils;
 
+import fr.ferret.model.locus.GeneConversion;
 import fr.ferret.utils.Resource;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GeneConverterTest {
-
 
     private InputStream getContent(String file) {
         return Resource.class.getClassLoader().getResourceAsStream(file);

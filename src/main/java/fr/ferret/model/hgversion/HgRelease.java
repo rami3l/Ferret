@@ -1,6 +1,7 @@
 package fr.ferret.model.hgversion;
 
 import fr.ferret.model.utils.XmlParser;
+import fr.ferret.utils.Conversion;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -61,6 +62,15 @@ public class HgRelease {
 
         return versionOpt.flatMap(v -> assVersionOpt
                 .map(assVersion -> new HgRelease(v[0], Integer.parseInt(v[1]), assVersion)));
+    }
 
+    public static HgRelease from(String hgVersion) {
+        var versionAndPatch = hgVersion.split("\\.p");
+        var version = versionAndPatch[0];
+        int patch = 0;
+        if(versionAndPatch.length > 1 && Conversion.isInteger(versionAndPatch[1])) {
+            patch = Integer.parseInt(versionAndPatch[1]);
+        }
+        return new HgRelease(version, patch, -1);
     }
 }

@@ -1,33 +1,27 @@
 package fr.ferret.model.conversions;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import java.io.File;
+import fr.ferret.model.Phase1KG;
+import fr.ferret.model.SampleSelection;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.stream.Stream;
 
-import fr.ferret.model.locus.Locus;
-import fr.ferret.model.vcf.VcfExport;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.io.TempDir;
-import fr.ferret.controller.settings.Phases1KG;
-import fr.ferret.model.ZoneSelection;
-import fr.ferret.utils.Resource;
-import reactor.core.publisher.Flux;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VcfConverterTest {
     private final String chr = "1";
     //private final int start = 196194909;
     //private final int end = 196194913;
-    private final Phases1KG phase = Phases1KG.V3;
+    private final Phase1KG phase = new Phase1KG("phase3", "Phase 3");
     //private final String vcfSource = "src/test/resources/chr1-africans-phase3.vcf.gz";
     private final String vcfPath = "src/test/resources/chr1-africans-phase3.vcf";
-    private final ZoneSelection selection = new ZoneSelection().add("AFR", List.of("MSL"));
+    // TODO: if we need toRegion::getZones correct this → see IgsrClientTest L72
+    private final SampleSelection selection = new SampleSelection(); //.add("AFR", List.of("MSL"));
 
 
     //@BeforeAll
@@ -54,7 +48,7 @@ class VcfConverterTest {
     void testToInfo(@TempDir Path tempDir) throws Exception {
         var outPath = tempDir.resolve("test.info");
 
-        var samples = Resource.getSamples(phase, selection);
+        var samples = selection.getSample();
         VcfConverter.toInfo(vcfPath, outPath.toString());
 
         var got = Files.readAllLines(outPath);
@@ -67,7 +61,7 @@ class VcfConverterTest {
     void testToMap(@TempDir Path tempDir) throws Exception {
         var outPath = tempDir.resolve("test.map");
 
-        var samples = Resource.getSamples(phase, selection);
+        var samples = selection.getSample();
         VcfConverter.toMap(vcfPath, outPath.toString());
 
         var got = Files.readAllLines(outPath);
