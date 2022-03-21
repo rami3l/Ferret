@@ -4,11 +4,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Map;
 import javax.swing.JFormattedTextField;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import fr.ferret.model.Phase1KG;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.header.ferret.SettingsFrame;
@@ -40,7 +43,7 @@ public class SettingsFrameController {
 
         private final FerretFrame ferretFrame;
         private final SettingsFrame settingsFrame;
-        private final JRadioButton[] phaseButtons;
+        private final Map<Phase1KG, JRadioButton> phaseButtons;
         private final JRadioButton[] humanVersionButtons;
         private final JFormattedTextField mafText;
         private final JRadioButton allFilesButton;
@@ -49,18 +52,11 @@ public class SettingsFrameController {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Phases1KG selected = null;
-            for (int i = 0; i < phaseButtons.length; i++) {
-                JRadioButton button = phaseButtons[i];
-                if (button.isSelected()) {
-                    selected = Phases1KG.values()[i];
-                    break;
-                }
-            }
-            if (selected == null) {
-                throw new IllegalStateException("No phases selected");
-            }
-            Resource.config().setSelectedVersion(selected);
+            // If a phase is selected (which should be the case), the selected phase is updated
+            phaseButtons.entrySet().stream()
+                .filter(entry -> entry.getValue().isSelected())
+                .map(Map.Entry::getKey).findFirst()
+                .ifPresent(selectedPhase -> Resource.config().setSelectedPhase(selectedPhase));
 
             Resource.config().setMafThreshold(((Number) mafText.getValue()).doubleValue());
             if (allFilesButton.isSelected()) {
