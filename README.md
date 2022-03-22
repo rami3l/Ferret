@@ -2,6 +2,7 @@
 
 [![Java Version](https://img.shields.io/badge/Java-v17-red?style=flat-square)](https://openjdk.java.net/projects/jdk/17)
 [![Gradle Version](https://img.shields.io/badge/Gradle-v7-red?style=flat-square)](https://gradle.org/install/)
+[![Javadoc](https://img.shields.io/badge/API-Javadoc-red?style=flat-square)](https://rami3l.github.io/Ferret/)
 [![Release](https://img.shields.io/github/v/release/rami3l/Ferret?include_prereleases&style=flat-square)][releases]
 [![License](https://img.shields.io/github/license/rami3l/Ferret?style=flat-square)](LICENSE)
 
@@ -66,7 +67,7 @@ As a portable, self-contained `.jar` executable, **no installation is required**
 
 No explicit uninstallation process is required.
 
-However, it might be useful to delete the cache folder at `~/config/ferret`.
+However, it might be useful to delete the cache folder at `~/.config/ferret`.
 
 ## References
 
