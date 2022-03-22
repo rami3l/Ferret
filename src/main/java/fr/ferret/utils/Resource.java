@@ -17,6 +17,7 @@ import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.model.Phase1KG;
 import fr.ferret.model.Region;
 import fr.ferret.model.conversions.Pedigree;
+import fr.ferret.model.utils.FileWriter;
 import lombok.experimental.UtilityClass;
 import org.spongepowered.configurate.ConfigurateException;
 import reactor.core.publisher.Mono;
@@ -53,6 +54,10 @@ public class Resource {
     public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
     public static final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
     public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
+
+    // TODO: include in FerretConfig
+    public static final FileWriter.VCFOutputType VCF_OUTPUT_TYPE = FileWriter.VCFOutputType.VCF;
+    public static final boolean WRITE_VCF_INDEX = false;
 
     public static FerretConfig config() {
         return config;
