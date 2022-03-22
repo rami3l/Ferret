@@ -3,10 +3,10 @@ package fr.ferret.controller.settings;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.ferret.model.Phase1KG;
 import fr.ferret.model.hgversion.HgVersion;
 import org.apache.commons.lang3.SystemUtils;
 import org.spongepowered.configurate.ConfigurateException;
@@ -30,7 +30,7 @@ public class FerretConfig {
      * Version du projet 1KG utilisée
      */
     @Builder.Default
-    private Phases1KG selectedVersion = Phases1KG.V3;
+    private Phase1KG selectedPhase = new Phase1KG("phase3", "Phase 3");
 
     /**
      * Selected output file type

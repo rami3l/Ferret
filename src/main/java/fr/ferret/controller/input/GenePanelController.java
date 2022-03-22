@@ -1,41 +1,39 @@
-package fr.ferret.controller;
+package fr.ferret.controller.input;
 
 import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
-import fr.ferret.controller.exceptions.GenesNotFoundException;
+import fr.ferret.controller.input.common.NeedingConversionPanelController;
 import fr.ferret.controller.state.Error;
-import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.locus.GeneConversion;
 import fr.ferret.model.locus.Locus;
-import fr.ferret.model.locus.LocusBuilding;
 import fr.ferret.model.state.PublishingStateProcessus;
-import fr.ferret.model.state.State;
 import fr.ferret.model.utils.FileReader;
-import fr.ferret.model.vcf.VcfExport;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.panel.StatePanel;
 import fr.ferret.view.panel.inputs.GenePanel;
 
 import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * The {@link GenePanel} controller
  */
-public class GenePanelController extends InputPanelController<GenePanel> {
+public class GenePanelController extends NeedingConversionPanelController {
+
+    /** The panel which is controlled by this controller */
+    private final GenePanel panel;
 
     private static final Logger logger = Logger.getLogger(GenePanelController.class.getName());
 
     public GenePanelController(FerretFrame frame) {
-        super(frame, frame.getGenePanel());
+        super(frame);
+        panel = frame.getGenePanel();
     }
 
     public void validateInfoAndRun() {
@@ -68,6 +66,19 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         boolean geneFileExtensionError = false;
         boolean invalidCharacter = false;
 
+        // windowSize field must be an integer or be empty (0 as default value)
+        String snpWindowSizeText = panel.getBpField().getText();
+        boolean validWindowSizeEntered = true;
+        int windowSize = 0;
+
+        if(!snpWindowSizeText.isBlank()) {
+            try {
+                windowSize = Integer.parseInt(snpWindowSizeText);
+            } catch (Exception e) {
+                validWindowSizeEntered = false;
+            }
+        }
+
         // Invalid characters for the genes names/ids (inputted as a list or a file)
         // This is everything except letters and numbers, including underscore
         var invalidRegex = ".*[^a-zA-Z0-9\\-].*";
@@ -99,71 +110,30 @@ public class GenePanelController extends InputPanelController<GenePanel> {
             var locale = new Locale("all");
             geneList = geneList.stream().map(text -> text.toUpperCase(locale)).toList();
 
-            convertGenesAndDownloadVcf(populations, geneList);
-
-            // TODO LINK WITH MODEL - see LocusPanelController to know how to deal with the file
+            convertAndDownloadVcf(populations, geneList, windowSize);
 
         } else {
             displayError(geneListInputted, geneFileImported, geneFileError, geneFileExtensionError,
-                    invalidCharacter, popSelected);
+                    invalidCharacter, popSelected, validWindowSizeEntered);
         }
     }
 
-    private void convertGenesAndDownloadVcf(ZoneSelection populations, List<String> geneList) {
-        run(outFile -> {
-            var assemblyAccVer = Resource.getAssemblyAccessVersion();
-            logger.log(Level.INFO, "Starting gene research using {0} assembly accession version...", assemblyAccVer);
-            var download = frame.getBottomPanel().addState("Starting download", outFile);
-
-            // Sets the locus building processus
-            var locusProcessing = new LocusBuilding(geneList, assemblyAccVer);
-            download.setAssociatedProcessus(locusProcessing);
-
-            var notFound = new AtomicReference<>("");
-
-            // Starts the processus and subscribes to its state
-            locusProcessing.start()
-                .doOnComplete(
-                    () -> {
-                        if("".equals(notFound.get()) || ExceptionHandler.genesNotFoundMessage(notFound.get())) {
-                            downloadVcf(populations, outFile, locusProcessing.getResult(), download);
-                        } else {
-                            download.cancel();
-                            logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
-                        }
-                    }
-                ).doOnError(e -> {
-                    logger.log(Level.WARNING, "Error while downloading or writing", e);
-                    download.error();
-                    ExceptionHandler.show(e);
-                }).doOnNext(state -> {
-                    if(state.getAction()== State.States.CONFIRM_CONTINUE
-                            && state.getObjectBeingProcessed() instanceof GenesNotFoundException e) {
-                        notFound.set(String.join(",", e.getNotFound()));
-                    } else if(state.getAction() == State.States.CANCELLED) {
-                        logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
-                    }
-                })
-                .subscribe(download::setState);
-        });
+    @Override
+    protected boolean confirmContinue(String notFound) {
+        return ExceptionHandler.genesNotFoundMessage(notFound);
     }
 
-    private void downloadVcf(ZoneSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
-        logger.log(Level.INFO, "Starting locus download...");
-        // Sets the vcf export processus
-        var vcfProcessus = new VcfExport(locusList, outFile).setFilter(populations);
-        download.setAssociatedProcessus(vcfProcessus);
-
-        // Subscribes to the state of the launched processus via the StatePublisher
-        vcfProcessus.start().doOnComplete(download::complete).doOnError(e -> {
-            logger.log(Level.WARNING, "Error while downloading or writing");
-            download.error();
-        }).subscribe(download::setState);
+    @Override
+    protected PublishingStateProcessus<List<Locus>> getConversionProcessus(List<String> geneList) {
+        var assemblyAccVer = Resource.getAssemblyAccessVersion();
+        logger.log(Level.INFO, "Starting gene research using {0} assembly accession version...", assemblyAccVer);
+        return new GeneConversion(geneList, assemblyAccVer);
     }
+
 
     private void displayError(boolean geneListInputted, boolean geneFileImported,
             boolean geneFileError, boolean geneFileExtensionError, boolean invalidCharacter,
-            boolean popSelected) {
+            boolean popSelected, boolean validWindowSizeEntered) {
 
         JComponent inputField = panel.getInputField();
         JComponent runButton = panel.getFileSelector().getRunButton();
@@ -187,6 +157,9 @@ public class GenePanelController extends InputPanelController<GenePanel> {
         }
         if (!popSelected) {
             error.append("run.selectpop").highlight(frame.getRegionPanel());
+        }
+        if (!validWindowSizeEntered) {
+            error.append("run.selectvari.wsize").highlight(panel.getBpField());
         }
         error.show();
     }

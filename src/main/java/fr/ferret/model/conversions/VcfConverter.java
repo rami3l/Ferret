@@ -75,7 +75,7 @@ public class VcfConverter {
         try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
             // A `distilled` VCF file should have for its header all the samples in question.
             var pedigrees = Resource.getPedigrees();
-            ((VCFHeader) reader.getHeader()).getGenotypeSamples().stream()
+            ((VCFHeader) reader.getHeader()).getGenotypeSamples()
                     .forEach(ThrowingConsumer.unchecked(sample -> {
                         // A pedigree record from the `pedigrees` table.
                         var pedigree = pedigrees.get(sample);

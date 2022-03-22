@@ -18,6 +18,7 @@ public class Message {
     static {
         stateTexts.put(State.States.GENE_NAME_TO_ID, "state.geneNameToId");
         stateTexts.put(State.States.GENE_ID_TO_LOCUS, "state.geneIdToLocus");
+        stateTexts.put(State.States.VARIANT_ID_TO_LOCUS, "state.variantIdToLocus");
         stateTexts.put(State.States.DOWNLOADING_HEADER, "state.downloadingHeader");
         stateTexts.put(State.States.DOWNLOADING_LINES, "state.downloadingLines");
         stateTexts.put(State.States.WRITING, "state.writingFile");
