@@ -2,22 +2,25 @@ package fr.ferret.model.vcf;
 
 import fr.ferret.model.utils.VCFHeaderExt;
 import htsjdk.samtools.util.CloseableIterator;
+import htsjdk.samtools.util.DelegatingIterator;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFHeader;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 
 @Getter
-@AllArgsConstructor
 public class VcfObject {
 
     private final VCFHeader header;
     private final CloseableIterator<VariantContext> variants;
+
+    public VcfObject(VCFHeader header, Iterator<VariantContext> variants) {
+        this.header = header;
+        this.variants = new DelegatingIterator<>(variants);
+    }
 
     public VcfObject filter(Set<String> samples) {
 
@@ -27,24 +30,9 @@ public class VcfObject {
         // We filter the header
         var filteredHeader = VCFHeaderExt.subVCFHeaderFromSamples(header, samples);
 
-        return new VcfObject(filteredHeader, new VariantIterator(filteredVariants.iterator()));
+        return new VcfObject(filteredHeader, filteredVariants.iterator());
 
     }
 
-    private record VariantIterator(Iterator<VariantContext> iterator)
-        implements CloseableIterator<VariantContext> {
-
-        @Override public void close() {
-            // We do not have any resource to close
-        }
-
-        @Override public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override public VariantContext next() throws NoSuchElementException {
-            return iterator.next();
-        }
-    }
 }
 

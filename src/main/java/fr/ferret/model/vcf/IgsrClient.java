@@ -1,6 +1,5 @@
 package fr.ferret.model.vcf;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -17,7 +16,7 @@ import reactor.core.publisher.Mono;
 /**
  * Simple query client for the IGSR (International Genome Sample Resource).
  */
-public class IgsrClient implements Closeable {
+public class IgsrClient implements AutoCloseable {
     private static final Logger logger = Logger.getLogger(IgsrClient.class.getName());
 
     /**

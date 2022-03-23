@@ -153,7 +153,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
      * @return this {@link VcfExport}
      */
     public VcfExport setFilter(SampleSelection selection) {
-        // TODO: see comment on SampleSelection#getPeopleFor
+        // If the selection.isAllSelected() is true, there is no need to filter the vcf
         if(!selection.isAllSelected()) {
             samples = selection.getSample();
         }

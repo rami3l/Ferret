@@ -25,11 +25,11 @@ class IgsrClientTest {
     private final int end = 46370880;
     private final Phase1KG phase = new Phase1KG("phase3", "Phase 3");
     private final String vcfPath = "src/test/resources/1kg/phase3/CCR5-Europeans.vcf.gz";
-    private final IgsrClient igsrClient = new IgsrClient(vcfPath);
 
     @Test
     void testBasicQuery() throws IOException {
 
+        var igsrClient = new IgsrClient(vcfPath);
         var reader = igsrClient.getReader(chr).block();
         assertNotNull(reader);
 
@@ -37,7 +37,6 @@ class IgsrClientTest {
         var fields = it.next();
         it.close();
         reader.close();
-
 
         assertAll(
                 // Fixed fields:
@@ -64,7 +63,8 @@ class IgsrClientTest {
                 () -> assertEquals("A|A", fields.getGenotype("NA20832").getGenotypeString()),
                 () -> assertEquals("G|A", fields.getGenotype("NA20826").getGenotypeString()),
                 () -> assertEquals("G|G", fields.getGenotype("NA20822").getGenotypeString()),
-                () -> assertEquals("A|G", fields.getGenotype("NA20813").getGenotypeString()));
+                () -> assertEquals("A|G", fields.getGenotype("NA20813").getGenotypeString())
+        );
 
         igsrClient.close();
     }
@@ -72,7 +72,9 @@ class IgsrClientTest {
     @Test
     void testWriteVCFFromSample(@TempDir Path tempDir) throws IOException {
 
-        try (var reader = igsrClient.getReader(chr).block(); var it = reader.query(chr, start, end)) {
+        try (var igsrClient = new IgsrClient(vcfPath)) {
+            var reader = igsrClient.getReader(chr).block();
+            var it = reader.query(chr, start, end);
 
             var samples = Resource.getSample(phase).stream()
                 .filter(region -> "EUR".equals(region.getAbbrev()))
@@ -101,7 +103,6 @@ class IgsrClientTest {
                         () -> assertEquals(variants.size(), tempReader.iterator().stream().count())
                 );
             }
-            igsrClient.close();
         }
     }
 }
