@@ -70,8 +70,8 @@ public class IgsrClient implements AutoCloseable {
     }
 
     /**
-     * Close all VCF readers created by this IgsrClient. You should call this method at the end of
-     * the download to avoid memory leaks (but not before the end of the download).
+     * Closes all the VCF readers created by this IgsrClient. You should call this method at the end
+     * of the download to avoid memory leaks (but not before the end of the download).
      */
     public void close() {
         readers.values().forEach(reader -> {

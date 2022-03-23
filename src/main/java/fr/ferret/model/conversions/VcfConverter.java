@@ -8,12 +8,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import com.pivovarit.function.ThrowingConsumer;
+import fr.ferret.model.vcf.VcfObject;
 import fr.ferret.utils.Resource;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.tribble.TribbleIndexedFeatureReader;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFCodec;
-import htsjdk.variant.vcf.VCFHeader;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
@@ -36,25 +36,20 @@ public class VcfConverter {
         return ctx.hasID() ? ctx.getID() : String.format("%s:%d", ctx.getContig(), ctx.getStart());
     }
 
-    private static FeatureReader<VariantContext> vcfTribbleReader(String vcfPath)
-            throws IOException {
-        return new TribbleIndexedFeatureReader<>(vcfPath, new VCFCodec(), false);
-    }
-
     private static BufferedWriter truncatingFileWriter(String outPath) throws IOException {
         return Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
                 StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     /**
-     * Read the given VCF file and create the corresponding FRQ file, returning its relative path.
+     * Writes a Frq file from a {@link VcfObject}.
      * 
-     * @param vcfPath relative path to the VCF file we want to convert.
+     * @param vcf The {@link VcfObject} to convert to Frq
+     * @param outPath The path to write the Frq file to
      */
-    public static String toFrq(String vcfPath, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
-            var variants = reader.iterator();
-            variants.forEach(ThrowingConsumer.unchecked(variant -> {
+    public static String toFrq(VcfObject vcf, String outPath) throws IOException {
+        try (var writer = truncatingFileWriter(outPath)) {
+            vcf.getVariants().stream().forEach(ThrowingConsumer.unchecked(variant -> {
                 var rec = new FrqRecord(variant);
                 writer.write(rec.toString());
                 writer.newLine();
@@ -66,20 +61,21 @@ public class VcfConverter {
     }
 
     /**
-     * Read the given VCF file and create the corresponding PED file, returning their relative path.
-     * 
-     * @param vcfPath path to the VCF file we want to convert.
-     * @param outPath path ti the output file.
+     * Writes a Ped file from a {@link VcfObject}.
+     *
+     * @param vcf The {@link VcfObject} to convert to Ped
+     * @param outPath The path to write the Ped file to
      */
-    public static String toPed(String vcfPath, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
+    public static String toPed(VcfObject vcf, String outPath) throws IOException {
+        try (var writer = truncatingFileWriter(outPath)) {
             // A `distilled` VCF file should have for its header all the samples in question.
             var pedigrees = Resource.getPedigrees();
-            ((VCFHeader) reader.getHeader()).getGenotypeSamples()
+            var variantList = vcf.getVariants().toList();
+            vcf.getHeader().getGenotypeSamples()
                     .forEach(ThrowingConsumer.unchecked(sample -> {
                         // A pedigree record from the `pedigrees` table.
                         var pedigree = pedigrees.get(sample);
-                        var variants = reader.iterator().stream()
+                        var variants = variantList.stream()
                                 .map(ctx -> GenotypePair.of(ctx, sample)).toList();
                         var pedRecord = new PedRecord(pedigree, variants);
                         writer.write(pedRecord.toString());
@@ -92,13 +88,14 @@ public class VcfConverter {
     }
 
     /**
-     * Read the given VCF file and create the corresponding MAP file, returning their relative path.
-     * 
-     * @param vcfPath relative path to the VCF file we want to convert.
+     * Writes a Map file from a {@link VcfObject}.
+     *
+     * @param vcf The {@link VcfObject} to convert to Map
+     * @param outPath The path to write the Map file to
      */
-    public static String toMap(String vcfPath, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
-            for (var variant : reader.iterator()) {
+    public static String toMap(VcfObject vcf, String outPath) throws IOException {
+        try (var writer = truncatingFileWriter(outPath);) {
+            for (var variant : vcf.getVariants().toList()) {
                 writer.write(new MapRecord(variant).toString());
                 writer.newLine();
             }
@@ -107,13 +104,14 @@ public class VcfConverter {
     }
 
     /**
-     * Read the given VCF file and create the corresponding INFO file, returning its relative path.
-     * 
-     * @param vcfPath relative path to the VCF file we want to convert.
+     * Writes an Info file from a {@link VcfObject}.
+     *
+     * @param vcf The {@link VcfObject} to convert to Info
+     * @param outPath The path to write the Info file to
      */
-    public static String toInfo(String vcfPath, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath); var reader = vcfTribbleReader(vcfPath)) {
-            for (var variant : reader.iterator()) {
+    public static String toInfo(VcfObject vcf, String outPath) throws IOException {
+        try (var writer = truncatingFileWriter(outPath)) {
+            for (var variant : vcf.getVariants().toList()) {
                 writer.write(new InfoRecord(variant).toString());
                 writer.newLine();
             }
