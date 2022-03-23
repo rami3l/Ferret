@@ -16,8 +16,7 @@ class VariantConversionTest {
 
     @BeforeAll
     void init() throws Exception {
-        String idUrlTemplate = "ncbi/variant-id-to-locus/%s.json";
-        // TODO: this seems to take effect only after the tests...
+        String idUrlTemplate = TestUtils.toURI("ncbi/variant-id-to-locus/%s.json");
         TestUtils.setFinalStatic(VariantConversion.class, "ID_URL_TEMPLATE", idUrlTemplate);
     }
 
@@ -31,7 +30,6 @@ class VariantConversionTest {
         // ACT
         conversion.start().blockLast();
         var locusList = conversion.getResult();
-        System.out.println(locusList);
 
         // ASSERT
         assertThat(locusList).containsExactly(new Locus("8", 6615836, 6615836));

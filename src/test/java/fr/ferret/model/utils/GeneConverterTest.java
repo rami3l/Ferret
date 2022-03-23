@@ -67,7 +67,7 @@ class GeneConverterTest {
     void getIdFromUnknownName_ShouldReturnEmpty() {
         // ARRANGE
         // https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&term=unknown[GENE]%20AND%20human[ORGN]&retmode=json
-        var json = new JsonDocument(TestUtils.getContent("ncbi/gene-name-to-id/unknown.json"));
+        var json = new JsonDocument(TestUtils.getContent("ncbi/gene-name-to-id/UNKNOWN.json"));
 
         // ACT
         var id = GeneConverter.extractId(json).blockOptional();

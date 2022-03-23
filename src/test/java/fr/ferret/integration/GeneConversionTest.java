@@ -16,9 +16,8 @@ class GeneConversionTest {
 
     @BeforeAll
     void init() throws Exception {
-        String idUrlTemplate = "ncbi/gene-id-to-locus/%s.json";
-        String nameUrlTemplate = "ncbi/gene-name-to-id/%s.json";
-        // TODO: this seems to take effect only after the tests...
+        String idUrlTemplate = TestUtils.toURI("ncbi/gene-id-to-locus/%s.json");
+        String nameUrlTemplate = TestUtils.toURI("ncbi/gene-name-to-id/%s.json");
         TestUtils.setFinalStatic(GeneConversion.class, "ID_URL_TEMPLATE", idUrlTemplate);
         TestUtils.setFinalStatic(GeneConversion.class, "NAME_URL_TEMPLATE", nameUrlTemplate);
     }
