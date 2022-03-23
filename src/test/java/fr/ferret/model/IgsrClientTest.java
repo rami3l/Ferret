@@ -65,6 +65,8 @@ class IgsrClientTest {
                 () -> assertEquals("G|A", fields.getGenotype("NA20826").getGenotypeString()),
                 () -> assertEquals("G|G", fields.getGenotype("NA20822").getGenotypeString()),
                 () -> assertEquals("A|G", fields.getGenotype("NA20813").getGenotypeString()));
+
+        igsrClient.close();
     }
 
     @Test
@@ -97,16 +99,9 @@ class IgsrClientTest {
                         () -> assertEquals(samples.size(), header.getNGenotypeSamples()),
                         // The size of contexts remains the same before and after truncation.
                         () -> assertEquals(variants.size(), tempReader.iterator().stream().count())
-                        // The wrapped method works in exactly the same way as this test case.
-                        //() -> {
-                        //    var oldContent = Files.readString(tempVcfPath);
-                        //    var newTempVCFPath = tempDir.resolve("test2.vcf");
-                        //    var newTempVCF = newTempVCFPath.toFile();
-                        //    igsrClient.exportVCFFromSamples(newTempVCF, start, end, selection)
-                        //            .blockLast();
-                        //    assertEquals(oldContent, Files.readString(newTempVCFPath));
-                        );
+                );
             }
+            igsrClient.close();
         }
     }
 }

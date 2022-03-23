@@ -2,7 +2,6 @@ package fr.ferret.model.vcf;
 
 import com.pivovarit.function.ThrowingFunction;
 import fr.ferret.controller.exceptions.VcfStreamingException;
-import fr.ferret.model.Phase1KG;
 import fr.ferret.model.SampleSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.state.PublishingStateProcessus;
@@ -37,15 +36,20 @@ public class VcfExport extends PublishingStateProcessus<Void> {
 
     private static final Logger logger = Logger.getLogger(VcfExport.class.getName());
 
+    /** When error while contacting the server, we retry several times */
     private static final int NB_RETRY = 3;
     private static final Duration RETRY_DELAY = Duration.ofMillis(500);
 
+    /**
+     * The individuals to keep in the VCF file. If null, no population filter will be performed
+     */
     private Set<String> samples;
 
     /**
-     * The phase to use for getting variants (default: selected version)
+     * The client used to download the vcf. It uses the url template for the selected phase
      */
-    private final Phase1KG phase1KG = Resource.config().getSelectedPhase();
+    private final IgsrClient client =
+        new IgsrClient(Resource.getVcfUrlTemplate(Resource.config().getSelectedPhase()));
 
     /**
      * Constructs a {@link VcfExport}. It is used to export a "distilled" VCF file from an IGSR
@@ -69,7 +73,8 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                 publishState(State.written(outFile.getName()));
                 logger.info("File written");
             })
-            .doOnError(this::publishErrorAndCancel).then();
+            .doOnError(this::publishErrorAndCancel)
+            .doFinally(s -> client.close()).then();
     }
 
     /**
@@ -92,7 +97,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
      */
     private Mono<FeatureReader<VariantContext>> getReader(String chromosome) {
         // TODO: each getReader call could get into an IOException Error
-        var client =new IgsrClient(Resource.getVcfUrlTemplate(phase1KG));
+
         return Mono.defer(() -> client.getReader(chromosome))
             .doOnSubscribe(s -> {
                 publishState(State.downloadingHeader(chromosome));

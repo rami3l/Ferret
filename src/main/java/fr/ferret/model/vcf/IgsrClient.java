@@ -1,5 +1,6 @@
 package fr.ferret.model.vcf;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -16,11 +17,12 @@ import reactor.core.publisher.Mono;
 /**
  * Simple query client for the IGSR (International Genome Sample Resource).
  */
-public class IgsrClient {
+public class IgsrClient implements Closeable {
     private static final Logger logger = Logger.getLogger(IgsrClient.class.getName());
 
     /**
-     * Cached readers for each chromosome
+     * Cached readers for each chromosome (to avoid downloading multiple times the same vcf header
+     * during one Ferret Request which may contains multiple genes/variants on the same chromosome)
      */
     private final Map<String, FeatureReader<VariantContext>> readers = new HashMap<>();
 
@@ -66,6 +68,22 @@ public class IgsrClient {
     public Mono<FeatureReader<VariantContext>> getReader(String chromosome) {
         var reader = readers.get(chromosome);
         return Mono.fromCallable(() -> reader == null ? initReader(chromosome) : reader);
+    }
+
+    /**
+     * Close all VCF readers created by this IgsrClient. You should call this method at the end of
+     * the download to avoid memory leaks (but not before the end of the download).
+     */
+    public void close() {
+        readers.values().forEach(reader -> {
+            try {
+                reader.close();
+            } catch (Exception e) {
+                logger.warning("Failed to close a VCF reader");
+            }
+        });
+        readers.clear();
+        logger.info("IgsrClient closed");
     }
 
 }
