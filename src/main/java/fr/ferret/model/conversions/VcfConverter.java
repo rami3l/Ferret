@@ -10,10 +10,7 @@ import java.util.List;
 import com.pivovarit.function.ThrowingConsumer;
 import fr.ferret.model.vcf.VcfObject;
 import fr.ferret.utils.Resource;
-import htsjdk.tribble.FeatureReader;
-import htsjdk.tribble.TribbleIndexedFeatureReader;
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.vcf.VCFCodec;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
@@ -23,7 +20,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class VcfConverter {
     /**
-     * List of the possible file extentions, without dot.
+     * List of the possible file extensions, without dot.
      */
     @Getter
     private static final List<String> fileExtensions = List.of("vcf", "frq", "map", "ped", "info");
@@ -48,7 +45,7 @@ public class VcfConverter {
      * @param outPath The path to write the Frq file to
      */
     public static String toFrq(VcfObject vcf, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath)) {
+        try (var writer = truncatingFileWriter(outPath + ".frq")) {
             vcf.getVariants().stream().forEach(ThrowingConsumer.unchecked(variant -> {
                 var rec = new FrqRecord(variant);
                 writer.write(rec.toString());
@@ -67,7 +64,7 @@ public class VcfConverter {
      * @param outPath The path to write the Ped file to
      */
     public static String toPed(VcfObject vcf, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath)) {
+        try (var writer = truncatingFileWriter(outPath + ".ped")) {
             // A `distilled` VCF file should have for its header all the samples in question.
             var pedigrees = Resource.getPedigrees();
             var variantList = vcf.getVariants().toList();
@@ -94,7 +91,7 @@ public class VcfConverter {
      * @param outPath The path to write the Map file to
      */
     public static String toMap(VcfObject vcf, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath);) {
+        try (var writer = truncatingFileWriter(outPath + ".map");) {
             for (var variant : vcf.getVariants().toList()) {
                 writer.write(new MapRecord(variant).toString());
                 writer.newLine();
@@ -110,7 +107,7 @@ public class VcfConverter {
      * @param outPath The path to write the Info file to
      */
     public static String toInfo(VcfObject vcf, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath)) {
+        try (var writer = truncatingFileWriter(outPath + ".info")) {
             for (var variant : vcf.getVariants().toList()) {
                 writer.write(new InfoRecord(variant).toString());
                 writer.newLine();

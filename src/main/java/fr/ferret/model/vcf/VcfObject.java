@@ -8,18 +8,31 @@ import htsjdk.variant.vcf.VCFHeader;
 import lombok.Getter;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 
-@Getter
 public class VcfObject {
 
+    @Getter
     private final VCFHeader header;
     private final CloseableIterator<VariantContext> variants;
+    private List<VariantContext> backedVariants;
 
     public VcfObject(VCFHeader header, Iterator<VariantContext> variants) {
         this.header = header;
         this.variants = new DelegatingIterator<>(variants);
+    }
+
+    public void backUp() {
+        if(backedVariants == null) {
+            backedVariants = variants.toList();
+            variants.close();
+        }
+    }
+
+    public CloseableIterator<VariantContext> getVariants() {
+        return backedVariants == null ? variants : new DelegatingIterator<>(backedVariants.iterator());
     }
 
     public VcfObject filter(Set<String> samples) {
@@ -31,8 +44,8 @@ public class VcfObject {
         var filteredHeader = VCFHeaderExt.subVCFHeaderFromSamples(header, samples);
 
         return new VcfObject(filteredHeader, filteredVariants.iterator());
-
     }
 
 }
+
 

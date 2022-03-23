@@ -1,8 +1,11 @@
 package fr.ferret.model.vcf;
 
 import com.pivovarit.function.ThrowingFunction;
+import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.VcfStreamingException;
+import fr.ferret.controller.settings.FileOutputType;
 import fr.ferret.model.SampleSelection;
+import fr.ferret.model.conversions.VcfConverter;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
@@ -20,10 +23,12 @@ import reactor.util.retry.Retry;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -59,7 +64,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
      * @param locusList The {@link List} of {@link Locus} to export in a VCF file.
      * @param outFile the output {@link File}
      */
-    public VcfExport(List<Locus> locusList, File outFile) {
+    public VcfExport(List<Locus> locusList, File outFile, FileOutputType outputType) {
         resultPromise = getVcf(locusList).subscribeOn(Schedulers.boundedElastic())
             .collect(Collectors.toList())
             .flatMap(this::merge).doOnNext(vcf -> {
@@ -69,12 +74,31 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                 }
                 publishState(State.writing(outFile.getName()));
                 logger.info("Writing to disk...");
-                FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
-                publishState(State.written(outFile.getName()));
-                logger.info("File written");
+                try {
+                    write(outFile, vcf, outputType);
+                    publishState(State.written(outFile.getName()));
+                    logger.info("File written");
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "Error while writing", e);
+                    publishErrorAndCancel(e);
+                }
             })
             .doOnError(this::publishErrorAndCancel)
             .doFinally(s -> client.close()).then();
+    }
+
+    private void write(File outFile, VcfObject vcf, FileOutputType outputType) throws IOException {
+        switch (outputType) {
+            case VCF -> FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
+            case FRQ -> VcfConverter.toFrq(vcf, outFile.getPath());
+            case ALL -> {
+                vcf.backUp();
+                VcfConverter.toFrq(vcf, outFile.getPath());
+                VcfConverter.toInfo(vcf, outFile.getPath());
+                VcfConverter.toMap(vcf, outFile.getPath());
+                VcfConverter.toPed(vcf, outFile.getPath());
+            }
+        }
     }
 
     /**
