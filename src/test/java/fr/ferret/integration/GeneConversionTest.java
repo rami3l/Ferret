@@ -1,6 +1,8 @@
-package fr.ferret.model.locus;
+package fr.ferret.integration;
 
 import fr.ferret.TestUtils;
+import fr.ferret.model.locus.GeneConversion;
+import fr.ferret.model.locus.Locus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -16,6 +18,7 @@ class GeneConversionTest {
     void init() throws Exception {
         String idUrlTemplate = "ncbi/gene-id-to-locus/%s.json";
         String nameUrlTemplate = "ncbi/gene-name-to-id/%s.json";
+        // TODO: this seems to take effect only after the tests...
         TestUtils.setFinalStatic(GeneConversion.class, "ID_URL_TEMPLATE", idUrlTemplate);
         TestUtils.setFinalStatic(GeneConversion.class, "NAME_URL_TEMPLATE", nameUrlTemplate);
     }

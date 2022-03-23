@@ -2,6 +2,7 @@ package fr.ferret;
 
 import sun.misc.Unsafe;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 
 
@@ -29,6 +30,10 @@ public class TestUtils {
 
         unsafe.putObject(fieldBase, fieldOffset, value);
 
+    }
+
+    public static InputStream getContent(String file) {
+        return TestUtils.class.getClassLoader().getResourceAsStream(file);
     }
 
 }

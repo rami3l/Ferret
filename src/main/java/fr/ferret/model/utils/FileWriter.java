@@ -69,7 +69,7 @@ public class FileWriter {
     private void writeVCF(File outFile, VCFHeader header, Stream<VariantContext> variants, OutputType outputType, boolean writeIndex) {
         // TODO: Can we get a sequence dictionary from another endpoint (if it is not present in the header) ?
         if(writeIndex && outputType!=OutputType.BLOCK_COMPRESSED_VCF && header.getSequenceDictionary()==null) {
-            // TODO: indicate that it's not possible to create the index file because the header doesn't contain a sequence dictionary
+            // TODO: ExceptionHandler → indicate that it's not possible to create the index file because the header doesn't contain a sequence dictionary
             writeIndex = false;
         }
         var writerBuilder = new VariantContextWriterBuilder().modifyOption(Options.INDEX_ON_THE_FLY, writeIndex);

@@ -1,5 +1,6 @@
 package fr.ferret.model.utils;
 
+import fr.ferret.TestUtils;
 import fr.ferret.model.locus.VariantConversion;
 import fr.ferret.utils.Resource;
 import org.junit.jupiter.api.Test;
@@ -11,19 +12,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class VariantConverterTest {
 
-    private InputStream getContent(String file) {
-        return Resource.class.getClassLoader().getResourceAsStream(file);
-    }
-
     @Test
     void getLocusFromJson_shouldReturnLocus() {
         // ARRANGE
         var hgVersion = "GRCh38";
-        var json = new JsonDocument(getContent("variant-id-to-locus.json"));
+        // https://www.ncbi.nlm.nih.gov/projects/SNP/snp_gene.cgi?connect=&rs=1257
+        var json = new JsonDocument(TestUtils.getContent("ncbi/variant-id-to-locus/1257.json"));
 
         // ACT
         var locus = VariantConverter.extractLocus(hgVersion, json).blockOptional();
-        locus.ifPresentOrElse(System.out::println, () -> System.out.println("Locus not found..."));
 
         // ASSERT
         assertTrue(locus.isPresent());
