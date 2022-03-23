@@ -37,11 +37,11 @@ public class VariantPanelController extends NeedingConversionPanelController {
 
     public void validateInfoAndRun() {
         // Reset the borders
-        panel.getVariantIdField().setBorder(null);
+        panel.getInputField().setBorder(null);
         panel.getFileSelector().getRunButton().setBorder(null);
         panel.getBpField().setBorder(null);
 
-        JTextField geneNameField = panel.getVariantIdField();
+        JTextField geneNameField = panel.getInputField();
 
         // Selected populations for the model
         var populations = getSelectedPopulations();
@@ -134,7 +134,7 @@ public class VariantPanelController extends NeedingConversionPanelController {
 
         var error = new Error(frame).append("run.fixerrors");
 
-        var idSelector = panel.getVariantIdField();
+        var idSelector = panel.getInputField();
         var runButton = panel.getFileSelector().getRunButton();
 
         if (!snpListInputted && !snpFileImported) {
