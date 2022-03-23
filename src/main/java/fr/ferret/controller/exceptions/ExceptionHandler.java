@@ -1,12 +1,8 @@
 package fr.ferret.controller.exceptions;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.UnknownHostException;
 import java.nio.file.FileSystemException;
-import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;

@@ -25,7 +25,7 @@ public class VariantConversion extends PublishingStateProcessus<List<Locus>> {
 
     private static final Logger logger = Logger.getLogger(VariantConversion.class.getName());
 
-    private static final String ID_URL_TEMPLATE = Resource.getServerConfig("ncbi.variant.idUrlTemplate");
+    public static final String ID_URL_TEMPLATE = Resource.getServerConfig("ncbi.variant.idUrlTemplate");
 
     private static final int NB_RETRY = 3;
     private static final Duration RETRY_DELAY = Duration.ofMillis(500);

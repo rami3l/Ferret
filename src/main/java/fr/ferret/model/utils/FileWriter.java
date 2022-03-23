@@ -3,6 +3,8 @@ package fr.ferret.model.utils;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.stream.Stream;
+
+import fr.ferret.utils.Resource;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.writer.Options;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
@@ -12,6 +14,10 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class FileWriter {
+
+    public enum VCFOutputType {
+        VCF, BCF, VCF_GZ
+    }
 
     // TODO: should we add a writeVCF(OutputStream, Stream<VariantContext>) method? It could be useful if we need VCF without header for conversion
 
@@ -41,9 +47,12 @@ public class FileWriter {
      */
     public void writeVCF(File outFile, VCFHeader header, Stream<VariantContext> variants) {
 
-        // TODO: add these options to the settings
-        var outputType = OutputType.VCF;
-        boolean writeIndex = false;
+        var outputType = switch (Resource.VCF_OUTPUT_TYPE) {
+            case VCF_GZ -> OutputType.BLOCK_COMPRESSED_VCF;
+            case BCF -> OutputType.BCF;
+            case VCF -> OutputType.VCF;
+        };
+        boolean writeIndex = Resource.WRITE_VCF_INDEX;
 
         writeVCF(outFile, header, variants, outputType, writeIndex);
     }
@@ -60,7 +69,7 @@ public class FileWriter {
     private void writeVCF(File outFile, VCFHeader header, Stream<VariantContext> variants, OutputType outputType, boolean writeIndex) {
         // TODO: Can we get a sequence dictionary from another endpoint (if it is not present in the header) ?
         if(writeIndex && outputType!=OutputType.BLOCK_COMPRESSED_VCF && header.getSequenceDictionary()==null) {
-            // TODO: indicate that it's not possible to create the index file because the header doesn't contain a sequence dictionary
+            // TODO: ExceptionHandler → indicate that it's not possible to create the index file because the header doesn't contain a sequence dictionary
             writeIndex = false;
         }
         var writerBuilder = new VariantContextWriterBuilder().modifyOption(Options.INDEX_ON_THE_FLY, writeIndex);

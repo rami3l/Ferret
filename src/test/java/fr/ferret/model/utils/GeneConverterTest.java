@@ -1,31 +1,26 @@
 package fr.ferret.model.utils;
 
-import fr.ferret.model.locus.GeneConversion;
+import fr.ferret.TestUtils;
 import fr.ferret.utils.Resource;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GeneConverterTest {
 
-    private InputStream getContent(String file) {
-        return Resource.class.getClassLoader().getResourceAsStream(file);
-    }
-
     @Test
     void getLocusFromFile_ShouldReturnLocus() {
         // ARRANGE
-        var id = "1234";
+        var id = "1234"; // we need the id to extract it because a json can contain multiple ids
         var assemblyAccVer = "GCF_000001405.39";
-        var json = new JsonDocument(getContent("gene-id-to-locus.json"));
+        // https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=1234&format=json
+        var json = new JsonDocument(TestUtils.getContent("ncbi/gene-id-to-locus/1234.json"));
 
         // ACT
         var locus = GeneConverter.extractLocus(id, assemblyAccVer, json).blockOptional();
-        locus.ifPresentOrElse(System.out::println, () -> System.out.println("Locus not found..."));
 
         // ASSERT
         assertTrue(locus.isPresent());
@@ -35,30 +30,50 @@ class GeneConverterTest {
     }
 
     @Test
+    void getLocusFromUnknownOrDiscontinuedId_ShouldReturnEmpty() {
+        // ARRANGE
+        var id1 = "123456"; // Discontinued
+        var id2 = "0"; // Unknown
+        var assemblyAccVer = "GCF_000001405.39";
+        // https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=123456&format=json
+        var json1 = new JsonDocument(TestUtils.getContent("ncbi/gene-id-to-locus/123456.json"));
+        // https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=0&format=json
+        var json2 = new JsonDocument(TestUtils.getContent("ncbi/gene-id-to-locus/0.json"));
+
+        // ACT
+        var locus1 = GeneConverter.extractLocus(id1, assemblyAccVer, json1).blockOptional();
+        var locus2 = GeneConverter.extractLocus(id2, assemblyAccVer, json2).blockOptional();
+
+        // ASSERT
+        assertTrue(locus1.isEmpty());
+        assertTrue(locus2.isEmpty());
+    }
+
+    @Test
     void getIdFromFile_ShouldReturnGeneId() {
         // ARRANGE
-        var name = "CR5";
-        var json = new JsonDocument(getContent("gene-name-to-id.json"));
+        // https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&term=CR5[GENE]%20AND%20human[ORGN]&retmode=json
+        var json = new JsonDocument(TestUtils.getContent("ncbi/gene-name-to-id/CR5.json"));
 
         // ACT
         var id = GeneConverter.extractId(json).blockOptional();
-        id.ifPresentOrElse(System.out::println, () -> System.out.println("Id not found..."));
 
         // ASSERT
         assertTrue(id.isPresent());
         assertEquals("22814", id.get());
     }
 
-
-    /** Tests for the locus builder (not real unit test because it reaches the server) **/
-
     @Test
-    void testLocusBuilder() {
-        var genes = List.of("KCNT2", "343450", "CCR5", "1234", "MICB", "4277", "IL6", "3569",
-                "APOL1", "8542", "4627", "MYH9");
-        // var genes = List.of("CR5", "1234");
-        var locusBuilding = new GeneConversion(genes, "GCF_000001405.39");
-        locusBuilding.start().doOnComplete(() -> System.out.println(locusBuilding.getResult())).blockLast();
+    void getIdFromUnknownName_ShouldReturnEmpty() {
+        // ARRANGE
+        // https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gene&term=unknown[GENE]%20AND%20human[ORGN]&retmode=json
+        var json = new JsonDocument(TestUtils.getContent("ncbi/gene-name-to-id/UNKNOWN.json"));
+
+        // ACT
+        var id = GeneConverter.extractId(json).blockOptional();
+
+        // ASSERT
+        assertTrue(id.isEmpty());
     }
 
 }
