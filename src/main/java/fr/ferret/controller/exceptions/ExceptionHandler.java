@@ -33,7 +33,7 @@ public class ExceptionHandler {
             ExceptionHandler.noIdFoundError(e);
         } catch (VcfStreamingException e) {
             ExceptionHandler.vcfStreamingError(e);
-        } catch (IOException e) {
+        } catch (FileWritingException e) {
             ExceptionHandler.fileWritingError(e);
         } catch (Throwable e) {
             ExceptionHandler.unknownError(e);

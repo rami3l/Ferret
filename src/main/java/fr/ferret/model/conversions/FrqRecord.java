@@ -1,5 +1,6 @@
 package fr.ferret.model.conversions;
 
+import fr.ferret.model.utils.VcfUtils;
 import htsjdk.variant.variantcontext.VariantContext;
 
 /**
@@ -8,7 +9,7 @@ import htsjdk.variant.variantcontext.VariantContext;
 public record FrqRecord(String chromosome, String variantId, GenotypePair genotype,
         RefFrequencyPair refFrequency) {
     public FrqRecord(VariantContext ctx) {
-        this(ctx.getContig(), VcfConverter.generateVariantId(ctx), GenotypePair.of(ctx),
+        this(ctx.getContig(), VcfUtils.generateVariantId(ctx), GenotypePair.of(ctx),
                 RefFrequencyPair.of(ctx));
     }
 

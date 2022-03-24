@@ -1,6 +1,6 @@
 package fr.ferret.model.vcf;
 
-import fr.ferret.model.utils.VCFHeaderExt;
+import fr.ferret.model.utils.VcfUtils;
 import htsjdk.samtools.util.CloseableIterator;
 import htsjdk.samtools.util.DelegatingIterator;
 import htsjdk.variant.variantcontext.VariantContext;
@@ -41,7 +41,7 @@ public class VcfObject {
         var filteredVariants = variants.stream().map(variant -> variant.subContextFromSamples(samples));
 
         // We filter the header
-        var filteredHeader = VCFHeaderExt.subVCFHeaderFromSamples(header, samples);
+        var filteredHeader = VcfUtils.subVCFHeaderFromSamples(header, samples);
 
         return new VcfObject(filteredHeader, filteredVariants.iterator());
     }

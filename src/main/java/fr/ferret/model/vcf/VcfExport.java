@@ -1,10 +1,10 @@
 package fr.ferret.model.vcf;
 
 import com.pivovarit.function.ThrowingFunction;
+import fr.ferret.controller.exceptions.FileWritingException;
 import fr.ferret.controller.exceptions.VcfStreamingException;
 import fr.ferret.controller.settings.FileOutputType;
 import fr.ferret.model.SampleSelection;
-import fr.ferret.model.conversions.VcfConverter;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
@@ -75,28 +75,36 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                 try {
                     write(outFile, vcf, outputType);
                     publishState(State.written(outFile.getName()));
-                    logger.info("File written");
+                    logger.info("File(s) written");
                 } catch (Exception e) {
                     logger.log(Level.WARNING, "Error while writing", e);
-                    publishErrorAndCancel(e);
+                    publishErrorAndCancel(new FileWritingException(e));
                 }
             })
             .doOnError(this::publishErrorAndCancel)
             .doFinally(s -> client.close()).then();
     }
 
+    /**
+     * Writes the data
+     * 
+     * @param outFile The filename to write the data to, without extension
+     * @param vcf The {@link VcfObject} containing the data
+     * @param outputType The output type (VCF, FRQ or ALL)
+     * @throws IOException
+     */
     private void write(File outFile, VcfObject vcf, FileOutputType outputType) throws IOException {
         var path = outFile.getPath() + ".";
         switch (outputType) {
             case VCF -> FileWriter.writeVCF(path + FileOutputType.Extension.VCF,
                     vcf.getHeader(), vcf.getVariants().stream());
-            case FRQ -> VcfConverter.toFrq(vcf, path + FileOutputType.Extension.FRQ);
+            case FRQ -> FileWriter.writeFRQ(vcf, path + FileOutputType.Extension.FRQ);
             case ALL -> {
                 vcf.backUp(); // Without doing this, we can only consume the VcfObject one time
-                VcfConverter.toFrq(vcf, path + FileOutputType.Extension.FRQ);
-                VcfConverter.toInfo(vcf, path + FileOutputType.Extension.INFO);
-                VcfConverter.toMap(vcf, path + FileOutputType.Extension.MAP);
-                VcfConverter.toPed(vcf, path + FileOutputType.Extension.PED);
+                FileWriter.writeFRQ(vcf, path + FileOutputType.Extension.FRQ);
+                FileWriter.writeINFO(vcf, path + FileOutputType.Extension.INFO);
+                FileWriter.writeMAP(vcf, path + FileOutputType.Extension.MAP);
+                FileWriter.writePED(vcf, path + FileOutputType.Extension.PED);
             }
         }
     }
@@ -120,8 +128,6 @@ public class VcfExport extends PublishingStateProcessus<Void> {
      * Creates a VCF reader for the given chromosome (downloads the VCF header)
      */
     private Mono<FeatureReader<VariantContext>> getReader(String chromosome) {
-        // TODO: each getReader call could get into an IOException Error
-
         return Mono.defer(() -> client.getReader(chromosome))
             .doOnSubscribe(s -> {
                 publishState(State.downloadingHeader(chromosome));
