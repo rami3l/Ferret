@@ -73,14 +73,16 @@ loadScripts(document, 'script');</script>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
 <div class="inheritance"><a href="common/InputPanelController.html" title="class in fr.ferret.controller.input.common">fr.ferret.controller.input.common.InputPanelController</a>
 <div class="inheritance"><a href="common/NeedingConversionPanelController.html" title="class in fr.ferret.controller.input.common">fr.ferret.controller.input.common.NeedingConversionPanelController</a>
+<div class="inheritance"><a href="common/FieldOrIdPanelController.html" title="class in fr.ferret.controller.input.common">fr.ferret.controller.input.common.FieldOrIdPanelController</a>
 <div class="inheritance">fr.ferret.controller.input.GenePanelController</div>
+</div>
 </div>
 </div>
 </div>
 <section class="class-description" id="class-description">
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">GenePanelController</span>
-<span class="extends-implements">extends <a href="common/NeedingConversionPanelController.html" title="class in fr.ferret.controller.input.common">NeedingConversionPanelController</a></span></div>
+<span class="extends-implements">extends <a href="common/FieldOrIdPanelController.html" title="class in fr.ferret.controller.input.common">FieldOrIdPanelController</a></span></div>
 <div class="block">The <a href="../../view/panel/inputs/GenePanel.html" title="class in fr.ferret.view.panel.inputs"><code>GenePanel</code></a> controller</div>
 </section>
 <section class="summary">
@@ -89,6 +91,9 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="field-summary" id="field-summary">
 <h2>Field Summary</h2>
+<div class="inherited-list">
+<h3 id="fields-inherited-from-class-fr.ferret.controller.input.common.FieldOrIdPanelController">Fields inherited from class&nbsp;fr.ferret.controller.input.common.<a href="common/FieldOrIdPanelController.html" title="class in fr.ferret.controller.input.common">FieldOrIdPanelController</a></h3>
+<code><a href="common/FieldOrIdPanelController.html#panel">panel</a></code></div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-fr.ferret.controller.input.common.InputPanelController">Fields inherited from class&nbsp;fr.ferret.controller.input.common.<a href="common/InputPanelController.html" title="class in fr.ferret.controller.input.common">InputPanelController</a></h3>
 <code><a href="common/InputPanelController.html#frame">frame</a></code></div>
@@ -121,17 +126,24 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#confirmContinue(java.lang.String)" class="member-name-link">confirmContinue</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;notFound)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="../../model/state/PublishingStateProcessus.html" title="class in fr.ferret.model.state">PublishingStateProcessus</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../../model/locus/Locus.html" title="class in fr.ferret.model.locus">Locus</a>&gt;&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getConversionProcessus(java.util.List)" class="member-name-link">getConversionProcessus</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;geneList)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#displayError(boolean,boolean,boolean,boolean,boolean,boolean,boolean)" class="member-name-link">displayError</a><wbr>(boolean&nbsp;geneListInputted,
+ boolean&nbsp;geneFileImported,
+ boolean&nbsp;geneFileError,
+ boolean&nbsp;geneFileExtensionError,
+ boolean&nbsp;invalidCharacter,
+ boolean&nbsp;popSelected,
+ boolean&nbsp;validWindowSizeEntered)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#validateInfoAndRun()" class="member-name-link">validateInfoAndRun</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Validates input and runs the program if it's valid</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="../../model/state/PublishingStateProcessus.html" title="class in fr.ferret.model.state">PublishingStateProcessus</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../../model/locus/Locus.html" title="class in fr.ferret.model.locus">Locus</a>&gt;&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getConversionProcessus(java.util.List)" class="member-name-link">getConversionProcessus</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;geneList)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
-</div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-fr.ferret.controller.input.common.FieldOrIdPanelController">Methods inherited from class&nbsp;fr.ferret.controller.input.common.<a href="common/FieldOrIdPanelController.html" title="class in fr.ferret.controller.input.common">FieldOrIdPanelController</a></h3>
+<code><a href="common/FieldOrIdPanelController.html#validateInfoAndRun()">validateInfoAndRun</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-fr.ferret.controller.input.common.NeedingConversionPanelController">Methods inherited from class&nbsp;fr.ferret.controller.input.common.<a href="common/NeedingConversionPanelController.html" title="class in fr.ferret.controller.input.common">NeedingConversionPanelController</a></h3>
 <code><a href="common/NeedingConversionPanelController.html#convertAndDownloadVcf(fr.ferret.model.SampleSelection,java.util.List,int)">convertAndDownloadVcf</a></code></div>
@@ -167,18 +179,6 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="validateInfoAndRun()">
-<h3>validateInfoAndRun</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">validateInfoAndRun</span>()</div>
-<div class="block"><span class="descfrm-type-label">Description copied from class:&nbsp;<code><a href="common/InputPanelController.html#validateInfoAndRun()">InputPanelController</a></code></span></div>
-<div class="block">Validates input and runs the program if it's valid</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="common/InputPanelController.html#validateInfoAndRun()">validateInfoAndRun</a></code>&nbsp;in class&nbsp;<code><a href="common/InputPanelController.html" title="class in fr.ferret.controller.input.common">InputPanelController</a></code></dd>
-</dl>
-</section>
-</li>
-<li>
 <section class="detail" id="confirmContinue(java.lang.String)">
 <h3>confirmContinue</h3>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">confirmContinue</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;notFound)</span></div>
@@ -195,6 +195,22 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="common/NeedingConversionPanelController.html#getConversionProcessus(java.util.List)">getConversionProcessus</a></code>&nbsp;in class&nbsp;<code><a href="common/NeedingConversionPanelController.html" title="class in fr.ferret.controller.input.common">NeedingConversionPanelController</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="displayError(boolean,boolean,boolean,boolean,boolean,boolean,boolean)">
+<h3>displayError</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">displayError</span><wbr><span class="parameters">(boolean&nbsp;geneListInputted,
+ boolean&nbsp;geneFileImported,
+ boolean&nbsp;geneFileError,
+ boolean&nbsp;geneFileExtensionError,
+ boolean&nbsp;invalidCharacter,
+ boolean&nbsp;popSelected,
+ boolean&nbsp;validWindowSizeEntered)</span></div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="common/FieldOrIdPanelController.html#displayError(boolean,boolean,boolean,boolean,boolean,boolean,boolean)">displayError</a></code>&nbsp;in class&nbsp;<code><a href="common/FieldOrIdPanelController.html" title="class in fr.ferret.controller.input.common">FieldOrIdPanelController</a></code></dd>
 </dl>
 </section>
 </li>
