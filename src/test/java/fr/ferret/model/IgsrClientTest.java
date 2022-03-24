@@ -89,12 +89,11 @@ class IgsrClientTest {
 
             var header = VCFHeaderExt.subVCFHeaderFromSamples(oldHeader, samples);
 
-            var tempVcfPath = tempDir.resolve("test.vcf");
-            var tempVcf = tempVcfPath.toFile();
-            FileWriter.writeVCF(tempVcf, header, variants.stream());
+            var tempVcf = tempDir.resolve("test.vcf");
+            FileWriter.writeVCF(tempVcf.toString(), header, variants.stream());
 
-            try (var tempReader = new VCFFileReader(tempVcfPath.toFile(), false)) {
-                assertAll(() -> assertTrue(Files.exists(tempVcfPath)),
+            try (var tempReader = new VCFFileReader(tempVcf.toFile(), false)) {
+                assertAll(() -> assertTrue(Files.exists(tempVcf)),
                         // The new header is truncated, the size of which equals to that of the
                         // samples.
                         () -> assertNotEquals(samples.size(), oldHeader.getNGenotypeSamples()),

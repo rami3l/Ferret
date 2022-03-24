@@ -19,11 +19,6 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class VcfConverter {
-    /**
-     * List of the possible file extensions, without dot.
-     */
-    @Getter
-    private static final List<String> fileExtensions = List.of("vcf", "frq", "map", "ped", "info");
 
     /**
      * Generates a new ID for a variant with an empty id {@code "."}. The generated ID will follow

@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,7 +14,10 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import fr.ferret.controller.settings.FileOutputType;
 import fr.ferret.utils.Resource;
+import fr.ferret.utils.Utils;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -104,10 +108,17 @@ public class GuiUtils {
         public void approveSelection() {
             if (getSelectedFile() == null)
                 return;
-            if (getSelectedFile().exists()) {
+            var filename = removeExtensionIfKnown(getSelectedFile().getPath());
+            var outputType = Resource.config().getSelectedOutputType();
+            var existingFiles = outputType.extensions().stream()
+                .map(ext -> new File(filename + "." + ext))
+                .filter(File::exists)
+                .map(File::getName)
+                .toList();
+            if (!existingFiles.isEmpty()) {
                 // If the file exists, we open a confirmation dialog
                 int result = JOptionPane.showConfirmDialog(this,
-                        Resource.getTextElement("run.fileExistingMsg"),
+                        Resource.getTextElement("run.fileExistingMsg", String.join(", ", existingFiles)),
                         Resource.getTextElement("run.fileExistingTitle"),
                         JOptionPane.YES_NO_CANCEL_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
@@ -118,6 +129,12 @@ public class GuiUtils {
                 return;
             }
             super.approveSelection();
+        }
+
+        private String removeExtensionIfKnown(String filename) {
+            var knownExtensions = Arrays.stream(FileOutputType.Extension.values())
+                .map(FileOutputType.Extension::toString).toList();
+            return Utils.removeExtensionIfInList(filename, knownExtensions);
         }
     }
 

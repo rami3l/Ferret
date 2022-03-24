@@ -7,7 +7,7 @@ import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
 import fr.ferret.model.utils.GeneConverter;
 import fr.ferret.model.utils.JsonDocument;
-import fr.ferret.utils.Conversion;
+import fr.ferret.utils.Utils;
 import fr.ferret.utils.Resource;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -58,10 +58,10 @@ public class GeneConversion extends PublishingStateProcessus<List<Locus>> {
         // On ne garde que les ids/names qui ne sont pas vides (isBlank)
         var flux = Flux.fromIterable(idsOrNames).filter(Predicate.not(String::isBlank));
         // ids are numeric
-        var ids = flux.filter(Conversion::isInteger);
+        var ids = flux.filter(Utils::isInteger);
         // names are non-numeric. We delay them to avoid getting 429 code from ncbi server (ddos...)
         var names =
-            flux.filter(Predicate.not(Conversion::isInteger)).delayElements(DELAY);
+            flux.filter(Predicate.not(Utils::isInteger)).delayElements(DELAY);
         // concat ids with names converted to ids
         var allIds = ids.concatWith(names.flatMap(this::fromName)).distinct();
         resultPromise = fromIds(allIds)

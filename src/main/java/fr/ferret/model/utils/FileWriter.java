@@ -45,7 +45,7 @@ public class FileWriter {
      * @param header the {@link VCFHeader header} to write
      * @param variants the variants to write
      */
-    public void writeVCF(File outFile, VCFHeader header, Stream<VariantContext> variants) {
+    public void writeVCF(String outFile, VCFHeader header, Stream<VariantContext> variants) {
 
         var outputType = switch (Resource.VCF_OUTPUT_TYPE) {
             case VCF_GZ -> OutputType.BLOCK_COMPRESSED_VCF;
@@ -54,7 +54,7 @@ public class FileWriter {
         };
         boolean writeIndex = Resource.WRITE_VCF_INDEX;
 
-        writeVCF(outFile, header, variants, outputType, writeIndex);
+        writeVCF(new File(outFile), header, variants, outputType, writeIndex);
     }
 
     /**

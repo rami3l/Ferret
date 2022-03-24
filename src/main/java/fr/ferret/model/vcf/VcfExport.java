@@ -1,7 +1,6 @@
 package fr.ferret.model.vcf;
 
 import com.pivovarit.function.ThrowingFunction;
-import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.VcfStreamingException;
 import fr.ferret.controller.settings.FileOutputType;
 import fr.ferret.model.SampleSelection;
@@ -23,7 +22,6 @@ import reactor.util.retry.Retry;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystemException;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
@@ -88,15 +86,17 @@ public class VcfExport extends PublishingStateProcessus<Void> {
     }
 
     private void write(File outFile, VcfObject vcf, FileOutputType outputType) throws IOException {
+        var path = outFile.getPath() + ".";
         switch (outputType) {
-            case VCF -> FileWriter.writeVCF(outFile, vcf.getHeader(), vcf.getVariants().stream());
-            case FRQ -> VcfConverter.toFrq(vcf, outFile.getPath());
+            case VCF -> FileWriter.writeVCF(path + FileOutputType.Extension.VCF,
+                    vcf.getHeader(), vcf.getVariants().stream());
+            case FRQ -> VcfConverter.toFrq(vcf, path + FileOutputType.Extension.FRQ);
             case ALL -> {
-                vcf.backUp();
-                VcfConverter.toFrq(vcf, outFile.getPath());
-                VcfConverter.toInfo(vcf, outFile.getPath());
-                VcfConverter.toMap(vcf, outFile.getPath());
-                VcfConverter.toPed(vcf, outFile.getPath());
+                vcf.backUp(); // Without doing this, we can only consume the VcfObject one time
+                VcfConverter.toFrq(vcf, path + FileOutputType.Extension.FRQ);
+                VcfConverter.toInfo(vcf, path + FileOutputType.Extension.INFO);
+                VcfConverter.toMap(vcf, path + FileOutputType.Extension.MAP);
+                VcfConverter.toPed(vcf, path + FileOutputType.Extension.PED);
             }
         }
     }
