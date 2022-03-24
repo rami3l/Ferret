@@ -1,9 +1,17 @@
 package fr.ferret.model.utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.OutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.stream.Stream;
 
+import com.pivovarit.function.ThrowingConsumer;
+import fr.ferret.model.conversions.*;
+import fr.ferret.model.vcf.VcfObject;
 import fr.ferret.utils.Resource;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.writer.Options;
@@ -19,33 +27,13 @@ public class FileWriter {
         VCF, BCF, VCF_GZ
     }
 
-    // TODO: should we add a writeVCF(OutputStream, Stream<VariantContext>) method? It could be useful if we need VCF without header for conversion
-
-    /**
-     * Writes a VCF to an {@link OutputStream outputStream}
-     *
-     * @param outputStream The {@link OutputStream} to write the VCF to
-     * @param header the {@link VCFHeader header} to write
-     * @param variants The variants of the VCF
-     */
-    public void writeVCF(OutputStream outputStream, VCFHeader header, Stream<VariantContext> variants) {
-        try (var writer = new VariantContextWriterBuilder()
-                .clearOptions()
-                .setOutputVCFStream(outputStream).build()) {
-            writer.writeHeader(header);
-            variants.forEach(writer::add);
-        }
-    }
-
     /**
      * Writes a VCF to a {@link File file}
-     * TODO: add Ferret Settings to determine format to use (VCF/BCF) and if index file must be written
      *
+     * @param vcf The {@link VcfObject} to write
      * @param outFile the {@link File file} to write the VCF to
-     * @param header the {@link VCFHeader header} to write
-     * @param variants the variants to write
      */
-    public void writeVCF(File outFile, VCFHeader header, Stream<VariantContext> variants) {
+    public void writeVCF(VcfObject vcf, String outFile) {
 
         var outputType = switch (Resource.VCF_OUTPUT_TYPE) {
             case VCF_GZ -> OutputType.BLOCK_COMPRESSED_VCF;
@@ -54,7 +42,83 @@ public class FileWriter {
         };
         boolean writeIndex = Resource.WRITE_VCF_INDEX;
 
-        writeVCF(outFile, header, variants, outputType, writeIndex);
+        writeVCF(new File(outFile), vcf.getHeader(), vcf.getVariants().stream(), outputType, writeIndex);
+    }
+
+    /**
+     * Writes a Frq file from a {@link VcfObject}.
+     *  @param vcf The {@link VcfObject} to write
+     * @param outPath The path to write the Frq file to
+     */
+    public void writeFRQ(VcfObject vcf, String outPath) throws IOException {
+        try (var writer = truncatingFileWriter(outPath)) {
+            vcf.getVariants().stream().forEach(ThrowingConsumer.unchecked(variant -> {
+                var rec = new FrqRecord(variant);
+                writer.write(rec.toString());
+                writer.newLine();
+            }));
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
+    }
+
+    /**
+     * Writes a Ped file from a {@link VcfObject}.
+     *  @param vcf The {@link VcfObject} to write
+     * @param outPath The path to write the Ped file to
+     */
+    public void writePED(VcfObject vcf, String outPath) throws IOException {
+        try (var writer = truncatingFileWriter(outPath)) {
+            // A `distilled` VCF file should have for its header all the samples in question.
+            var pedigrees = Resource.getPedigrees();
+            var variantList = vcf.getVariants().toList();
+            vcf.getHeader().getGenotypeSamples()
+                .forEach(ThrowingConsumer.unchecked(sample -> {
+                    // A pedigree record from the `pedigrees` table.
+                    var pedigree = pedigrees.get(sample);
+                    var variants = variantList.stream()
+                        .map(ctx -> GenotypePair.of(ctx, sample)).toList();
+                    var pedRecord = new PedRecord(pedigree, variants);
+                    writer.write(pedRecord.toString());
+                    writer.newLine();
+                }));
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
+    }
+
+    /**
+     * Writes a Map file from a {@link VcfObject}.
+     *  @param vcf The {@link VcfObject} to write
+     * @param outPath The path to write the Map file to
+     */
+    public void writeMAP(VcfObject vcf, String outPath) throws IOException {
+        try (var writer = truncatingFileWriter(outPath);) {
+            for (var variant : vcf.getVariants().toList()) {
+                writer.write(new MapRecord(variant).toString());
+                writer.newLine();
+            }
+        }
+    }
+
+    /**
+     * Writes an Info file from a {@link VcfObject}.
+     *  @param vcf The {@link VcfObject} to write
+     * @param outPath The path to write the Info file to
+     */
+    public void writeINFO(VcfObject vcf, String outPath) throws IOException {
+        try (var writer = truncatingFileWriter(outPath)) {
+            for (var variant : vcf.getVariants().toList()) {
+                writer.write(new InfoRecord(variant).toString());
+                writer.newLine();
+            }
+        }
+    }
+    
+
+    private BufferedWriter truncatingFileWriter(String outPath) throws IOException {
+        return Files.newBufferedWriter(Path.of(outPath), StandardOpenOption.CREATE,
+            StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     /**

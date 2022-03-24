@@ -1,8 +1,9 @@
 package fr.ferret.model;
 
 import fr.ferret.model.utils.FileWriter;
-import fr.ferret.model.utils.VCFHeaderExt;
+import fr.ferret.model.utils.VcfUtils;
 import fr.ferret.model.vcf.IgsrClient;
+import fr.ferret.model.vcf.VcfObject;
 import fr.ferret.utils.Resource;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.vcf.VCFFileReader;
@@ -87,14 +88,13 @@ class IgsrClientTest {
                     it.stream().map(variant -> variant.subContextFromSamples(samples)).toList();
             var oldHeader = (VCFHeader) reader.getHeader();
 
-            var header = VCFHeaderExt.subVCFHeaderFromSamples(oldHeader, samples);
+            var header = VcfUtils.subVCFHeaderFromSamples(oldHeader, samples);
 
-            var tempVcfPath = tempDir.resolve("test.vcf");
-            var tempVcf = tempVcfPath.toFile();
-            FileWriter.writeVCF(tempVcf, header, variants.stream());
+            var tempVcf = tempDir.resolve("test.vcf");
+            FileWriter.writeVCF(new VcfObject(header, variants.iterator()), tempVcf.toString());
 
-            try (var tempReader = new VCFFileReader(tempVcfPath.toFile(), false)) {
-                assertAll(() -> assertTrue(Files.exists(tempVcfPath)),
+            try (var tempReader = new VCFFileReader(tempVcf.toFile(), false)) {
+                assertAll(() -> assertTrue(Files.exists(tempVcf)),
                         // The new header is truncated, the size of which equals to that of the
                         // samples.
                         () -> assertNotEquals(samples.size(), oldHeader.getNGenotypeSamples()),

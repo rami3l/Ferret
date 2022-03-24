@@ -1,5 +1,6 @@
 package fr.ferret.controller.exceptions;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.file.FileSystemException;
 import java.util.LinkedHashMap;
@@ -32,7 +33,7 @@ public class ExceptionHandler {
             ExceptionHandler.noIdFoundError(e);
         } catch (VcfStreamingException e) {
             ExceptionHandler.vcfStreamingError(e);
-        } catch (FileSystemException e) {
+        } catch (FileWritingException e) {
             ExceptionHandler.fileWritingError(e);
         } catch (Throwable e) {
             ExceptionHandler.unknownError(e);

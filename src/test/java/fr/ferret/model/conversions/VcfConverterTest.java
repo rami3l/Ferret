@@ -1,5 +1,6 @@
 package fr.ferret.model.conversions;
 
+import fr.ferret.model.utils.FileWriter;
 import fr.ferret.model.vcf.VcfObject;
 import htsjdk.tribble.FeatureReader;
 import htsjdk.tribble.TribbleIndexedFeatureReader;
@@ -40,7 +41,7 @@ class VcfConverterTest {
         try(var closeableVcf = new CloseableVcfObject(vcfPath)) {
             var outPath = tempDir.resolve("test.ped");
 
-            VcfConverter.toPed(closeableVcf.getVcf(), outPath.toString());
+            FileWriter.writePED(closeableVcf.getVcf(), outPath.toString());
 
             var got = Files.readAllLines(outPath);
             var expected = Stream.of("HG00097 HG00097 0 0 2 0 G G C C A G T T G G G G A A A A T T T T G G",
@@ -58,7 +59,7 @@ class VcfConverterTest {
         try(var closeableVcf = new CloseableVcfObject(vcfPath)) {
             var outPath = tempDir.resolve("test.info");
 
-            VcfConverter.toInfo(closeableVcf.getVcf(), outPath.toString());
+            FileWriter.writeINFO(closeableVcf.getVcf(), outPath.toString());
 
             var got = Files.readAllLines(outPath);
             var expected =
@@ -75,7 +76,7 @@ class VcfConverterTest {
         try(var closeableVcf = new CloseableVcfObject(vcfPath)) {
             var outPath = tempDir.resolve("test.map");
 
-            VcfConverter.toMap(closeableVcf.getVcf(), outPath.toString());
+            FileWriter.writeMAP(closeableVcf.getVcf(), outPath.toString());
 
             var got = Files.readAllLines(outPath);
             var expected = Stream.of("3 3:46370719 0 46370719", "3 3:46370803 0 46370803",
@@ -91,7 +92,7 @@ class VcfConverterTest {
         try(var closeableVcf = new CloseableVcfObject(vcfPath)) {
             var outPath = tempDir.resolve("test.frq");
 
-            VcfConverter.toFrq(closeableVcf.getVcf(), outPath.toString());
+            FileWriter.writeFRQ(closeableVcf.getVcf(), outPath.toString());
 
             var got = Files.readAllLines(outPath);
             var expected = Stream.of("3 3:46370719 G . 1.0000 91", "3 3:46370803 C T 0.9286 91",

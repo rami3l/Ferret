@@ -83,7 +83,9 @@ public abstract class InputPanelController {
     protected void downloadVcf(SampleSelection populations, File outFile, List<Locus> locusList, StatePanel download) {
         logger.log(Level.INFO, "Starting locus download...");
         // Sets the vcf export processus
-        var vcfProcessus = new VcfExport(locusList, outFile).setFilter(populations);
+        var vcfProcessus =
+            new VcfExport(locusList, outFile, Resource.config().getSelectedOutputType())
+                .setFilter(populations);
         download.setAssociatedProcessus(vcfProcessus);
 
         // Starts the processus and subscribes its states
