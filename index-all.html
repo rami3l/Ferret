@@ -161,7 +161,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="fr/ferret/model/conversions/Pedigree.PedigreeBuilder.html#children(java.lang.String)" class="member-name-link">children(String)</a> - Method in class fr.ferret.model.conversions.<a href="fr/ferret/model/conversions/Pedigree.PedigreeBuilder.html" title="class in fr.ferret.model.conversions">Pedigree.PedigreeBuilder</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="fr/ferret/view/utils/GuiUtils.html#chooseFile(java.awt.Component,boolean)" class="member-name-link">chooseFile(Component, boolean)</a> - Static method in class fr.ferret.view.utils.<a href="fr/ferret/view/utils/GuiUtils.html" title="class in fr.ferret.view.utils">GuiUtils</a></dt>
+<dt><a href="fr/ferret/view/utils/GuiUtils.html#chooseFile(java.awt.Component,boolean,javax.swing.filechooser.FileNameExtensionFilter)" class="member-name-link">chooseFile(Component, boolean, FileNameExtensionFilter)</a> - Static method in class fr.ferret.view.utils.<a href="fr/ferret/view/utils/GuiUtils.html" title="class in fr.ferret.view.utils">GuiUtils</a></dt>
 <dd>
 <div class="block">Open a popup to let the user choose a file</div>
 </dd>
@@ -563,6 +563,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the extension of the given filename (without ".").</div>
 </dd>
+<dt><a href="fr/ferret/controller/BrowseFileButtonListener.html#getExtensionFilter()" class="member-name-link">getExtensionFilter()</a> - Method in class fr.ferret.controller.<a href="fr/ferret/controller/BrowseFileButtonListener.html" title="class in fr.ferret.controller">BrowseFileButtonListener</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="fr/ferret/model/conversions/Pedigree.html#getFamilyId()" class="member-name-link">getFamilyId()</a> - Method in class fr.ferret.model.conversions.<a href="fr/ferret/model/conversions/Pedigree.html" title="class in fr.ferret.model.conversions">Pedigree</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="fr/ferret/view/panel/inputs/FieldOrFilePanel.html#getFileSelector()" class="member-name-link">getFileSelector()</a> - Method in class fr.ferret.view.panel.inputs.<a href="fr/ferret/view/panel/inputs/FieldOrFilePanel.html" title="class in fr.ferret.view.panel.inputs">FieldOrFilePanel</a></dt>
@@ -695,6 +697,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">The file selected by the user</div>
 </dd>
+<dt><a href="fr/ferret/controller/BrowseFileButtonListener.html#getSelectedFileDefaultText()" class="member-name-link">getSelectedFileDefaultText()</a> - Method in class fr.ferret.controller.<a href="fr/ferret/controller/BrowseFileButtonListener.html" title="class in fr.ferret.controller">BrowseFileButtonListener</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="fr/ferret/controller/BrowseFileButtonListener.html#getSelectedFileLabel()" class="member-name-link">getSelectedFileLabel()</a> - Method in class fr.ferret.controller.<a href="fr/ferret/controller/BrowseFileButtonListener.html" title="class in fr.ferret.controller">BrowseFileButtonListener</a></dt>
 <dd>
 <div class="block">The status label</div>
@@ -790,6 +794,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="fr/ferret/model/Phase1KG.html#hashCode()" class="member-name-link">hashCode()</a> - Method in class fr.ferret.model.<a href="fr/ferret/model/Phase1KG.html" title="class in fr.ferret.model">Phase1KG</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="fr/ferret/utils/Resource.html#HELP_BORDER_COLOR" class="member-name-link">HELP_BORDER_COLOR</a> - Static variable in class fr.ferret.utils.<a href="fr/ferret/utils/Resource.html" title="class in fr.ferret.utils">Resource</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="fr/ferret/utils/Resource.html#HELP_LABEL_FONT" class="member-name-link">HELP_LABEL_FONT</a> - Static variable in class fr.ferret.utils.<a href="fr/ferret/utils/Resource.html" title="class in fr.ferret.utils">Resource</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="fr/ferret/model/hgversion/HgRelease.html#HG_VERSION_TAG" class="member-name-link">HG_VERSION_TAG</a> - Static variable in class fr.ferret.model.hgversion.<a href="fr/ferret/model/hgversion/HgRelease.html" title="class in fr.ferret.model.hgversion">HgRelease</a></dt>
@@ -849,6 +855,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="fr/ferret/view/LinkLabel.html#init()" class="member-name-link">init()</a> - Method in class fr.ferret.view.<a href="fr/ferret/view/LinkLabel.html" title="class in fr.ferret.view">LinkLabel</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="fr/ferret/utils/Resource.html#inputExtensions" class="member-name-link">inputExtensions</a> - Static variable in class fr.ferret.utils.<a href="fr/ferret/utils/Resource.html" title="class in fr.ferret.utils">Resource</a></dt>
+<dd>
+<div class="block">Extensions for csv-like files containing genes or variants</div>
+</dd>
 <dt><a href="fr/ferret/controller/input/common/InputPanelController.html" class="type-name-link" title="class in fr.ferret.controller.input.common">InputPanelController</a> - Class in <a href="fr/ferret/controller/input/common/package-summary.html">fr.ferret.controller.input.common</a></dt>
 <dd>
 <div class="block">The base for input panel controllers (locus, gene and variant panel controllers)</div>
@@ -1186,6 +1196,8 @@ loadScripts(document, 'script');</script>
 <div class="block">Removes the extension of a filename if it is in the given <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link"><code>List</code></a>.</div>
 </dd>
 <dt><a href="fr/ferret/view/panel/BottomPanel.html#removeState(fr.ferret.view.panel.StatePanel)" class="member-name-link">removeState(StatePanel)</a> - Method in class fr.ferret.view.panel.<a href="fr/ferret/view/panel/BottomPanel.html" title="class in fr.ferret.view.panel">BottomPanel</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="fr/ferret/controller/BrowseFileButtonListener.html#reset()" class="member-name-link">reset()</a> - Method in class fr.ferret.controller.<a href="fr/ferret/controller/BrowseFileButtonListener.html" title="class in fr.ferret.controller">BrowseFileButtonListener</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="fr/ferret/utils/Resource.html" class="type-name-link" title="class in fr.ferret.utils">Resource</a> - Class in <a href="fr/ferret/utils/package-summary.html">fr.ferret.utils</a></dt>
 <dd>

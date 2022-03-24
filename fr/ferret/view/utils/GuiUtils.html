@@ -106,8 +106,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Browses the given target</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#chooseFile(java.awt.Component,boolean)" class="member-name-link">chooseFile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/java/awt/Component.html" title="class or interface in java.awt" class="external-link">Component</a>&nbsp;parent,
- boolean&nbsp;save)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#chooseFile(java.awt.Component,boolean,javax.swing.filechooser.FileNameExtensionFilter)" class="member-name-link">chooseFile</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/java/awt/Component.html" title="class or interface in java.awt" class="external-link">Component</a>&nbsp;parent,
+ boolean&nbsp;save,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/filechooser/FileNameExtensionFilter.html" title="class or interface in javax.swing.filechooser" class="external-link">FileNameExtensionFilter</a>&nbsp;filter)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
 <div class="block">Open a popup to let the user choose a file</div>
 </div>
@@ -153,10 +154,12 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="chooseFile(java.awt.Component,boolean)">
+<section class="detail" id="chooseFile(java.awt.Component,boolean,javax.swing.filechooser.FileNameExtensionFilter)">
 <h3>chooseFile</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&gt;</span>&nbsp;<span class="element-name">chooseFile</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/java/awt/Component.html" title="class or interface in java.awt" class="external-link">Component</a>&nbsp;parent,
- boolean&nbsp;save)</span></div>
+ boolean&nbsp;save,
+ @Nullable
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/filechooser/FileNameExtensionFilter.html" title="class or interface in javax.swing.filechooser" class="external-link">FileNameExtensionFilter</a>&nbsp;filter)</span></div>
 <div class="block">Open a popup to let the user choose a file</div>
 <dl class="notes">
 <dt>Parameters:</dt>
