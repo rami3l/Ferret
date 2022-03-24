@@ -46,6 +46,7 @@ public class Resource {
     public static final Color TITLE_COLOR = new Color(18, 113, 236);
     public static final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
     public static final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
+    public static final Color HELP_BORDER_COLOR = new Color(148, 69, 91, 145);
     public static final Color BUTTON_COLOR = new Color(201, 157, 240);
     public static final Color LINK_STANDARD_COLOR = new Color(40, 100, 255);
     public static final Color LINK_HOVER_COLOR = new Color(255, 0, 0);
@@ -59,6 +60,9 @@ public class Resource {
     // TODO: include in FerretConfig
     public static final FileWriter.VCFOutputType VCF_OUTPUT_TYPE = FileWriter.VCFOutputType.VCF;
     public static final boolean WRITE_VCF_INDEX = false;
+
+    /** Extensions for csv-like files containing genes or variants */
+    public static final String[] inputExtensions = new String[]{"csv", "tab", "tsv", "txt"};
 
     public static FerretConfig config() {
         return config;

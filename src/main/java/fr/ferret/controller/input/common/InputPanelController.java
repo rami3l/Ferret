@@ -41,7 +41,7 @@ public abstract class InputPanelController {
      * @param action The action to execute with the selected file
      */
     protected void run(Consumer<? super File> action) {
-        GuiUtils.chooseFile(frame.getBottomPanel().getRunButton(), true)
+        GuiUtils.chooseFile(frame.getBottomPanel().getRunButton(), true, null)
             .ifPresentOrElse(action, this::actionOnFileNotSelected);
     }
 

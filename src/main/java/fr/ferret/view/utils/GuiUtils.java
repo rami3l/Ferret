@@ -10,10 +10,12 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import fr.ferret.controller.settings.FileOutputType;
 import fr.ferret.utils.Resource;
@@ -51,10 +53,14 @@ public class GuiUtils {
      * @param save The selection mode (true → save, false → open)
      * @return An {@link Optional} {@link File} (empty if no file selected)
      */
-    public Optional<File> chooseFile(Component parent, boolean save) {
+    public Optional<File> chooseFile(Component parent, boolean save, @Nullable FileNameExtensionFilter filter) {
         var fileChooser = save ? new SaveFileChooser() : new OpenFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle(Resource.getTextElement(save ? "run.save" : "input.selectfile"));
+        if(filter!=null) {
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            fileChooser.addChoosableFileFilter(filter);
+        }
         int returnVal = fileChooser.showDialog(parent,
                 Resource.getTextElement(save ? "run.saveButtonText" : "gene.openButtonText"));
         if (returnVal == JFileChooser.APPROVE_OPTION) {

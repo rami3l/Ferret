@@ -1,8 +1,6 @@
 package fr.ferret.view.panel.inputs;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -45,8 +43,9 @@ public class LocusPanel extends JPanel {
         JTextPane helpPane = new JTextPane();
         helpPane.setContentType("text/html");
         helpPane.setText(Resource.getTextElement("locus.help"));
-        helpPane.setBackground(null);
+        helpPane.setBackground(new Color(0, 0, 0, 0));
         helpPane.setEditable(false);
+        helpPane.setBorder(BorderFactory.createLineBorder(Resource.HELP_BORDER_COLOR, 2));
         StyledDocument styledHelpPane = helpPane.getStyledDocument();
         // Set the font
         MutableAttributeSet attrs = helpPane.getInputAttributes();

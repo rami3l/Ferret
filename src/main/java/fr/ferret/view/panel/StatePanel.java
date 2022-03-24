@@ -53,6 +53,7 @@ public class StatePanel extends JPanel {
         Resource.getIcon("/img/cancel.png", 20, 20)
             .ifPresentOrElse(cancelButton::setIcon, () -> cancelButton.setText("X"));
         cancelButton.setToolTipText(Resource.getTextElement("tooltip.cancelDownload"));
+        cancelButton.setPreferredSize(new Dimension(30, 30));
 
         spinner = new JLabel();
         Resource.getIcon("/img/loading.gif").ifPresentOrElse(spinner::setIcon,

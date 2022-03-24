@@ -11,6 +11,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * A panel allowing the user to input a text or a file
@@ -31,7 +33,6 @@ public class FieldOrFilePanel extends JPanel {
 
         /* --- Help section --- */
         JTextPane helpPane = generateHelpSection(helpTextElement);
-        helpPane.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
 
         // Adds the 3 parts defined above to the contentPanel
         JPanel contentPanel = new JPanel();
@@ -72,17 +73,28 @@ public class FieldOrFilePanel extends JPanel {
         browseButton.setPreferredSize(new Dimension(200, 30));
         browseButton.setBackground(Resource.BUTTON_COLOR);
 
-        JLabel selectedFile = new JLabel(Resource.getTextElement("input.selectfile"));
-        selectedFile.setFont(new Font(selectedFile.getFont().getFontName(), Font.PLAIN, 13));
+        JLabel selectedFileLabel = new JLabel(Resource.getTextElement("input.selectfile"));
+        selectedFileLabel.setFont(new Font(selectedFileLabel.getFont().getFontName(), Font.PLAIN, 13));
 
-        fileSelector = new BrowseFileButtonListener(this, browseButton, selectedFile);
+        fileSelector = new BrowseFileButtonListener(this, browseButton, selectedFileLabel);
+
+        JButton resetButton = new JButton();
+        Resource.getIcon("/img/cancel.png", 20, 20)
+            .ifPresentOrElse(resetButton::setIcon, () -> resetButton.setText("X"));
+        resetButton.setPreferredSize(new Dimension(25, 25));
+        resetButton.addActionListener(actionEvent -> fileSelector.reset());
+
+        JPanel fileSelection = new JPanel();
+        fileSelection.add(selectedFileLabel);
+        fileSelection.add(resetButton);
+
 
         // Add the elements defined above to the input panel
         GuiUtils.addToPanel(inputPanel, inputField, 0.8, 1, 1);
         GuiUtils.addToPanel(inputPanel, includingVariantSubPanel, 0.7, 1, 2);
         GuiUtils.addToPanel(inputPanel, orLabel, 0.2, 2, 1);
         GuiUtils.addToPanel(inputPanel, browseButton, 0.4, 3, 1);
-        GuiUtils.addToPanel(inputPanel, selectedFile, 0.4, 3, 2);
+        GuiUtils.addToPanel(inputPanel, fileSelection, 0.4, 3, 2);
 
         return inputPanel;
     }
@@ -115,7 +127,8 @@ public class FieldOrFilePanel extends JPanel {
         JTextPane helpPane = new JTextPane();
         helpPane.setContentType("text/html");
         helpPane.setText(Resource.getTextElement(textElement));
-        helpPane.setBackground(null);
+        helpPane.setBackground(new Color(0, 0, 0, 0));
+        helpPane.setBorder(BorderFactory.createLineBorder(Resource.HELP_BORDER_COLOR, 2));
         helpPane.setEditable(false);
         StyledDocument styledHelpPane = helpPane.getStyledDocument();
         // Set the font
