@@ -30,11 +30,10 @@ public class FileWriter {
     /**
      * Writes a VCF to a {@link File file}
      *
+     * @param vcf The {@link VcfObject} to write
      * @param outFile the {@link File file} to write the VCF to
-     * @param header the {@link VCFHeader header} to write
-     * @param variants the variants to write
      */
-    public void writeVCF(String outFile, VCFHeader header, Stream<VariantContext> variants) {
+    public void writeVCF(VcfObject vcf, String outFile) {
 
         var outputType = switch (Resource.VCF_OUTPUT_TYPE) {
             case VCF_GZ -> OutputType.BLOCK_COMPRESSED_VCF;
@@ -43,16 +42,16 @@ public class FileWriter {
         };
         boolean writeIndex = Resource.WRITE_VCF_INDEX;
 
-        writeVCF(new File(outFile), header, variants, outputType, writeIndex);
+        writeVCF(new File(outFile), vcf.getHeader(), vcf.getVariants().stream(), outputType, writeIndex);
     }
 
     /**
      * Writes a Frq file from a {@link VcfObject}.
-     *  @param vcf The {@link VcfObject} to convert to Frq
+     *  @param vcf The {@link VcfObject} to write
      * @param outPath The path to write the Frq file to
      */
     public void writeFRQ(VcfObject vcf, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath + ".frq")) {
+        try (var writer = truncatingFileWriter(outPath)) {
             vcf.getVariants().stream().forEach(ThrowingConsumer.unchecked(variant -> {
                 var rec = new FrqRecord(variant);
                 writer.write(rec.toString());
@@ -65,11 +64,11 @@ public class FileWriter {
 
     /**
      * Writes a Ped file from a {@link VcfObject}.
-     *  @param vcf The {@link VcfObject} to convert to Ped
+     *  @param vcf The {@link VcfObject} to write
      * @param outPath The path to write the Ped file to
      */
     public void writePED(VcfObject vcf, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath + ".ped")) {
+        try (var writer = truncatingFileWriter(outPath)) {
             // A `distilled` VCF file should have for its header all the samples in question.
             var pedigrees = Resource.getPedigrees();
             var variantList = vcf.getVariants().toList();
@@ -90,11 +89,11 @@ public class FileWriter {
 
     /**
      * Writes a Map file from a {@link VcfObject}.
-     *  @param vcf The {@link VcfObject} to convert to Map
+     *  @param vcf The {@link VcfObject} to write
      * @param outPath The path to write the Map file to
      */
     public void writeMAP(VcfObject vcf, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath + ".map");) {
+        try (var writer = truncatingFileWriter(outPath);) {
             for (var variant : vcf.getVariants().toList()) {
                 writer.write(new MapRecord(variant).toString());
                 writer.newLine();
@@ -104,11 +103,11 @@ public class FileWriter {
 
     /**
      * Writes an Info file from a {@link VcfObject}.
-     *  @param vcf The {@link VcfObject} to convert to Info
+     *  @param vcf The {@link VcfObject} to write
      * @param outPath The path to write the Info file to
      */
     public void writeINFO(VcfObject vcf, String outPath) throws IOException {
-        try (var writer = truncatingFileWriter(outPath + ".info")) {
+        try (var writer = truncatingFileWriter(outPath)) {
             for (var variant : vcf.getVariants().toList()) {
                 writer.write(new InfoRecord(variant).toString());
                 writer.newLine();

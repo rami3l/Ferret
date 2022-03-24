@@ -3,6 +3,7 @@ package fr.ferret.model;
 import fr.ferret.model.utils.FileWriter;
 import fr.ferret.model.utils.VcfUtils;
 import fr.ferret.model.vcf.IgsrClient;
+import fr.ferret.model.vcf.VcfObject;
 import fr.ferret.utils.Resource;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.vcf.VCFFileReader;
@@ -90,7 +91,7 @@ class IgsrClientTest {
             var header = VcfUtils.subVCFHeaderFromSamples(oldHeader, samples);
 
             var tempVcf = tempDir.resolve("test.vcf");
-            FileWriter.writeVCF(tempVcf.toString(), header, variants.stream());
+            FileWriter.writeVCF(new VcfObject(header, variants.iterator()), tempVcf.toString());
 
             try (var tempReader = new VCFFileReader(tempVcf.toFile(), false)) {
                 assertAll(() -> assertTrue(Files.exists(tempVcf)),

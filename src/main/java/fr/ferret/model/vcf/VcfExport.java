@@ -96,8 +96,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
     private void write(File outFile, VcfObject vcf, FileOutputType outputType) throws IOException {
         var path = outFile.getPath() + ".";
         switch (outputType) {
-            case VCF -> FileWriter.writeVCF(path + FileOutputType.Extension.VCF,
-                    vcf.getHeader(), vcf.getVariants().stream());
+            case VCF -> FileWriter.writeVCF(vcf, path + FileOutputType.Extension.VCF);
             case FRQ -> FileWriter.writeFRQ(vcf, path + FileOutputType.Extension.FRQ);
             case ALL -> {
                 vcf.backUp(); // Without doing this, we can only consume the VcfObject one time
