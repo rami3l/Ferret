@@ -102,8 +102,9 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.util.List,java.io.File)" class="member-name-link">VcfExport</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../locus/Locus.html" title="class in fr.ferret.model.locus">Locus</a>&gt;&nbsp;locusList,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;outFile)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(java.util.List,java.io.File,fr.ferret.controller.settings.FileOutputType)" class="member-name-link">VcfExport</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../locus/Locus.html" title="class in fr.ferret.model.locus">Locus</a>&gt;&nbsp;locusList,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;outFile,
+ <a href="../../controller/settings/FileOutputType.html" title="enum class in fr.ferret.controller.settings">FileOutputType</a>&nbsp;outputType)</code></div>
 <div class="col-last even-row-color">
 <div class="block">Constructs a <a href="VcfExport.html" title="class in fr.ferret.model.vcf"><code>VcfExport</code></a>.</div>
 </div>
@@ -147,10 +148,11 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(java.util.List,java.io.File)">
+<section class="detail" id="&lt;init&gt;(java.util.List,java.io.File,fr.ferret.controller.settings.FileOutputType)">
 <h3>VcfExport</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">VcfExport</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../locus/Locus.html" title="class in fr.ferret.model.locus">Locus</a>&gt;&nbsp;locusList,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;outFile)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;outFile,
+ <a href="../../controller/settings/FileOutputType.html" title="enum class in fr.ferret.controller.settings">FileOutputType</a>&nbsp;outputType)</span></div>
 <div class="block">Constructs a <a href="VcfExport.html" title="class in fr.ferret.model.vcf"><code>VcfExport</code></a>. It is used to export a "distilled" VCF file from an IGSR
  online database query.<br>
  Call the <a href="#setFilter(fr.ferret.model.SampleSelection)"><code>setFilter(SampleSelection)</code></a> method to filter the VCF by populations</div>

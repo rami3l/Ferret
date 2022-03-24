@@ -107,19 +107,34 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeVCF(java.io.File,htsjdk.variant.vcf.VCFHeader,java.util.stream.Stream)" class="member-name-link">writeVCF</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;outFile,
- htsjdk.variant.vcf.VCFHeader&nbsp;header,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html" title="class or interface in java.util.stream" class="external-link">Stream</a>&lt;htsjdk.variant.variantcontext.VariantContext&gt;&nbsp;variants)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeFRQ(fr.ferret.model.vcf.VcfObject,java.lang.String)" class="member-name-link">writeFRQ</a><wbr>(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outPath)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Writes a VCF to a <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link"><code>file</code></a>
- TODO: add Ferret Settings to determine format to use (VCF/BCF) and if index file must be written</div>
+<div class="block">Writes a Frq file from a <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a>.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeVCF(java.io.OutputStream,htsjdk.variant.vcf.VCFHeader,java.util.stream.Stream)" class="member-name-link">writeVCF</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/OutputStream.html" title="class or interface in java.io" class="external-link">OutputStream</a>&nbsp;outputStream,
- htsjdk.variant.vcf.VCFHeader&nbsp;header,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html" title="class or interface in java.util.stream" class="external-link">Stream</a>&lt;htsjdk.variant.variantcontext.VariantContext&gt;&nbsp;variants)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeINFO(fr.ferret.model.vcf.VcfObject,java.lang.String)" class="member-name-link">writeINFO</a><wbr>(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outPath)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Writes a VCF to an <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/OutputStream.html" title="class or interface in java.io" class="external-link"><code>outputStream</code></a></div>
+<div class="block">Writes an Info file from a <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeMAP(fr.ferret.model.vcf.VcfObject,java.lang.String)" class="member-name-link">writeMAP</a><wbr>(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outPath)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Writes a Map file from a <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a>.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writePED(fr.ferret.model.vcf.VcfObject,java.lang.String)" class="member-name-link">writePED</a><wbr>(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outPath)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Writes a Ped file from a <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#writeVCF(fr.ferret.model.vcf.VcfObject,java.lang.String)" class="member-name-link">writeVCF</a><wbr>(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outFile)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Writes a VCF to a <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link"><code>file</code></a></div>
 </div>
 </div>
 </div>
@@ -139,33 +154,79 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="writeVCF(java.io.OutputStream,htsjdk.variant.vcf.VCFHeader,java.util.stream.Stream)">
+<section class="detail" id="writeVCF(fr.ferret.model.vcf.VcfObject,java.lang.String)">
 <h3>writeVCF</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeVCF</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/OutputStream.html" title="class or interface in java.io" class="external-link">OutputStream</a>&nbsp;outputStream,
- htsjdk.variant.vcf.VCFHeader&nbsp;header,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html" title="class or interface in java.util.stream" class="external-link">Stream</a>&lt;htsjdk.variant.variantcontext.VariantContext&gt;&nbsp;variants)</span></div>
-<div class="block">Writes a VCF to an <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/OutputStream.html" title="class or interface in java.io" class="external-link"><code>outputStream</code></a></div>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeVCF</span><wbr><span class="parameters">(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outFile)</span></div>
+<div class="block">Writes a VCF to a <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link"><code>file</code></a></div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>outputStream</code> - The <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/OutputStream.html" title="class or interface in java.io" class="external-link"><code>OutputStream</code></a> to write the VCF to</dd>
-<dd><code>header</code> - the <code>header</code> to write</dd>
-<dd><code>variants</code> - The variants of the VCF</dd>
+<dd><code>vcf</code> - The <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a> to write</dd>
+<dd><code>outFile</code> - the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link"><code>file</code></a> to write the VCF to</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="writeVCF(java.io.File,htsjdk.variant.vcf.VCFHeader,java.util.stream.Stream)">
-<h3>writeVCF</h3>
-<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeVCF</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link">File</a>&nbsp;outFile,
- htsjdk.variant.vcf.VCFHeader&nbsp;header,
- <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html" title="class or interface in java.util.stream" class="external-link">Stream</a>&lt;htsjdk.variant.variantcontext.VariantContext&gt;&nbsp;variants)</span></div>
-<div class="block">Writes a VCF to a <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link"><code>file</code></a>
- TODO: add Ferret Settings to determine format to use (VCF/BCF) and if index file must be written</div>
+<section class="detail" id="writeFRQ(fr.ferret.model.vcf.VcfObject,java.lang.String)">
+<h3>writeFRQ</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeFRQ</span><wbr><span class="parameters">(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outPath)</span>
+                     throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block">Writes a Frq file from a <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a>.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>outFile</code> - the <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/File.html" title="class or interface in java.io" class="external-link"><code>file</code></a> to write the VCF to</dd>
-<dd><code>header</code> - the <code>header</code> to write</dd>
-<dd><code>variants</code> - the variants to write</dd>
+<dd><code>vcf</code> - The <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a> to write</dd>
+<dd><code>outPath</code> - The path to write the Frq file to</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="writePED(fr.ferret.model.vcf.VcfObject,java.lang.String)">
+<h3>writePED</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writePED</span><wbr><span class="parameters">(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outPath)</span>
+                     throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block">Writes a Ped file from a <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>vcf</code> - The <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a> to write</dd>
+<dd><code>outPath</code> - The path to write the Ped file to</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="writeMAP(fr.ferret.model.vcf.VcfObject,java.lang.String)">
+<h3>writeMAP</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeMAP</span><wbr><span class="parameters">(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outPath)</span>
+                     throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block">Writes a Map file from a <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>vcf</code> - The <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a> to write</dd>
+<dd><code>outPath</code> - The path to write the Map file to</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="writeINFO(fr.ferret.model.vcf.VcfObject,java.lang.String)">
+<h3>writeINFO</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">writeINFO</span><wbr><span class="parameters">(<a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a>&nbsp;vcf,
+ <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;outPath)</span>
+                      throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
+<div class="block">Writes an Info file from a <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>vcf</code> - The <a href="../vcf/VcfObject.html" title="class in fr.ferret.model.vcf"><code>VcfObject</code></a> to write</dd>
+<dd><code>outPath</code> - The path to write the Info file to</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code></dd>
 </dl>
 </section>
 </li>
