@@ -8,7 +8,12 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.Getter;
@@ -37,19 +42,33 @@ public class LocusPanel extends JPanel {
         JPanel inputPanel = generateInputPanel();
 
         /* --- Help section --- */
-        JLabel helpLabel = new JLabel(Resource.getTextElement("locus.help"), SwingConstants.CENTER);
+        JTextPane helpPane = new JTextPane();
+        helpPane.setContentType("text/html");
+        helpPane.setText(Resource.getTextElement("locus.help"));
+        helpPane.setBackground(null);
+        helpPane.setEditable(false);
+        StyledDocument styledHelpPane = helpPane.getStyledDocument();
+        // Set the font
+        MutableAttributeSet attrs = helpPane.getInputAttributes();
+        StyleConstants.setFontFamily(attrs, Resource.HELP_LABEL_FONT.getFamily());
+        StyleConstants.setFontSize(attrs, Resource.HELP_LABEL_FONT.getSize());
+        styledHelpPane.setCharacterAttributes(0, styledHelpPane.getLength() + 1, attrs, false);
+        // Center the text
+        SimpleAttributeSet center = new SimpleAttributeSet();
+        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
+        styledHelpPane.setParagraphAttributes(0, styledHelpPane.getLength() + 1, center, false);
 
-        // Add the 3 parts defined above to the layout
-        setLayout(new BorderLayout());
-        add(titleLabel, BorderLayout.NORTH);
-        add(inputPanel, BorderLayout.CENTER);
-        add(helpLabel, BorderLayout.SOUTH);
+        // Adds the 3 parts defined above to the contentPanel
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
+        contentPanel.add(inputPanel, BorderLayout.CENTER);
+        contentPanel.add(helpPane, BorderLayout.SOUTH);
 
-        // Set the borders
+        // Sets the borders and adds the content to the panel
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
         setBorder(BorderFactory.createLineBorder(Resource.PANEL_BORDER_COLOR, 4));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
-        inputPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20));
-        helpLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        add(contentPanel);
     }
 
     /**
@@ -58,8 +77,8 @@ public class LocusPanel extends JPanel {
      * @return the title label
      */
     private JLabel generateTitle() {
-        String text =
-                Resource.getTextElement("locus.input." + Resource.config().getSelectedHumanGenome());
+        String text = Resource
+                .getTextElement("locus.input." + Resource.config().getSelectedHumanGenome());
         JLabel title = new JLabel(text, SwingConstants.LEFT);
         title.setFont(Resource.TITLE_FONT);
         title.setForeground(Resource.TITLE_COLOR);
@@ -77,7 +96,6 @@ public class LocusPanel extends JPanel {
 
         // Chromosome selection
         JLabel labChromosome = new JLabel(Resource.getTextElement("locus.chromosome"));
-        labChromosome.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
         labChromosome.setFont(new Font(labChromosome.getFont().getFontName(), Font.PLAIN, 16));
 
         String[] chromosomes = {" ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
@@ -90,14 +108,12 @@ public class LocusPanel extends JPanel {
 
         // Start position selection
         JLabel labStart = new JLabel(Resource.getTextElement("locus.start"));
-        labStart.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
         labStart.setFont(new Font(labStart.getFont().getFontName(), Font.PLAIN, 16));
 
         inputStart = new JTextField();
 
         // End position selection
         JLabel labEnd = new JLabel(Resource.getTextElement("locus.end"));
-        labEnd.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 10));
         labEnd.setFont(new Font(labEnd.getFont().getFontName(), Font.PLAIN, 16));
 
         inputEnd = new JTextField();

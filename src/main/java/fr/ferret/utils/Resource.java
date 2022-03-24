@@ -43,7 +43,7 @@ public class Resource {
 
     public static final String ASS_ACC_VERSION_PREFIX = "GCF_000001405";
 
-    public static final Color TITLE_COLOR = new Color(12, 28, 134);
+    public static final Color TITLE_COLOR = new Color(18, 113, 236);
     public static final Color ZONE_LABEL_COLOR = new Color(131, 55, 192);
     public static final Color PANEL_BORDER_COLOR = new Color(131, 55, 192, 140);
     public static final Color BUTTON_COLOR = new Color(201, 157, 240);
@@ -51,9 +51,10 @@ public class Resource {
     public static final Color LINK_HOVER_COLOR = new Color(255, 0, 0);
     public static final Color LINK_ACTIVE_COLOR = new Color(128, 0, 128);
 
-    public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
+    public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 20);
     public static final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
     public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
+    public static final Font HELP_LABEL_FONT = new Font("Calibri", Font.PLAIN, 14);
 
     // TODO: include in FerretConfig
     public static final FileWriter.VCFOutputType VCF_OUTPUT_TYPE = FileWriter.VCFOutputType.VCF;
@@ -97,7 +98,7 @@ public class Resource {
             .doOnSuccess(o -> logger.info("Assembly accession versions updated"))
             .doOnError(e -> logger.log(Level.WARNING, "Assembly accession versions update failed", e))
             .doOnSuccess(r -> saveConfig())
-            .subscribe();
+	        .subscribe();
     }
 
     /**

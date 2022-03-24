@@ -149,8 +149,8 @@ public class StatePanel extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            panel.setBackground(panel.getBackground().darker());
             canDestroy = false;
+            panel.setBackground(panel.getBackground().darker());
             if (destroyAction != null) {
                 destroyAction.dispose();
                 setForegroundOpacity(stateLabel, 255);
@@ -159,6 +159,7 @@ public class StatePanel extends JPanel {
 
         @Override
         public void mouseExited(MouseEvent e) {
+            canDestroy = true;
             panel.setBackground(panel.getBackground().brighter());
             if (completed) {
                 destroyAction = startDestroyAction();
