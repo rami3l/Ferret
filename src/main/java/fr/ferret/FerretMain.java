@@ -13,6 +13,7 @@ public class FerretMain {
         Resource.loadConfig();
         FerretFrame frame = new FerretFrame(); // Show ferret frame
         ExceptionHandler.setFrame(frame);
+        frame.setResizable(false);
         frame.setVisible(true);
         Resource.updateAssemblyAccessVersions();
     }
