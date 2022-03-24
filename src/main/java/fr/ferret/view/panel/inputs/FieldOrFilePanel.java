@@ -11,8 +11,6 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * A panel allowing the user to input a text or a file
@@ -73,7 +71,7 @@ public class FieldOrFilePanel extends JPanel {
         browseButton.setPreferredSize(new Dimension(200, 30));
         browseButton.setBackground(Resource.BUTTON_COLOR);
 
-        JLabel selectedFileLabel = new JLabel(Resource.getTextElement("input.selectfile"));
+        JLabel selectedFileLabel = new JLabel(Resource.getTextElement("input.noFileSelected"));
         selectedFileLabel.setFont(new Font(selectedFileLabel.getFont().getFontName(), Font.PLAIN, 13));
 
         fileSelector = new BrowseFileButtonListener(this, browseButton, selectedFileLabel);

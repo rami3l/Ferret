@@ -29,7 +29,7 @@ public class FileReader {
 
         List<String> content = new ArrayList<>();
         if (optionalDelemiter.isEmpty()) {
-            // If the delimiter could not be deduced from the file extension
+            // If the delimiter cannot be deduced from the file extension
             throw new FileFormatException();
         } else {
             String delimiter = optionalDelemiter.get();

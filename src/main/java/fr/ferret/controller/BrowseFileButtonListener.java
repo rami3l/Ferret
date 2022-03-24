@@ -58,8 +58,7 @@ public class BrowseFileButtonListener implements ActionListener {
         var file = GuiUtils.chooseFile(runButton, false, extensionFilter);
         file.ifPresent(f -> {
             selectedFile = f;
-            selectedFileLabel
-                    .setText(Resource.getTextElement("browse.selectedfile") + f.getAbsolutePath());
+            selectedFileLabel.setText(f.getAbsolutePath());
         });
     }
 

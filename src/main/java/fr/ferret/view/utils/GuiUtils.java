@@ -56,7 +56,8 @@ public class GuiUtils {
     public Optional<File> chooseFile(Component parent, boolean save, @Nullable FileNameExtensionFilter filter) {
         var fileChooser = save ? new SaveFileChooser() : new OpenFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setDialogTitle(Resource.getTextElement(save ? "run.save" : "input.selectfile"));
+        fileChooser.setDialogTitle(Resource.getTextElement(save ? "run.save" :
+            "input.noFileSelected"));
         if(filter!=null) {
             fileChooser.setAcceptAllFileFilterUsed(false);
             fileChooser.addChoosableFileFilter(filter);
