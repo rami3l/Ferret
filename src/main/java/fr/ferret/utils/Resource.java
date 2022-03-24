@@ -52,10 +52,10 @@ public class Resource {
     public static final Color LINK_HOVER_COLOR = new Color(255, 0, 0);
     public static final Color LINK_ACTIVE_COLOR = new Color(128, 0, 128);
 
-    public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 20);
+    public static final Font TITLE_FONT = new Font("Calibri", Font.BOLD, 24);
     public static final Font ZONE_LABEL_FONT = new Font("Calibri", Font.BOLD, 20);
     public static final Font SETTINGS_LABEL_FONT = new Font("SansSerif", Font.BOLD, 16);
-    public static final Font HELP_LABEL_FONT = new Font("Calibri", Font.PLAIN, 14);
+    public static final Font HELP_LABEL_FONT = new Font("Calibri", Font.PLAIN, 13);
 
     // TODO: include in FerretConfig
     public static final FileWriter.VCFOutputType VCF_OUTPUT_TYPE = FileWriter.VCFOutputType.VCF;

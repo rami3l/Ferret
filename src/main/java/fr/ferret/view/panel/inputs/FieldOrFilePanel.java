@@ -72,7 +72,7 @@ public class FieldOrFilePanel extends JPanel {
         browseButton.setBackground(Resource.BUTTON_COLOR);
 
         JLabel selectedFileLabel = new JLabel(Resource.getTextElement("input.noFileSelected"));
-        selectedFileLabel.setFont(new Font(selectedFileLabel.getFont().getFontName(), Font.PLAIN, 13));
+        selectedFileLabel.setFont(new Font(selectedFileLabel.getFont().getFontName(), Font.PLAIN, 14));
 
         fileSelector = new BrowseFileButtonListener(this, browseButton, selectedFileLabel);
 
@@ -106,7 +106,7 @@ public class FieldOrFilePanel extends JPanel {
 
         // Including variants label
         JLabel bpLabel = new JLabel(Resource.getTextElement("input.window.label"));
-        bpLabel.setFont(new Font(bpLabel.getFont().getFontName(), Font.PLAIN, 13));
+        bpLabel.setFont(new Font(bpLabel.getFont().getFontName(), Font.PLAIN, 14));
 
 
         // bp Label

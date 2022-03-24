@@ -95,7 +95,7 @@ public class LocusPanel extends JPanel {
 
         // Chromosome selection
         JLabel labChromosome = new JLabel(Resource.getTextElement("locus.chromosome"));
-        labChromosome.setFont(new Font(labChromosome.getFont().getFontName(), Font.PLAIN, 16));
+        labChromosome.setFont(new Font(labChromosome.getFont().getFontName(), Font.PLAIN, 18));
 
         String[] chromosomes = {" ", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
                 "13", "14", "15", "16", "17", "18", "19", "20", "21", "22"};
@@ -107,13 +107,13 @@ public class LocusPanel extends JPanel {
 
         // Start position selection
         JLabel labStart = new JLabel(Resource.getTextElement("locus.start"));
-        labStart.setFont(new Font(labStart.getFont().getFontName(), Font.PLAIN, 16));
+        labStart.setFont(new Font(labStart.getFont().getFontName(), Font.PLAIN, 18));
 
         inputStart = new JTextField();
 
         // End position selection
         JLabel labEnd = new JLabel(Resource.getTextElement("locus.end"));
-        labEnd.setFont(new Font(labEnd.getFont().getFontName(), Font.PLAIN, 16));
+        labEnd.setFont(new Font(labEnd.getFont().getFontName(), Font.PLAIN, 18));
 
         inputEnd = new JTextField();
 

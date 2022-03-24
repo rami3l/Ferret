@@ -5,6 +5,7 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +45,12 @@ public abstract class PublishingStateProcessus<T> {
      */
     public Flux<State> start() {
         currentProcessusList.add(this);
-        disposable = resultPromise.doOnSuccess(r -> {
-            result = r;
-            state.tryEmitComplete();
-            currentProcessusList.remove(this);
-        }).subscribe();
+        disposable = resultPromise.subscribeOn(Schedulers.boundedElastic())
+            .doOnSuccess(r -> {
+                result = r;
+                state.tryEmitComplete();
+                currentProcessusList.remove(this);
+            }).subscribe();
         return state.asFlux();
     }
 

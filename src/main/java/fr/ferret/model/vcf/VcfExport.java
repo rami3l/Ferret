@@ -54,6 +54,8 @@ public class VcfExport extends PublishingStateProcessus<Void> {
     private final IgsrClient client =
         new IgsrClient(Resource.getVcfUrlTemplate(Resource.config().getSelectedPhase()));
 
+    boolean hasStopped = false;
+
     /**
      * Constructs a {@link VcfExport}. It is used to export a "distilled" VCF file from an IGSR
      * online database query.<br>
@@ -63,7 +65,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
      * @param outFile the output {@link File}
      */
     public VcfExport(List<Locus> locusList, File outFile, FileOutputType outputType) {
-        resultPromise = getVcf(locusList).subscribeOn(Schedulers.boundedElastic())
+        resultPromise = getVcf(locusList)
             .collect(Collectors.toList())
             .flatMap(this::merge).doOnNext(vcf -> {
                 if (samples != null) {
@@ -81,8 +83,11 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                     publishErrorAndCancel(new FileWritingException(e));
                 }
             })
-            .doOnError(this::publishErrorAndCancel)
-            .doFinally(s -> client.close()).then();
+            .doOnError(this::publishErrorAndCancel).then()
+            .doFinally(s -> {
+                this.hasStopped = true;
+                client.close();
+            });
     }
 
     /**
@@ -119,7 +124,13 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                 logger.info(String.format("Downloading lines for locus %s", l));
                 var lines = reader.query(l.getChromosome(), l.getStart(), l.getEnd());
                 return new VcfObject((VCFHeader) reader.getHeader(), lines);
-            })).doOnError(e -> publishErrorAndCancel(new VcfStreamingException(e)))
+            })).doOnError(e -> {
+                if(this.hasStopped) {
+                    logger.info("Not publishing the streaming error because it is due to cancellation");
+                } else {
+                    publishErrorAndCancel(new VcfStreamingException(e));
+                }
+            })
         );
     }
 
