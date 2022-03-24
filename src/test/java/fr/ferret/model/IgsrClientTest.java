@@ -1,39 +1,35 @@
 package fr.ferret.model;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import fr.ferret.model.utils.FileWriter;
+import fr.ferret.model.utils.VCFHeaderExt;
+import fr.ferret.model.vcf.IgsrClient;
+import fr.ferret.utils.Resource;
+import htsjdk.variant.variantcontext.Allele;
+import htsjdk.variant.vcf.VCFFileReader;
+import htsjdk.variant.vcf.VCFHeader;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-import fr.ferret.model.vcf.IgsrClient;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import fr.ferret.controller.settings.Phases1KG;
-import fr.ferret.model.utils.FileWriter;
-import fr.ferret.model.utils.VCFHeaderExt;
-import fr.ferret.utils.Resource;
-import htsjdk.variant.variantcontext.Allele;
-import htsjdk.variant.vcf.VCFFileReader;
-import htsjdk.variant.vcf.VCFHeader;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class IgsrClientTest {
-    private final String chr = "1";
-    private final int start = 114514;
-    private final int end = 196194913;
-    private final Phases1KG phase = Phases1KG.V3;
-    private final String vcfPath = "src/test/resources/chr1-africans-phase3.vcf.gz";
-    private final IgsrClient igsrClient = new IgsrClient(vcfPath);
+    private final String chr = "3";
+    private final int start = 46370804;
+    private final int end = 46370880;
+    private final Phase1KG phase = new Phase1KG("phase3", "Phase 3");
+    private final String vcfPath = "src/test/resources/1kg/phase3/CCR5-Europeans.vcf.gz";
 
     @Test
     void testBasicQuery() throws IOException {
 
+        var igsrClient = new IgsrClient(vcfPath);
         var reader = igsrClient.getReader(chr).block();
         assertNotNull(reader);
 
@@ -42,19 +38,18 @@ class IgsrClientTest {
         it.close();
         reader.close();
 
-
         assertAll(
                 // Fixed fields:
                 // #CHROM POS ID REF ALT QUAL FILTER INFO
                 // https://samtools.github.io/hts-specs/VCFv4.2.pdf
-                () -> assertEquals(196187886, fields.getStart()),
+                () -> assertEquals(46370804, fields.getStart()),
                 () -> assertEquals(".", fields.getID()),
                 // REF: Allele 2 code (missing = 'N')
-                () -> assertEquals(Allele.REF_T, fields.getReference()),
+                () -> assertEquals(Allele.REF_G, fields.getReference()),
                 // ALT: Allele 1 code (missing = '.')
                 // `<CN2>` means "Copy Number = 2"
                 // See: https://www.biostars.org/p/232205/
-                () -> assertEquals(List.of(),
+                () -> assertEquals(List.of("A"),
                         fields.getAlternateAlleles().stream().map(Allele::getDisplayString)
                                 .toList()),
                 // This position has passed all filters, so nothing fails.
@@ -62,19 +57,32 @@ class IgsrClientTest {
 
                 // The INFO field contains some key-value pairs...
                 // eg. "AF" for Allele Frequency...
-                () -> assertEquals(0.000399361, fields.getAttributeAsDouble("AF", 0)),
+                () -> assertEquals(0.338458, fields.getAttributeAsDouble("AF", 0)),
 
                 // This is how you get the info of an individual...
-                () -> assertEquals("T|T", fields.getGenotype("NA18523").getGenotypeString()));
+                () -> assertEquals("A|A", fields.getGenotype("NA20832").getGenotypeString()),
+                () -> assertEquals("G|A", fields.getGenotype("NA20826").getGenotypeString()),
+                () -> assertEquals("G|G", fields.getGenotype("NA20822").getGenotypeString()),
+                () -> assertEquals("A|G", fields.getGenotype("NA20813").getGenotypeString())
+        );
+
+        igsrClient.close();
     }
 
     @Test
     void testWriteVCFFromSample(@TempDir Path tempDir) throws IOException {
 
-        try (var reader = igsrClient.getReader(chr).block(); var it = reader.query(chr, start, end)) {
-            var selection = new ZoneSelection();
-            selection.add("AFR", List.of("MSL"));
-            var samples = Resource.getSamples(phase, selection);
+        try (var igsrClient = new IgsrClient(vcfPath)) {
+            var reader = igsrClient.getReader(chr).block();
+            var it = reader.query(chr, start, end);
+
+            var samples = Resource.getSample(phase).stream()
+                .filter(region -> "EUR".equals(region.getAbbrev()))
+                .flatMap(region -> region.getZones().stream())
+                .filter(zone -> "GBR".equals(zone.getAbbrev()))
+                .map(Zone::getPeople)
+                .findFirst().orElseThrow();
+
             var variants =
                     it.stream().map(variant -> variant.subContextFromSamples(samples)).toList();
             var oldHeader = (VCFHeader) reader.getHeader();
@@ -93,15 +101,7 @@ class IgsrClientTest {
                         () -> assertEquals(samples.size(), header.getNGenotypeSamples()),
                         // The size of contexts remains the same before and after truncation.
                         () -> assertEquals(variants.size(), tempReader.iterator().stream().count())
-                        // The wrapped method works in exactly the same way as this test case.
-                        //() -> {
-                        //    var oldContent = Files.readString(tempVcfPath);
-                        //    var newTempVCFPath = tempDir.resolve("test2.vcf");
-                        //    var newTempVCF = newTempVCFPath.toFile();
-                        //    igsrClient.exportVCFFromSamples(newTempVCF, start, end, selection)
-                        //            .blockLast();
-                        //    assertEquals(oldContent, Files.readString(newTempVCFPath));
-                        );
+                );
             }
         }
     }

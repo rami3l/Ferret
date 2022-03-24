@@ -17,7 +17,6 @@ import java.awt.*;
 @Getter
 public class GenePanel extends FieldOrFilePanel {
 
-
     /**
      * Creates the gene panel
      */

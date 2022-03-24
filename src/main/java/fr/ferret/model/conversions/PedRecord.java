@@ -17,8 +17,8 @@ public record PedRecord(String familyId, String individualId, String paternalId,
 
     public List<String> toListStrings() {
         return Stream.concat(
-                List.of(familyId, individualId, paternalId, maternalId, Integer.toString(sex),
-                        phenotype.toString()).stream(),
+                Stream.of(familyId, individualId, paternalId, maternalId, Integer.toString(sex),
+                        phenotype.toString()),
                 variants.stream().flatMap(pair -> pair.toListString().stream())).toList();
     }
 

@@ -1,9 +1,8 @@
 package fr.ferret.controller.input;
 
 import fr.ferret.controller.input.common.InputPanelController;
-import fr.ferret.controller.input.common.NeedingConversionPanelController;
 import fr.ferret.controller.state.Error;
-import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.SampleSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.utils.Resource;
 import fr.ferret.view.FerretFrame;
@@ -102,7 +101,7 @@ public class LocusPanelController extends InputPanelController {
         }
     }
 
-    private void downloadVcf(ZoneSelection populations, String chr, final int start,
+    private void downloadVcf(SampleSelection populations, String chr, final int start,
             final int end) {
         run(outFile -> {
             logger.log(Level.INFO, "Starting locus download...");

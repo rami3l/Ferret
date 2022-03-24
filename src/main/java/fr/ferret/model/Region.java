@@ -2,50 +2,58 @@ package fr.ferret.model;
 
 import lombok.Getter;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * A <strong>world region</strong> of the 1KG project. <br>
+ * It is a {@link Zone} containing other zones.<br>
  * Currently, the world regions are "All populations", "Africa", "Europe", "East asia", "America"
- * and "South asia". <br>
- * <br>
- *
- * The <strong>zones</strong> are the populations inside these world regions. For Europe it's EUR,
- * CEU, GBR, FIN, IBS and TSI.
+ * and "South asia".
  */
 @Getter
-public class Region {
-    /**
-     * The region name
-     */
-    private final String name;
-
-    /**
-     * The abbreviation of the region name
-     */
-    private final String abbrev;
+public final class Region extends Zone {
 
     /**
      * The zones (populations) of the region
      */
-    private final String[] zones;
+    private final Set<Zone> zones;
 
     /**
-     * The individuals count for each zone, respectively
-     */
-    private final int[] individualCount;
-
-    /**
-     * Creates a new Region
-     * @param name The name of the region (for translation)
+     * Creates a new Region containing {@link Zone zones}
      * @param abbrev The abbreviation of the region
      * @param zones The zones (populations) of the region
-     * @param individualCount The individuals count for each zone, respectively
      */
-    public Region(String name, String abbrev, String[] zones, int[] individualCount) {
-        this.name = name;
-        this.abbrev = abbrev;
+    public Region(String abbrev, Set<Zone> zones) {
+        super(abbrev, zones.stream().mapToInt(Zone::getNbPeople).sum());
         this.zones = zones;
-        this.individualCount = individualCount;
-        if (zones.length != individualCount.length)
-            throw new AssertionError("The zones length doesn't match the individuals count");
+        zones.forEach(zone -> zone.setRegion(this));
     }
+
+    /**
+     * Creates a Region with a given number of people, but without containing zones. It is used to
+     * represent the "All populations" option in the interface
+     *
+     * @param abbrev The abbreviation of the region
+     * @param nbPeople The population size
+     */
+    public Region(String abbrev, int nbPeople) {
+        super(abbrev, nbPeople);
+        this.zones = new HashSet<>();
+    }
+
+    /**
+     * Creates a {@link Set} of {@link Region regions} from a sample map. The keys of this map are
+     * the abbreviations of the regions, and the values are maps corresponding to the zones
+     * contained in the regions. See {@link Zone#of} for more information about these maps
+     *
+     * @param regions The sample {@link Map} to create the regions from
+     * @return The {@link Set} of regions.
+     */
+    public static Set<Region> fromSample(Map<String, Map<String, Set<String>>> regions) {
+        return regions.entrySet().stream()
+            .map(entry -> new Region(entry.getKey(), Zone.of(entry.getValue())))
+            .collect(Collectors.toSet());
+    }
+
 }

@@ -10,10 +10,10 @@ import fr.ferret.view.FerretFrame;
 public class FerretMain {
 
     public static void main(String[] args) {
+        Resource.loadConfig();
         FerretFrame frame = new FerretFrame(); // Show ferret frame
         ExceptionHandler.setFrame(frame);
         frame.setVisible(true);
-        Resource.loadConfig();
         Resource.updateAssemblyAccessVersions();
     }
 

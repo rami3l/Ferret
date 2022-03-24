@@ -3,14 +3,11 @@ package fr.ferret.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
-import java.util.Arrays;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import fr.ferret.controller.settings.HumanGenomeVersions;
 import fr.ferret.model.hgversion.HgRelease;
-import fr.ferret.model.hgversion.HgVersion;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -49,10 +46,15 @@ class HgReleaseTest {
     }
 
 
-    // TODO: This test must be changed because it reaches the server
+    /**
+     * This test is commented because it is not a real unit test (it reaches the server, and even
+     * worse, the values 25 and 39 may change over the time). It is here only to be able to test the
+     * update functionality when needed.
+     */
 
+    /*
     @Test
-    void testURL() {
+    void testAssemblyAccessVersionsUpdate() {
         var theMap = HgVersion.getLatestAssemblyAccessVersions(
             Arrays.asList(HumanGenomeVersions.HG19, HumanGenomeVersions.HG38));
         var hg37 = theMap.get(HumanGenomeVersions.HG19);
@@ -62,4 +64,5 @@ class HgReleaseTest {
         assertEquals(25, hg37.get());
         assertEquals(39, hg38.get());
     }
+    */
 }

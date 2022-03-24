@@ -1,10 +1,8 @@
 package fr.ferret.model.vcf;
 
 import com.pivovarit.function.ThrowingFunction;
-import fr.ferret.controller.exceptions.ExceptionHandler;
 import fr.ferret.controller.exceptions.VcfStreamingException;
-import fr.ferret.controller.settings.Phases1KG;
-import fr.ferret.model.ZoneSelection;
+import fr.ferret.model.SampleSelection;
 import fr.ferret.model.locus.Locus;
 import fr.ferret.model.state.PublishingStateProcessus;
 import fr.ferret.model.state.State;
@@ -31,27 +29,32 @@ import java.util.stream.Collectors;
 
 /**
  * An object representing a VCF export. It is constructed with a {@link Locus} {@link Flux}. We can
- * set a {@link ZoneSelection population filter} with the <i>setFilter</i> method. We start the
+ * set a {@link SampleSelection population filter} with the <i>setFilter</i> method. We start the
  * export with the <i>start</i> method, passing it the {@link File outFile}
  */
 public class VcfExport extends PublishingStateProcessus<Void> {
 
     private static final Logger logger = Logger.getLogger(VcfExport.class.getName());
 
+    /** When error while contacting the server, we retry several times */
     private static final int NB_RETRY = 3;
     private static final Duration RETRY_DELAY = Duration.ofMillis(500);
 
+    /**
+     * The individuals to keep in the VCF file. If null, no population filter will be performed
+     */
     private Set<String> samples;
 
     /**
-     * The phase to use for getting variants (default: selected version)
+     * The client used to download the vcf. It uses the url template for the selected phase
      */
-    private final Phases1KG phase1KG = Resource.config().getSelectedVersion();
+    private final IgsrClient client =
+        new IgsrClient(Resource.getVcfUrlTemplate(Resource.config().getSelectedPhase()));
 
     /**
      * Constructs a {@link VcfExport}. It is used to export a "distilled" VCF file from an IGSR
      * online database query.<br>
-     * Call the {@link VcfExport#setFilter(ZoneSelection)} method to filter the VCF by populations
+     * Call the {@link VcfExport#setFilter(SampleSelection)} method to filter the VCF by populations
      *
      * @param locusList The {@link List} of {@link Locus} to export in a VCF file.
      * @param outFile the output {@link File}
@@ -70,7 +73,8 @@ public class VcfExport extends PublishingStateProcessus<Void> {
                 publishState(State.written(outFile.getName()));
                 logger.info("File written");
             })
-            .doOnError(this::publishErrorAndCancel).then();
+            .doOnError(this::publishErrorAndCancel)
+            .doFinally(s -> client.close()).then();
     }
 
     /**
@@ -93,7 +97,7 @@ public class VcfExport extends PublishingStateProcessus<Void> {
      */
     private Mono<FeatureReader<VariantContext>> getReader(String chromosome) {
         // TODO: each getReader call could get into an IOException Error
-        var client =new IgsrClient(Resource.getVcfUrlTemplate(phase1KG));
+
         return Mono.defer(() -> client.getReader(chromosome))
             .doOnSubscribe(s -> {
                 publishState(State.downloadingHeader(chromosome));
@@ -148,12 +152,10 @@ public class VcfExport extends PublishingStateProcessus<Void> {
      * @param selection the selected populations
      * @return this {@link VcfExport}
      */
-    public VcfExport setFilter(ZoneSelection selection) {
-        try {
-            samples = Resource.getSamples(phase1KG, selection);
-        } catch (IOException e) {
-            // TODO: this access to ExceptionHandler shouldn't be in the model part
-            ExceptionHandler.ressourceAccessError(e);
+    public VcfExport setFilter(SampleSelection selection) {
+        // If the selection.isAllSelected() is true, there is no need to filter the vcf
+        if(!selection.isAllSelected()) {
+            samples = selection.getSample();
         }
         return this;
     }

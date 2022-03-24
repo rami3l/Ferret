@@ -120,7 +120,7 @@ public class GenePanelController extends NeedingConversionPanelController {
 
     @Override
     protected boolean confirmContinue(String notFound) {
-        return ExceptionHandler.variantsNotFoundMessage(notFound);
+        return ExceptionHandler.genesNotFoundMessage(notFound);
     }
 
     @Override

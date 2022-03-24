@@ -1,17 +1,12 @@
 package fr.ferret.view.panel;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
+
 import fr.ferret.model.Region;
+import fr.ferret.model.Zone;
 import fr.ferret.utils.Resource;
 import lombok.Getter;
 
@@ -26,6 +21,12 @@ public class RegionPanel extends JPanel {
      */
     @Getter
     private final List<ZonesPanel> regions = new ArrayList<>();
+    private ZonesPanel allPopulations;
+
+    public boolean isAllPopulationSelected(){
+        return allPopulations.getCheckBoxes().keySet().stream().findFirst()
+            .map(JCheckBox::isSelected).orElse(false);
+    }
 
     /**
      * Inits a new RegionPanel
@@ -40,8 +41,7 @@ public class RegionPanel extends JPanel {
     }
 
     /**
-     * Reloads the contents of the panel <br>
-     * Called when the Ferret settings are modified
+     * Reloads the contents of the panel. <br> Called when the Ferret settings are modified
      */
     public void reloadPanel() {
         removeAll();
@@ -60,14 +60,21 @@ public class RegionPanel extends JPanel {
         add(label, BorderLayout.NORTH);
 
         // Container for zone selection panels
+        // TODO: adapt this to work with any number of regions
         JPanel container = new JPanel(new GridLayout(2, 3));
 
-        Region[] ferretRegions = Resource.config().getSelectedVersion().getRegions();
-        for (int i = 0; i < ferretRegions.length; i++) {
-            ZonesPanel panel = new ZonesPanel(ferretRegions[i], i >= 3 ? 7 : 9);
+        var phaseRegions = Resource.getSample(Resource.config().getSelectedPhase());
+
+        var allPopulationRegion = new Region("ALL", phaseRegions.stream().mapToInt(Region::getNbPeople).sum());
+        allPopulations = new ZonesPanel(allPopulationRegion, 9, true);
+        container.add(RegionPanel.this.allPopulations);
+
+        phaseRegions.forEach(region -> {
+            // TODO: adapt the number of lines → we should use the maximum number of zones for the regions of the current row
+            ZonesPanel panel = new ZonesPanel(region, 9, false);
             regions.add(panel);
             container.add(panel);
-        }
+        });
 
         add(container, BorderLayout.CENTER);
     }
@@ -75,8 +82,7 @@ public class RegionPanel extends JPanel {
 
 
     /**
-     * A JPanel containing a {@link Region} <br>
-     * Contains all the selectable zones of the region
+     * A JPanel containing a {@link Region} <br> Contains all the selectable zones of the region
      */
     @Getter
     public class ZonesPanel extends JPanel {
@@ -87,7 +93,7 @@ public class RegionPanel extends JPanel {
         /**
          * The checkboxes for each zone of the region
          */
-        private final JCheckBox[] checkBoxes;
+        private final Map<JCheckBox, Zone> checkBoxes = new LinkedHashMap<>();
 
         /**
          * Creates a panel for the given region
@@ -95,54 +101,33 @@ public class RegionPanel extends JPanel {
          * @param region The region
          * @param lines The number of lines of the layout, to keep coherence with other displayed
          *        SubPanels
+         * @param isGlobal Boolean indicating that this zone panel is the "All population" one<br>
+         * TODO: should we use "ALL".equals(region.getAbbrev()) instead of isGlobal ?
          */
-        public ZonesPanel(Region region, int lines) {
+        public ZonesPanel(Region region, int lines,  boolean isGlobal) {
 
             this.region = region;
             this.setLayout(new GridLayout(lines, 1));
 
             // Zone panel title
-            JLabel label = new JLabel(
-                    Resource.getTextElement("region." + region.getName().toLowerCase(Locale.ROOT)));
+            JLabel label = new JLabel(Resource.getTextElement("region." + region.getAbbrev()));
             label.setFont(Resource.ZONE_LABEL_FONT);
             label.setForeground(Resource.ZONE_LABEL_COLOR);
             add(label);
 
-            // Zones selection
-            this.checkBoxes = new JCheckBox[region.getZones().length];
+            var regionCheckbox = addCheckbox(region, true);
+            region.getZones().forEach(zone -> addCheckbox(zone, false));
 
-            for (int i = 0; i < checkBoxes.length; i++) {
+            // When we select the first checkbox (the region checkbox) others are disabled.
+            regionCheckbox.addActionListener(action -> {
+                boolean state = !regionCheckbox.isSelected();
+                setCheckBoxesState(state, false);
 
-                int nbIndividuals = region.getIndividualCount()[i];
-
-                // Checkbox created with its label
-                checkBoxes[i] = new JCheckBox(region.getZones()[i] + " "
-                        + Resource.getTextElement("region." + region.getZones()[i]) + " (n="
-                        + nbIndividuals + ")");
-
-                // Checkbox font (bold for the first checkbox)
-                checkBoxes[i].setFont(new Font(checkBoxes[i].getFont().getFontName(),
-                        i == 0 ? Font.BOLD : Font.PLAIN, 14));
-
-                // Checkbox is added to the panel
-                add(checkBoxes[i]);
-
-                // If there is no individual for this zone, the checkbox is disabled.
-                if (nbIndividuals == 0) {
-                    checkBoxes[i].setEnabled(false);
-                }
-            }
-
-            // When we select the first checkbox (the All zone population one) others are disabled.
-            checkBoxes[0].addActionListener(action -> {
-                boolean state = !checkBoxes[0].isSelected();
-                setCheckBoxesState(1, state);
-
-                // If we selected the All population checkboxes, all others checkboxes are disabled
-                if (region == Resource.config().getSelectedVersion().getRegions()[0]) {
+                // If we selected the "All population" checkbox, all others checkboxes are disabled
+                if (isGlobal) {
                     for (ZonesPanel panel : RegionPanel.this.regions) {
                         if (panel != this) {
-                            panel.setCheckBoxesState(0, state);
+                            panel.setCheckBoxesState(state, true);
                         }
                     }
                 }
@@ -150,21 +135,36 @@ public class RegionPanel extends JPanel {
         }
 
         /**
-         * Changes the states of all zone checkboxes between start and checkBoxes.length
-         * 
-         * @param start The start offset
-         * @param state The new selected state of the checkboxes
+         * Creates a checkbox for the given {@link Zone} (or {@link Region}) and makes its label
+         * bold according to the bold boolean argument
          */
-        private void setCheckBoxesState(int start, boolean state) {
-            for (int i = start; i < checkBoxes.length; i++) {
-                // We change the state of the checkbox only if there is individuals for the
-                // corresponding zone (else we leave it disabled)
-                if (region.getIndividualCount()[i] != 0) {
-                    checkBoxes[i].setEnabled(state);
+        private JCheckBox addCheckbox(Zone zone, boolean bold) {
+
+            // creates the checkbox and setting his font
+            var checkbox = new JCheckBox(
+                zone.getAbbrev() + " " + zone.getName() + " (n=" + zone.getNbPeople() + ")");
+            checkbox.setFont(new Font(checkbox.getFont().getFontName(), bold ? Font.BOLD : Font.PLAIN, 14));
+
+            // adds the checkbox to the checkBoxes map and the panel, then returns it
+            checkBoxes.put(checkbox, zone);
+            add(checkbox);
+            return checkbox;
+        }
+
+        /**
+         * Changes the state of the checkboxes in this panel
+         *
+         * @param state The new selected state of the checkboxes
+         * @param regionsAlso Boolean indicating if the state change must also be applied to the regions
+         */
+        private void setCheckBoxesState(boolean state, boolean regionsAlso) {
+            checkBoxes.forEach((checkBox, zone) -> {
+                if (regionsAlso || !(zone instanceof Region)) {
+                    checkBox.setEnabled(state);
+                    checkBox.setSelected(false);
+                    checkBox.updateUI();
                 }
-                checkBoxes[i].setSelected(false);
-                checkBoxes[i].updateUI();
-            }
+            });
         }
     }
 }

@@ -1,6 +1,5 @@
 package fr.ferret.view.panel.inputs;
 
-import fr.ferret.controller.BrowseFileButtonListener;
 import fr.ferret.utils.Resource;
 import lombok.Getter;
 
@@ -17,9 +16,6 @@ import java.awt.*;
  */
 @Getter
 public class VariantPanel extends FieldOrFilePanel {
-
-    private JTextField variantIdField;
-    private transient BrowseFileButtonListener fileSelector;
 
     /**
      * Creates the variant panel
