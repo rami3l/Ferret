@@ -115,7 +115,11 @@ public class GuiUtils {
         public void approveSelection() {
             if (getSelectedFile() == null)
                 return;
+            // If the file contains a known extension (vcf, frq, map, ped, info), we remove it
             var filename = removeExtensionIfKnown(getSelectedFile().getPath());
+            setSelectedFile(new File(filename));
+            // We check if some files may be overwritten (E.g: if we are in ALL output type mode,
+            // we check for `filename + ext`, for ext in ['.frq', '.map', '.info', '.ped'])
             var outputType = Resource.config().getSelectedOutputType();
             var existingFiles = outputType.extensions().stream()
                 .map(ext -> new File(filename + "." + ext))
@@ -123,7 +127,7 @@ public class GuiUtils {
                 .map(File::getName)
                 .toList();
             if (!existingFiles.isEmpty()) {
-                // If the file exists, we open a confirmation dialog
+                // If some files are going to be overwritten, we open a confirmation dialog
                 int result = JOptionPane.showConfirmDialog(this,
                         Resource.getTextElement("run.fileExistingMsg", String.join(", ", existingFiles)),
                         Resource.getTextElement("run.fileExistingTitle"),
