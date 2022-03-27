@@ -38,8 +38,7 @@ public class VariantPanelController extends FieldOrIdPanelController {
         return new VariantConversion(variantList, hgVersion);
     }
 
-
-
+    // TODO: refacto: create one super method in FieldOrIdPanelController
     protected void displayError(boolean snpListInputted, boolean snpFileImported,
         boolean snpFileError, boolean snpFileExtensionError, boolean invalidCharacter,
         boolean popSelected, boolean validWindowSizeEntered) {

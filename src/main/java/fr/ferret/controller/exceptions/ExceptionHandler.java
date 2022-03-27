@@ -60,6 +60,11 @@ public class ExceptionHandler {
         new Error(f).append("error.noIdFound").show();
     }
 
+    public static void noLocusFoundError() {
+        logger.log(Level.WARNING, "The conversion failed for all entered elements");
+        new Error(f).append("error.noLocusFound").show();
+    }
+
     public static void vcfStreamingError(Throwable throwable) {
         logger.log(Level.WARNING, "VCF streaming error", throwable);
         new Error(f).append("error.vcfStreaming").show();

@@ -37,14 +37,17 @@ public abstract class NeedingConversionPanelController extends InputPanelControl
 
             // Starts the processus and subscribes to its state
             conversion.start().doOnComplete(() -> {
-                if ("".equals(notFound.get()) || confirmContinue(notFound.get())) {
-                    var locusList = conversion.getResult();
+                var locusList = conversion.getResult();
+                if (!locusList.isEmpty() && ("".equals(notFound.get()) || confirmContinue(notFound.get()))) {
                     if (windowSize != 0)
                         locusList = locusList.stream().map(l -> l.withWindow(windowSize)).toList();
                     downloadVcf(populations, outFile, locusList, download);
                 } else {
                     download.cancel();
                     logger.log(Level.INFO, "Download to {0} cancelled", outFile.getName());
+                    if(locusList.isEmpty()) {
+                        ExceptionHandler.noLocusFoundError();
+                    }
                 }
             }).doOnError(e -> {
                 logger.log(Level.WARNING, "Error while downloading or writing", e);

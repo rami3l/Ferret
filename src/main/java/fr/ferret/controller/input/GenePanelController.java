@@ -39,7 +39,7 @@ public class GenePanelController extends FieldOrIdPanelController {
         return new GeneConversion(geneList, assemblyAccVer);
     }
 
-
+    // TODO: refacto: create one super method in FieldOrIdPanelController
     protected void displayError(boolean geneListInputted, boolean geneFileImported,
             boolean geneFileError, boolean geneFileExtensionError, boolean invalidCharacter,
             boolean popSelected, boolean validWindowSizeEntered) {
