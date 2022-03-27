@@ -69,7 +69,8 @@ public class RegionPanel extends JPanel {
         allPopulations = new ZonesPanel(allPopulationRegion, 9, true);
         container.add(RegionPanel.this.allPopulations);
 
-        phaseRegions.forEach(region -> {
+        // We alphabetically sort displayed regions
+        phaseRegions.stream().sorted(Comparator.comparing(Zone::getAbbrev)).forEach(region -> {
             // TODO: adapt the number of lines → we should use the maximum number of zones for the regions of the current row
             ZonesPanel panel = new ZonesPanel(region, 9, false);
             regions.add(panel);
@@ -116,7 +117,9 @@ public class RegionPanel extends JPanel {
             add(label);
 
             var regionCheckbox = addCheckbox(region, true);
-            region.getZones().forEach(zone -> addCheckbox(zone, false));
+            // We alphabetically sort displayed zones
+            region.getZones().stream().sorted(Comparator.comparing(Zone::getName))
+                .forEach(zone -> addCheckbox(zone, false));
 
             // When we select the first checkbox (the region checkbox) others are disabled.
             regionCheckbox.addActionListener(action -> {
