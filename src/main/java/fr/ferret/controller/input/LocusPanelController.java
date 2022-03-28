@@ -72,7 +72,9 @@ public class LocusPanelController extends InputPanelController {
             } catch (NumberFormatException ex) {
                 endSelected = false;
             }
-            startEndValid = (endPos >= startPos);
+
+            // If the startPos or the endPos is invalid, we shouldn't display "endPos must be > startPos"
+            startEndValid = (!startSelected || !endSelected || endPos >= startPos);
 
             // Checks that given end position is not greater than chromosome end position
             if (startSelected && endSelected && startEndValid) {
