@@ -56,7 +56,7 @@ public abstract class InputPanelController {
      * @return A list of the selected zones (using the zones codes of the {@link Region} class)
      */
     protected SampleSelection getSelectedPopulations() {
-        frame.getRegionPanel().setBorder(null);
+        frame.getRegionPanel().resetBorders();
         var selection = new SampleSelection();
         // We add to the selection all the zones associated with a selected checkbox
         if(frame.getRegionPanel().isAllPopulationSelected()) {

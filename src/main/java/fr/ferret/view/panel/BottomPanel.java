@@ -1,8 +1,6 @@
 package fr.ferret.view.panel;
 
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.LayoutManager;
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import javax.swing.JButton;
@@ -20,14 +18,12 @@ public class BottomPanel extends JPanel {
 
     /** The panel containing the states of current downloads */
     private final JPanel statesPanel;
-    private final LayoutManager layout;
     private final java.util.List<StatePanel> states = new ArrayList<>();
 
     public BottomPanel(FerretFrame frame) {
 
         // TODO: update the layout (add contraints ?) to have a better disposition of panels
-        layout = new GridBagLayout();
-        this.setLayout(layout);
+        this.setLayout(new GridBagLayout());
 
         // Button to launch Ferret action
         runButton = generateRunButton();
@@ -41,19 +37,19 @@ public class BottomPanel extends JPanel {
     }
 
     private JButton generateRunButton() {
-        JButton runButton = new JButton(Resource.getTextElement("run.button"));
-        runButton.setPreferredSize(new Dimension(300, 60));
-        runButton.setBackground(Resource.BUTTON_COLOR);
-        return runButton;
+        JButton button = new JButton(Resource.getTextElement("run.button"));
+        button.setPreferredSize(new Dimension(300, 60));
+        button.setBackground(Resource.BUTTON_COLOR);
+        return button;
     }
 
     private JPanel generateStatesPanel() {
-        var states = new JPanel();
-        states.setLayout(new GridBagLayout());
-        states.setAlignmentX(LEFT_ALIGNMENT);
+        var panel = new JPanel();
+        panel.setLayout(new GridBagLayout());
+        panel.setAlignmentX(LEFT_ALIGNMENT);
         // TODO: find a way to add a scrollbar when there are too many downloads at the same time
         // states.setAutoscrolls(true);
-        return states;
+        return panel;
     }
 
 

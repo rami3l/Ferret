@@ -35,9 +35,13 @@ public class RegionPanel extends JPanel {
 
         // Panel settings
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20));
+        resetBorders();
 
         initPanel();
+    }
+
+    public void resetBorders() {
+        setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20));
     }
 
     /**

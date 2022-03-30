@@ -46,7 +46,7 @@ public class VariantPanelController extends FieldOrIdPanelController {
         var error = new Error(frame).append("run.fixerrors");
 
         var idSelector = panel.getInputField();
-        var runButton = panel.getFileSelector().getRunButton();
+        var runButton = panel.getFileSelector().getBrowseButton();
 
         if (!snpListInputted && !snpFileImported) {
             error.append("run.selectvari").highlight(idSelector, runButton);

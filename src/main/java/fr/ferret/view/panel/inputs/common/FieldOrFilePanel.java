@@ -2,6 +2,7 @@ package fr.ferret.view.panel.inputs.common;
 
 import fr.ferret.controller.BrowseFileButtonListener;
 import fr.ferret.utils.Resource;
+import fr.ferret.view.HighlightableTextField;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.Getter;
 
@@ -15,7 +16,7 @@ import java.awt.*;
 public class FieldOrFilePanel extends InputPanel {
 
     private JTextField inputField;
-    protected JTextField bpField;
+    protected HighlightableTextField bpField;
     private transient BrowseFileButtonListener fileSelector;
 
     protected FieldOrFilePanel(String titleTextElement, String helpTextElement) {
@@ -54,7 +55,7 @@ public class FieldOrFilePanel extends InputPanel {
         inputField = new JTextField();
 
         // Including variants (placed in a sub panel)
-        bpField = new JTextField();
+        bpField = new HighlightableTextField(2);
         JPanel includingVariantSubPanel = includingVariantsPanel();
 
         // Or Label

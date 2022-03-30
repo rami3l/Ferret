@@ -6,7 +6,6 @@ import fr.ferret.model.utils.FileReader;
 import fr.ferret.view.FerretFrame;
 import fr.ferret.view.panel.inputs.common.FieldOrFilePanel;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,10 +32,8 @@ public abstract class FieldOrIdPanelController extends NeedingConversionPanelCon
     public void validateInfoAndRun() {
         // Reset the borders
         panel.getInputField().setBorder(null);
-        panel.getFileSelector().getRunButton().setBorder(null);
+        panel.getFileSelector().getBrowseButton().setBorder(null);
         panel.getBpField().setBorder(null);
-
-        JTextField inputField = panel.getInputField();
 
         // Selected populations for the model
         var populations = getSelectedPopulations();
@@ -45,7 +42,7 @@ public abstract class FieldOrIdPanelController extends NeedingConversionPanelCon
         // List which will contain the genes (from field or file)
         List<String> enteredElements = new ArrayList<>();
 
-        String elements = inputField.getText();
+        String elements = panel.getInputField().getText();
 
         // Did the user input a list of gene
         boolean areElementsEntered = elements.length() > 0;
