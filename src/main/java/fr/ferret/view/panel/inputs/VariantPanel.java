@@ -1,5 +1,6 @@
 package fr.ferret.view.panel.inputs;
 
+import fr.ferret.view.panel.inputs.common.FieldOrFilePanel;
 import lombok.Getter;
 
 /**

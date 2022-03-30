@@ -4,7 +4,7 @@ import fr.ferret.controller.exceptions.FileContentException;
 import fr.ferret.controller.exceptions.FileFormatException;
 import fr.ferret.model.utils.FileReader;
 import fr.ferret.view.FerretFrame;
-import fr.ferret.view.panel.inputs.FieldOrFilePanel;
+import fr.ferret.view.panel.inputs.common.FieldOrFilePanel;
 
 import javax.swing.*;
 import java.io.IOException;
