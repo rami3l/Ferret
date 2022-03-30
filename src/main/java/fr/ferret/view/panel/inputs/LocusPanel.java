@@ -6,13 +6,10 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+
 import fr.ferret.utils.Resource;
+import fr.ferret.view.panel.inputs.common.InputPanel;
 import fr.ferret.view.utils.GuiUtils;
 import lombok.Getter;
 
@@ -21,7 +18,7 @@ import lombok.Getter;
  * Selection of the chromosome and genes parameters
  */
 @Getter
-public class LocusPanel extends JPanel {
+public class LocusPanel extends InputPanel {
 
     private JComboBox<String> chromosomeList;
     private JTextField inputStart;
@@ -40,29 +37,14 @@ public class LocusPanel extends JPanel {
         JPanel inputPanel = generateInputPanel();
 
         /* --- Help section --- */
-        JTextPane helpPane = new JTextPane();
-        helpPane.setContentType("text/html");
-        helpPane.setText(Resource.getTextElement("locus.help"));
-        helpPane.setBackground(new Color(0, 0, 0, 0));
-        helpPane.setEditable(false);
-        helpPane.setBorder(BorderFactory.createLineBorder(Resource.HELP_BORDER_COLOR, 2));
-        StyledDocument styledHelpPane = helpPane.getStyledDocument();
-        // Set the font
-        MutableAttributeSet attrs = helpPane.getInputAttributes();
-        StyleConstants.setFontFamily(attrs, Resource.HELP_LABEL_FONT.getFamily());
-        StyleConstants.setFontSize(attrs, Resource.HELP_LABEL_FONT.getSize());
-        styledHelpPane.setCharacterAttributes(0, styledHelpPane.getLength() + 1, attrs, false);
-        // Center the text
-        SimpleAttributeSet center = new SimpleAttributeSet();
-        StyleConstants.setAlignment(center, StyleConstants.ALIGN_CENTER);
-        styledHelpPane.setParagraphAttributes(0, styledHelpPane.getLength() + 1, center, false);
+        var help = generateHelpSection("locus.help");
 
         // Adds the 3 parts defined above to the contentPanel
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BorderLayout());
         contentPanel.add(titleLabel, BorderLayout.NORTH);
         contentPanel.add(inputPanel, BorderLayout.CENTER);
-        contentPanel.add(helpPane, BorderLayout.SOUTH);
+        contentPanel.add(help, BorderLayout.SOUTH);
 
         // Sets the borders and adds the content to the panel
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));

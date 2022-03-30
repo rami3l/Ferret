@@ -1,14 +1,7 @@
 package fr.ferret.view.panel.inputs;
 
-import fr.ferret.utils.Resource;
+import fr.ferret.view.panel.inputs.common.FieldOrFilePanel;
 import lombok.Getter;
-
-import javax.swing.*;
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import java.awt.*;
 
 /**
  * The gene panel of Ferret <br>

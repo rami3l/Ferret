@@ -3,7 +3,6 @@ package fr.ferret.controller;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileFilter;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,7 +25,7 @@ public class BrowseFileButtonListener implements ActionListener {
     /**
      * The listened button
      */
-    private final JButton runButton;
+    private final JButton browseButton;
     /**
      * The status label
      */
@@ -40,22 +39,22 @@ public class BrowseFileButtonListener implements ActionListener {
 
     /**
      * @param panel The panel owning the button
-     * @param runButton The button to listen
+     * @param browseButton The button to listen
      * @param selectedFileLabel The status label
      */
-    public BrowseFileButtonListener(JPanel panel, JButton runButton, JLabel selectedFileLabel) {
+    public BrowseFileButtonListener(JPanel panel, JButton browseButton, JLabel selectedFileLabel) {
         this.panel = panel;
-        this.runButton = runButton;
+        this.browseButton = browseButton;
         this.selectedFileLabel = selectedFileLabel;
         this.selectedFileDefaultText = selectedFileLabel.getText();
-        runButton.addActionListener(this);
+        browseButton.addActionListener(this);
         var description = Resource.getTextElement("input.extensionsDescription");
         extensionFilter = new FileNameExtensionFilter(description, Resource.inputExtensions);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        var file = GuiUtils.chooseFile(runButton, false, extensionFilter);
+        var file = GuiUtils.chooseFile(browseButton, false, extensionFilter);
         file.ifPresent(f -> {
             selectedFile = f;
             selectedFileLabel.setText(f.getAbsolutePath());

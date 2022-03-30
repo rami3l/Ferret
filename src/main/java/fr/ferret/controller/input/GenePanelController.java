@@ -45,7 +45,7 @@ public class GenePanelController extends FieldOrIdPanelController {
             boolean popSelected, boolean validWindowSizeEntered) {
 
         JComponent inputField = panel.getInputField();
-        JComponent runButton = panel.getFileSelector().getRunButton();
+        JComponent runButton = panel.getFileSelector().getBrowseButton();
 
         var error = new Error(frame).append("run.fixerrors");
 
