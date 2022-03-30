@@ -55,7 +55,7 @@ public class FieldOrFilePanel extends InputPanel {
         inputField = new JTextField();
 
         // Including variants (placed in a sub panel)
-        bpField = new HighlightableTextField(2);
+        bpField = new HighlightableTextField(4);
         JPanel includingVariantSubPanel = includingVariantsPanel();
 
         // Or Label
