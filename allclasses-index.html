@@ -93,7 +93,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Main Ferret class displaying the FerretFrame</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/inputs/FieldOrFilePanel.html" title="class in fr.ferret.view.panel.inputs">FieldOrFilePanel</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/inputs/common/FieldOrFilePanel.html" title="class in fr.ferret.view.panel.inputs.common">FieldOrFilePanel</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">A panel allowing the user to input a text or a file</div>
 </div>
@@ -146,18 +146,26 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/hgversion/HgVersion.html" title="class in fr.ferret.model.hgversion">HgVersion</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab3"><a href="fr/ferret/controller/settings/HumanGenomeVersions.html" title="enum class in fr.ferret.controller.settings">HumanGenomeVersions</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab3">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/HighlightableTextField.html" title="class in fr.ferret.view">HighlightableTextField</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">This class encapsulate a <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.desktop/javax/swing/JTextField.html" title="class or interface in javax.swing" class="external-link"><code>JTextField</code></a> so that you can change highlight its border without
+ destroying the border of the JTextField <br>
+ TODO: we should use it for others text field than bpField, but it needs to fix the auto size issue</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab3"><a href="fr/ferret/controller/settings/HumanGenomeVersions.html" title="enum class in fr.ferret.controller.settings">HumanGenomeVersions</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab3">
 <div class="block">Supported versions of the genes</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/vcf/IgsrClient.html" title="class in fr.ferret.model.vcf">IgsrClient</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/vcf/IgsrClient.html" title="class in fr.ferret.model.vcf">IgsrClient</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Simple query client for the IGSR (International Genome Sample Resource).</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab4"><a href="fr/ferret/model/conversions/InfoRecord.html" title="class in fr.ferret.model.conversions">InfoRecord</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab4">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab4"><a href="fr/ferret/model/conversions/InfoRecord.html" title="class in fr.ferret.model.conversions">InfoRecord</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab4">
 <div class="block">A single line in a <code>.info</code> file.</div>
 </div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/inputs/common/InputPanel.html" title="class in fr.ferret.view.panel.inputs.common">InputPanel</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/input/common/InputPanelController.html" title="class in fr.ferret.controller.input.common">InputPanelController</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The base for input panel controllers (locus, gene and variant panel controllers)</div>
@@ -239,76 +247,72 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Listens events of the run button and sends input data to the model</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/RunPanel.html" title="class in fr.ferret.view.panel">RunPanel</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
-<div class="block">The panel with the run button of Ferret</div>
-</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/SampleSelection.html" title="class in fr.ferret.model">SampleSelection</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/header/ferret/SettingsFrame.html" title="class in fr.ferret.view.panel.header.ferret">SettingsFrame</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/SampleSelection.html" title="class in fr.ferret.model">SampleSelection</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/header/ferret/SettingsFrame.html" title="class in fr.ferret.view.panel.header.ferret">SettingsFrame</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The ferret settings frame</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/settings/SettingsFrameController.html" title="class in fr.ferret.controller.settings">SettingsFrameController</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/settings/SettingsFrameController.html" title="class in fr.ferret.controller.settings">SettingsFrameController</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Groups all controllers for the <a href="fr/ferret/view/panel/header/ferret/SettingsFrame.html" title="class in fr.ferret.view.panel.header.ferret"><code>SettingsFrame</code></a></div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/settings/SettingsFrameController.CancelButtonListener.html" title="class in fr.ferret.controller.settings">SettingsFrameController.CancelButtonListener</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/settings/SettingsFrameController.CancelButtonListener.html" title="class in fr.ferret.controller.settings">SettingsFrameController.CancelButtonListener</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Cancel button click listener</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/settings/SettingsFrameController.MafInputListener.html" title="class in fr.ferret.controller.settings">SettingsFrameController.MafInputListener</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/settings/SettingsFrameController.MafInputListener.html" title="class in fr.ferret.controller.settings">SettingsFrameController.MafInputListener</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Maf inputs listener</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/settings/SettingsFrameController.SaveButtonListener.html" title="class in fr.ferret.controller.settings">SettingsFrameController.SaveButtonListener</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/settings/SettingsFrameController.SaveButtonListener.html" title="class in fr.ferret.controller.settings">SettingsFrameController.SaveButtonListener</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Save button click listener</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/state/State.html" title="class in fr.ferret.model.state">State</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/state/State.html" title="class in fr.ferret.model.state">State</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">An object representing the state of a processus (a download for example).</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab3"><a href="fr/ferret/model/state/State.States.html" title="enum class in fr.ferret.model.state">State.States</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/StatePanel.html" title="class in fr.ferret.view.panel">StatePanel</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/UpdateChecker.html" title="class in fr.ferret.controller">UpdateChecker</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab3"><a href="fr/ferret/model/state/State.States.html" title="enum class in fr.ferret.model.state">State.States</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/StatePanel.html" title="class in fr.ferret.view.panel">StatePanel</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/UpdateChecker.html" title="class in fr.ferret.controller">UpdateChecker</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">An update checker for Ferret <br>
  Not tested</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/header/ferret/UpdateFrame.html" title="class in fr.ferret.view.panel.header.ferret">UpdateFrame</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/utils/Utils.html" title="class in fr.ferret.utils">Utils</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/header/ferret/UpdateFrame.html" title="class in fr.ferret.view.panel.header.ferret">UpdateFrame</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/locus/VariantConversion.html" title="class in fr.ferret.model.locus">VariantConversion</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/utils/Utils.html" title="class in fr.ferret.utils">Utils</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/utils/VariantConverter.html" title="class in fr.ferret.model.utils">VariantConverter</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/locus/VariantConversion.html" title="class in fr.ferret.model.locus">VariantConversion</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/inputs/VariantPanel.html" title="class in fr.ferret.view.panel.inputs">VariantPanel</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/utils/VariantConverter.html" title="class in fr.ferret.model.utils">VariantConverter</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/view/panel/inputs/VariantPanel.html" title="class in fr.ferret.view.panel.inputs">VariantPanel</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The variant panel of Ferret <br>
  Selection of the gene variants parameters</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/input/VariantPanelController.html" title="class in fr.ferret.controller.input">VariantPanelController</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/controller/input/VariantPanelController.html" title="class in fr.ferret.controller.input">VariantPanelController</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">The <a href="fr/ferret/view/panel/inputs/VariantPanel.html" title="class in fr.ferret.view.panel.inputs"><code>VariantPanel</code></a> controller</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/vcf/VcfExport.html" title="class in fr.ferret.model.vcf">VcfExport</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/vcf/VcfExport.html" title="class in fr.ferret.model.vcf">VcfExport</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">An object representing a VCF export.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab5"><a href="fr/ferret/controller/exceptions/VcfStreamingException.html" title="class in fr.ferret.controller.exceptions">VcfStreamingException</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab5">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/utils/VcfUtils.html" title="class in fr.ferret.model.utils">VcfUtils</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/utils/XmlParser.html" title="class in fr.ferret.model.utils">XmlParser</a></div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/vcf/VcfObject.html" title="class in fr.ferret.model.vcf">VcfObject</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/Zone.html" title="class in fr.ferret.model">Zone</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab5"><a href="fr/ferret/controller/exceptions/VcfStreamingException.html" title="class in fr.ferret.controller.exceptions">VcfStreamingException</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab5">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/utils/VcfUtils.html" title="class in fr.ferret.model.utils">VcfUtils</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/utils/XmlParser.html" title="class in fr.ferret.model.utils">XmlParser</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">&nbsp;</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="fr/ferret/model/Zone.html" title="class in fr.ferret.model">Zone</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">A <strong>world zone</strong> of the 1KG project.</div>
 </div>
 </div>
