@@ -17,6 +17,8 @@ import lombok.Getter;
  */
 @Getter
 public class BrowseFileButtonListener implements ActionListener {
+
+    private static final int FILE_DISPLAY_MAX_LENGTH = 22;
     private final FileNameExtensionFilter extensionFilter;
     /**
      * The panel containing the button
@@ -56,8 +58,13 @@ public class BrowseFileButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         var file = GuiUtils.chooseFile(browseButton, false, extensionFilter);
         file.ifPresent(f -> {
+            var filename = f.getName();
+            if(filename.length()>FILE_DISPLAY_MAX_LENGTH) {
+                filename = filename.substring(0, FILE_DISPLAY_MAX_LENGTH - 3) + "...";
+            }
             selectedFile = f;
-            selectedFileLabel.setText(f.getAbsolutePath());
+            selectedFileLabel.setText(filename);
+            selectedFileLabel.setToolTipText(f.getAbsolutePath());
         });
     }
 

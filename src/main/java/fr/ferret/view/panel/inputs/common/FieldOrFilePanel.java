@@ -76,6 +76,7 @@ public class FieldOrFilePanel extends InputPanel {
         JButton resetButton = new JButton();
         Resource.getIcon("/img/cancel.png", 20, 20)
             .ifPresentOrElse(resetButton::setIcon, () -> resetButton.setText("X"));
+        resetButton.setToolTipText(Resource.getTextElement("input.unselectFile"));
         resetButton.setPreferredSize(new Dimension(25, 25));
         resetButton.addActionListener(actionEvent -> fileSelector.reset());
 
