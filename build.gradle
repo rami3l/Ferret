@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'fr.ferret'
-version = '3.0.0-alpha2'
+version = '3.0.0-alpha3'
 description = 'A user-friendly tool to extract data from the 1000 Genomes Project.'
 
 repositories {
